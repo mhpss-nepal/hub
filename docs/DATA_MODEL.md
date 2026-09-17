@@ -27,8 +27,8 @@ observed in the current reporting workbook rather than from the manual.
 | A · Date | `dateAD` | Gregorian. The field the system sorts and groups on. |
 | — | `dateBS` | **Addition.** Bikram Sambat as reported, typed. Not converted automatically — see below. |
 | B · Implementing agency | `org`, `orgOther` | Coded. The manual says B is the agency implementing the activity, *rather than the donor*. `OTHER` requires a name and is flagged for reconciliation. |
-| C · Other organisation(s) with whom the activity is done | *(not yet a field)* | The manual's item C is the joint-activity partner. Two partners are written that way in the current reports. A `partners` field is the next schema change; until then the names sit in `codes.js` against the organisation. |
-| — | `donor` | **Addition.** A funding tag. Donor has no IASC item. It distinguishes one organisation reporting under two funding lines from two organisations. One record in the current reports carries two tags; allowing several is a pending schema change. |
+| C · Other organisation(s) with whom the activity is done | `partners` | The manual's item C is the joint-activity partner — organisation names, comma-separated on the form, stored as a list. Never a person, never a funder. |
+| — | `donors` | **Addition.** Funding tags, a list. Donor has no IASC item. It distinguishes one organisation reporting under two funding lines from two organisations; one record in the current reports carries two tags, which is why it is a list. |
 | D · Focal point name | `focalName` | A professional, not a service user. The only personal data in the model. |
 | E · Focal point phone | `focalPhone` | As above. |
 | F · Focal point email | `focalEmail` | As above. Optional. |

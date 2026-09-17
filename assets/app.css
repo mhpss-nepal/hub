@@ -74,7 +74,7 @@ p{margin:0 0 12px}
 .f{margin-bottom:12px}
 label{display:block; font-size:12.5px; font-weight:700; margin-bottom:4px; color:var(--ink)}
 label .opt{font-weight:400; color:var(--mute)}
-input[type=text],input[type=date],input[type=tel],input[type=email],input[type=number],select,textarea{
+input[type=text],input[type=date],input[type=tel],input[type=email],input[type=number],input[type=password],select,textarea{
   width:100%; padding:9px 10px; border:1px solid var(--line); border-radius:5px; font:inherit; font-size:14px;
   background:#fff; color:var(--ink)
 }

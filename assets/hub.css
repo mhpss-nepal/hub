@@ -36,7 +36,7 @@
 /* The activity-mix ramp — SEQUENTIAL, one hue, and that is the point.
    Five categorical hues could not be made colour-blind-safe at five slots in
    both light and dark: every candidate set failed the orange-vs-green pair
-   under deuteranopia (the search is recorded in claude/hub-design.md). A ramp
+   under deuteranopia (the search is recorded in the project's design notes). A ramp
    solves it by construction, because lightness is the one channel every kind
    of colour vision keeps. It also says something true that hues did not: the
    steps run from the broadest, least specialised support to the most

@@ -228,7 +228,7 @@
   }
 
   /* Activity mix — VERTICAL columns, GROUPED, one bar per activity family.
-     It was horizontal bars, then vertical stacked ones; Adib asked for each
+     It was horizontal bars, then vertical stacked ones; the request was for each
      family to stand beside the others rather than be piled into one bar. That
      is the better chart anyway: every family now starts from the baseline, so a
      small family is compared against the axis instead of being read off the top
@@ -360,7 +360,7 @@
             '<div class="r"><span>Share of district</span><span>' + Math.round(100 * v / r.tot) + '%</span></div>');
           /* the value sits ABOVE the bar, in ink, never inside it: at this range
              the smallest bars are two pixels tall and a label inside them is
-             unreadable however good the contrast is (Adib's rule 10). */
+             unreadable however good the contrast is (design rule 10). */
           if (barW >= 16) {
             var vl = mk('text', { x: bx + barW / 2, y: y0 - h - 5, 'text-anchor': 'middle',
               class: 'blabel' }, fmt(v));
