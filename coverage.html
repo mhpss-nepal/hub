@@ -444,8 +444,11 @@
           f1549: f - Math.floor(f * 0.3), m1549: (tot - fu - mu - f) - Math.floor((tot - fu - mu - f) * 0.3), o1549: 0,
           f5059: Math.floor(f * 0.18), m5059: Math.floor((tot - fu - mu - f) * 0.2), o5059: 0,
           f60: Math.floor(f * 0.3) - Math.floor(f * 0.18), m60: Math.floor((tot - fu - mu - f) * 0.3) - Math.floor((tot - fu - mu - f) * 0.2), o60: 0,
-          ofPwd: rand() > 0.75 ? 1 + Math.floor(rand() * 3) : 0,
+          ofChildAlone: rand() > 0.8 ? 1 + Math.floor(rand() * 2) : 0,
           ofPreg: rand() > 0.85 ? 1 + Math.floor(rand() * 2) : 0,
+          ofPwd: rand() > 0.75 ? 1 + Math.floor(rand() * 3) : 0,
+          ofInjured: rand() > 0.85 ? 1 : 0,
+          ofDistress: rand() > 0.7 ? 1 + Math.floor(rand() * 3) : 0,
           schemaVersion: S.SCHEMA_VERSION
         });
       }
@@ -1090,8 +1093,12 @@
         legacy.f18 += d.fHigh; legacy.m18 += d.mHigh; legacy.o18 += d.oHigh;
       }
     });
-    var ofPwd = 0, ofPreg = 0;
-    DATA.forEach(function (r) { ofPwd += n(r.ofPwd); ofPreg += n(r.ofPreg); });
+    /* seen at the session: five counts, summed on their own, never added to
+       the figures above or to each other */
+    var seen = {};
+    S.OF_WHOM.forEach(function (k) { seen[k] = 0; });
+    DATA.forEach(function (r) { S.OF_WHOM.forEach(function (k) { seen[k] += n(r[k]); }); });
+    var ofPwd = seen.ofPwd, ofPreg = seen.ofPreg;
 
     var rows = [];
     var cell = function (x) { return '<td class="n">' + x.toLocaleString() + "</td>"; };
@@ -1129,10 +1136,11 @@
         cell(fold18.F) + cell(fold18.M) + cell(fold18.O) + cell(fold18.F + fold18.M + fold18.O) + "</tr>");
     }
     var oF18 = fold18.f, oM18 = fold18.m, oO18 = fold18.o, aF = fold18.F, aM = fold18.M, aO = fold18.O;
-    if (ofPwd || ofPreg) {
-      rows.push('<tr class="ofw"><td colspan="5" class="xs">Of whom — inside the figures above, not added to them: <b>' +
-        ofPwd.toLocaleString() + "</b> persons with disabilities, <b>" + ofPreg.toLocaleString() +
-        "</b> pregnant or postpartum.</td></tr>");
+    if (S.OF_WHOM.some(function (k) { return seen[k] > 0; })) {
+      rows.push('<tr class="ofw"><td colspan="5" class="xs">Seen at the sessions — inside the figures above, not added to them: ' +
+        S.OF_WHOM.filter(function (k) { return seen[k] > 0; }).map(function (k) {
+          return "<b>" + seen[k].toLocaleString() + "</b> " + esc(S.OF_WHOM_LABEL[k].toLowerCase());
+        }).join(" · ") + ".</td></tr>");
     }
     var dgTotal = oF18 + oM18 + oO18 + aF + aM + aO + fold15.f + fold15.m + fold15.o + fold15.F + fold15.M + fold15.O;
     $("disBody").innerHTML = rows.join("");
@@ -1149,7 +1157,7 @@
     /* what the publish step reads -- the same objects the tables were drawn from,
        so the public documents can never disagree with the screen */
     PUBSRC = { ROSTER: ROSTER, GAPS: GAPS, bySite: bySite, byOrg: byOrg, byAct: byAct, flags: flags,
-               sadd: { band: band, band03: band03, legacy: legacy, ofPwd: ofPwd, ofPreg: ofPreg, total: total, dgTotal: dgTotal,
+               sadd: { band: band, band03: band03, legacy: legacy, ofPwd: ofPwd, ofPreg: ofPreg, seen: seen, total: total, dgTotal: dgTotal,
                        u18: { f: oF18, m: oM18, o: oO18 }, a18: { f: aF, m: aM, o: aO },
                        u15: { f: fold15.f, m: fold15.m, o: fold15.o }, a15: { f: fold15.F, m: fold15.M, o: fold15.O },
                        n: { v04: nBanded, v03: nBanded03, pair: nLegacy } } };
@@ -1279,7 +1287,11 @@
                  legacy_two_band: P.sadd.legacy, official_under18: P.sadd.u18, official_18plus: P.sadd.a18,
                  records_by_shape: P.sadd.n,
                  fold_note: "five groups agreed with EDCD 17 Sep 2026 (0-4, 5-14, 15-49, 50-59, 60+) fold at 15; earlier records fold at 18; the two folds are not added together",
-                 of_whom_pwd: P.sadd.ofPwd, of_whom_pregnant_postpartum: P.sadd.ofPreg, disaggregated_total: P.sadd.dgTotal, total: P.sadd.total };
+                 of_whom_pwd: P.sadd.ofPwd, of_whom_pregnant_postpartum: P.sadd.ofPreg,
+                 seen_at_session: { children_without_adult: P.sadd.seen.ofChildAlone, pregnant_or_with_infant: P.sadd.seen.ofPreg,
+                                    visible_disability: P.sadd.seen.ofPwd, injured_or_unwell: P.sadd.seen.ofInjured, acute_distress: P.sadd.seen.ofDistress,
+                                    note: "counted by sight at the session (WHO PFA guide, LOOK step); each inside the total, never added together" },
+                 disaggregated_total: P.sadd.dgTotal, total: P.sadd.total };
     var gaps = P.GAPS.map(function (s) { return { code: s.code, name: s.name, district: s.district, palika: s.palika || "" }; });
     var duplication = P.flags.map(function (g) {
       var orgs = {}; g.rows.forEach(function (r) { orgs[orgName(r)] = (orgs[orgName(r)] || 0) + 1; });

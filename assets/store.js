@@ -120,8 +120,24 @@ function save(rec) {
    bridge is loaded, so the form still works as a local-only instrument. */
 function syncToRegister(rec) {
   if (!window.FB || typeof window.FB.submit !== "function") return null;
-  const body = { ...rec, kind: "activity", schema: "mhpss-np-4ws/" + SCHEMA_VERSION };
-  return window.FB.submit(body);
+  return window.FB.submit(registerBody(rec));
+}
+/* The copy of a report that goes to the register. The device copy keeps
+   everything, including empty fields and the revision history; the
+   register copy carries only what was filled. The security rules cap a
+   document at 60 keys (size() < 60), and a report with every band and
+   every "Other" box present as an empty string would sit within a few
+   keys of that cap -- so empties are dropped here, deliberately, and the
+   cap stays out of reach. Readers already treat a missing key and an
+   empty one the same way. */
+function registerBody(rec) {
+  const body = { kind: "activity", schema: "mhpss-np-4ws/" + SCHEMA_VERSION };
+  for (const [k, v] of Object.entries(rec || {})) {
+    if (k === "previous" || k === "archived" || k === "archivedAt" || k === "archiveReason") continue;
+    if (v === "" || v === null || v === undefined) continue;
+    body[k] = v;
+  }
+  return body;
 }
 
 /* Nothing is deleted. A removed record is archived with a reason, so the
@@ -176,12 +192,26 @@ const BANDS_V03 = [
 ];
 const PART_IDS_V03 = BANDS_V03.reduce((a, b) => a.concat([b.f, b.m, b.o]), []);
 
-/* The two "of whom" counts. NOT additive: a person already counted in a
-   band above can appear in either or both of these. They never enter the
-   sum check -- a pregnant woman counted once as 15-49 female and once
-   here is one person, not two. Kept optional: EDCD raised them on 17 Sep
-   without a decision. */
-const OF_WHOM = ["ofPwd", "ofPreg"];
+/* "Seen at the session" -- five counts a PFA provider can make by looking,
+   without asking anyone anything. They follow the LOOK step of the WHO
+   Psychological First Aid guide (2011): people with urgent needs or
+   injuries, people in serious distress, and people who need special
+   attention -- children without a caregiver, people with a visible
+   disability or who need help to move, pregnant women and women with an
+   infant. Chosen with the Coordinator on 17 Sep 2026 in place of a long
+   vulnerable-group list: what cannot be seen is not asked here.
+   NOT additive: a person already counted in a band above can appear in
+   one or several of these. They never enter the sum check -- a pregnant
+   woman counted once as 15-49 female and once here is one person, not
+   two. All optional. */
+const OF_WHOM = ["ofChildAlone", "ofPreg", "ofPwd", "ofInjured", "ofDistress"];
+const OF_WHOM_LABEL = {
+  ofChildAlone: "Children without an adult with them",
+  ofPreg:       "Pregnant women or women with an infant",
+  ofPwd:        "Visible disability or needing help to move",
+  ofInjured:    "Visibly injured or unwell",
+  ofDistress:   "In acute distress, needing one-to-one attention",
+};
 
 /* Which age shape a record carries. "v04" = the five groups (fold at 15);
    "v03" = the four bands of 16–17 Sep (fold at 18); "pair" = the earliest
@@ -290,10 +320,9 @@ function validate(r) {
   /* The "of whom" counts sit INSIDE the total, so each one can be at most
      the total -- but they are not added to it and not added to each other,
      because one person can be in both. */
-  const ofLabel = { ofPwd: "Persons with disabilities", ofPreg: "Pregnant or postpartum" };
   for (const k of OF_WHOM) {
     const v = num(r[k]);
-    if (v !== null && t !== null && v > t) p.push(`${ofLabel[k]} (${v}) is more than the total of ${t}`);
+    if (v !== null && t !== null && v > t) p.push(`${OF_WHOM_LABEL[k]} (${v}) is more than the total of ${t}`);
   }
   return p;
 }
@@ -321,8 +350,8 @@ const CSV_COLUMNS = [
   /* folded to two at export, never stored; foldBoundary says whether the
      split is at 15 (five groups) or 18 (earlier records) */
   "fLow", "mLow", "oLow", "fHigh", "mHigh", "oHigh", "foldBoundary",
-  /* counted inside the figures above, never added to them */
-  "ofPwd", "ofPreg",
+  /* seen at the session -- counted inside the figures above, never added to them */
+  "ofChildAlone", "ofPreg", "ofPwd", "ofInjured", "ofDistress",
   "schemaVersion",
 ];
 
@@ -378,7 +407,7 @@ function donorsOf(r) {
 
 /* Global for the same reason as codes.js — see the note there. */
 window.STORE = {
-  SCHEMA_VERSION, CSV_COLUMNS, BANDS, BANDS_V03, PART_IDS, PART_IDS_V03, FOLD_BOUNDARY, OF_WHOM, fold, ageShape, disaggTotal, donorsOf, todayLocal,
+  SCHEMA_VERSION, CSV_COLUMNS, BANDS, BANDS_V03, PART_IDS, PART_IDS_V03, FOLD_BOUNDARY, OF_WHOM, OF_WHOM_LABEL, fold, ageShape, disaggTotal, donorsOf, todayLocal, registerBody,
   recordId, all, active, save, archive,
   validate, toCSV, download, stamp, clearAll
 };
