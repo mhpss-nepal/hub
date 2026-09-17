@@ -81,6 +81,17 @@ const PALIKAS = [
   { pcode: "NP0329403", name: "Uttargaya Rural Municipality", np: "उत्तरगया गाउँपालिका", type: "RM", wards: 5, district: "RAS", province: "Bagmati", src: "[S3][S5][S6][S8]; pcode COD-AB NPL v02" },
   { pcode: "NP0329402", name: "Gosaikunda Rural Municipality", np: "गोसाईकुण्ड गाउँपालिका", type: "RM", wards: 6, district: "RAS", province: "Bagmati", src: "[S3][S5][S6][S8]; pcode COD-AB NPL v02" },
   { pcode: "NP0329404", name: "Kalika Rural Municipality", np: "कालिका गाउँपालिका", type: "RM", wards: 5, district: "RAS", province: "Bagmati", src: "[S3][S5][S6][S8]; pcode COD-AB NPL v02" },
+  /* Added 17 Sep 2026 from the official list of affected local levels in the
+     RDNA Rasuwa-Bhotekoshi Flood 2026 (NDRRMA / NPC). P-codes as the COD-AB
+     NPL v02 file names them (read the same day); ward counts and Devanagari
+     spellings are drafts until the data workstream's code-list ruling
+     confirms them. Shivapuri RM (Nuwakot, NDRRMA SitRep #1) is NOT added:
+     COD-AB carries two units of that name in Nuwakot (NP0328410, NP0328596)
+     and does not say which is the rural municipality -- a ruling first. */
+  { pcode: "NP0329401", name: "Aamachhodingmo Rural Municipality", np: "आमाछोदिङमो गाउँपालिका", type: "RM", district: "RAS", province: "Bagmati", np_src: "draft", src: "RDNA 2026; NDRRMA SitRep #1; pcode COD-AB NPL v02 (17 Sep)" },
+  { pcode: "NP0436408", name: "Shahid Lakhan Rural Municipality", np: "शहीद लखन गाउँपालिका", type: "RM", district: "GOR", province: "Gandaki", np_src: "draft", src: "RDNA 2026; pcode COD-AB NPL v02 (17 Sep)" },
+  { pcode: "NP0436409", name: "Gandaki Rural Municipality", np: "गण्डकी गाउँपालिका", type: "RM", district: "GOR", province: "Gandaki", np_src: "draft", src: "RDNA 2026; pcode COD-AB NPL v02 (17 Sep)" },
+  { pcode: "NP0335401", name: "Ichchhakamana Rural Municipality", alias: "Ichchha Kamana", np: "इच्छाकामना गाउँपालिका", type: "RM", district: "CHT", province: "Bagmati", np_src: "draft", src: "RDNA 2026; pcode COD-AB NPL v02 (17 Sep), spelt Ichchha Kamana there" },
   { pcode: "NP0328301", name: "Bidur Municipality", np: "विदुर नगरपालिका", type: "M", wards: 13, district: "NUW", province: "Bagmati", src: "[S3][S4][S5][S6]; pcode COD-AB NPL v02" },
   { pcode: "NP0328302", name: "Belkotgadhi Municipality", np: "बेलकोटगढी नगरपालिका", type: "M", wards: 13, district: "NUW", province: "Bagmati", src: "[S3][S5][S6][S8]; pcode COD-AB NPL v02" },
   { pcode: "NP0328402", name: "Kispang Rural Municipality", np: "किस्पाङ गाउँपालिका", type: "RM", wards: 5, district: "NUW", province: "Bagmati", src: "[S3][S5][S6][S8]; pcode COD-AB NPL v02" },
