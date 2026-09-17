@@ -422,9 +422,36 @@
     });
   }
 
+  /* ---------- the public shelf -----------------------------------------
+     public_stats is the ONLY thing the public website reads: aggregates a
+     coordinator publishes on purpose, never the register itself. The rules
+     let anyone read it and let a coordinator write it, provided the document
+     stamps computed_at with the server clock, says in `basis` what it
+     counts, and stays under 40 top-level fields. Everything written here is
+     public the moment it lands, so the caller shows a preview first. */
+  function publish(docId, body) {
+    if (!state.ready) return Promise.reject(new Error("not connected"));
+    if (!state.user) return Promise.reject(new Error("not signed in"));
+    if (!body || typeof body.basis !== "string" || !body.basis.trim()) {
+      return Promise.reject(new Error("a published document must say in `basis` what it counts"));
+    }
+    var out = JSON.parse(JSON.stringify(body));
+    for (var i = 0; i < NEVER_SENT.length; i++) delete out[NEVER_SENT[i]];
+    if (Object.keys(out).length + 1 >= 40) return Promise.reject(new Error("too many top-level fields for the rules (< 40)"));
+    out.computed_at = api.serverTimestamp();
+    out.published_by_role = "coordinator";
+    return api.setDoc(api.doc(db, "public_stats", docId), out).then(function () { return docId; });
+  }
+  /* the published copy, as anyone would see it (no account needed) */
+  function readPublic(docId) {
+    if (!state.ready) return Promise.reject(new Error("not connected"));
+    return api.getDoc(api.doc(db, "public_stats", docId)).then(function (d) { return d.exists() ? d.data() : null; });
+  }
+
   window.FB = {
     status: status,
     myRole: myRole, listRoles: listRoles, grantRole: grantRole, revokeRole: revokeRole,
+    publish: publish, readPublic: readPublic,
     sendLink: sendLink, OWNER: OWNER, ROLES: ROLE_LIST,
     onStatus: function (f) { stateCbs.push(f); f(status()); },
     onUser: function (f) { userCbs.push(f); f(state.user); },
