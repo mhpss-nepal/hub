@@ -20,46 +20,53 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # expand on a chevron, items inside them, and a footer. Two things added for
 # this hub: the ARCHITECTURE STRIP at the very top -- the three layers, with
 # the one the reader is standing in marked -- so nobody has to guess where
-# they are; and the group state is remembered per browser. The "Method" link
-# to the public site's design page is gone (17 Sep 2026): it took readers out
-# of the hub without warning.
+# they are; and the group state is remembered per browser.
+#
+# Restructured 17 Sep 2026 (evening). The GROUP headers are the main bar,
+# the items under them the sub bar:
+#   Coordination  -- the ONE dashboard page, index.html, whose sections are
+#                    addressed by hash and switched from here. There is no
+#                    separate "coordination view" any more: the synthetic
+#                    page duplicated the dashboard and confused readers.
+#   Field forms   -- not the forms (those are on the phones, layer 1) but
+#                    each form's OUTPUT HOME in the hub: where the entries
+#                    made on that form can be found. The Sadar Hati pattern
+#                    ("Rumah Output"). One link opens the forms themselves.
+#   Public site   -- one item, Home. The public pages navigate themselves.
+#   Admin         -- at the bottom, and only drawn for an admin account
+#                    (the rail script asks the bridge for the role). Rules
+#                    protect the data either way; hiding it keeps the rail
+#                    honest for everyone else.
 GROUPS = [
-    # (key, label, layer, items) -- items: (key, label, href)
-    ("coord", "Coordination", "2", [
-        ("hubindex",    "Coordination view",   "./"),
-        ("hubcoverage", "Coverage &amp; 5Ws",  "coverage.html"),
-        ("hubinbox",    "Field inbox",         "inbox.html"),
-        ("hubaccess",   "Access",              "access.html"),
+    # (key, label, layer, em, items) -- items: (key, label, href)
+    ("coord", "Coordination", "2", "layer 2", [
+        ("hubindex",    "Dashboard &middot; overview", "./#overview"),
+        ("hubwho",      "Who is where",                "./#who-is-where"),
+        ("hubact",      "Activities",                  "./#activities"),
+        ("hubreports",  "Reports received",            "./#reports"),
+        ("hubpublish",  "Publish",                     "./#publish"),
     ]),
-    ("forms", "Field forms", "1", [
-        ("outforms",    "All forms",              "../form/"),
-        ("outact",      "Activity report (5Ws)",  "../form/5ws-report.html"),
-        ("outcontact",  "Service contact",        "../form/contact.html"),
-        ("outref",      "Referral",               "../form/referral.html"),
-        ("outphq",      "PHQ-9 follow-up",        "../form/phq9.html"),
-        ("outself",     "Self-report",            "../form/selfreport.html"),
-        ("outcards",    "Printable QR cards",     "../form/cards.html"),
+    ("forms", "Field forms", "1", "outputs", [
+        ("outact",      "Activity report (5Ws)",  "./#reports"),
+        ("outcontact",  "Service contact",        "forms.html#contact"),
+        ("outref",      "Referral",               "forms.html#referral"),
+        ("outphq",      "PHQ-9 follow-up",        "forms.html#phq9"),
+        ("outself",     "Self-report",            "forms.html#selfreport"),
+        ("outopen",     "Open the forms &rarr;",  "../form/"),
     ]),
-    ("public", "Public site", "3", [
+    ("public", "Public site", "3", "layer 3", [
         ("outpublic",   "Home",                   "../"),
-        ("outflood",    "Flood response",         "../flood-response.html"),
-        ("outrefdir",   "Referral directory",     "../referral-directory.html"),
+    ]),
+    ("admin", "Admin", "2", "admin only", [
+        ("hubaccess",   "Access &amp; sign-in",   "access.html"),
     ]),
 ]
+# which group a PAGE stands in (its rail key is the page's, not an item's)
+PAGE_GROUP = {"hubindex": "coord", "hubforms": "forms", "hubaccess": "admin"}
+# the item lit when the page is opened without a hash
+PAGE_DEFAULT = {"hubindex": "hubindex", "hubforms": "outcontact", "hubaccess": "hubaccess"}
 # kept for the completeness check below: every hub page the rail points at
-RAIL = [(k, l, h) for g in GROUPS for (k, l, h) in g[3]]
-# the sections of the coordination view itself, shown only on that page
-HUBSECTIONS = [
-    ("#coverage", "Coverage"), ("#who", "Who is doing what"), ("#when", "Over time"),
-    ("#what", "Activities"),   ("#people", "Workforce"),      ("#helpline", "Helplines"),
-    ("#layers", "Architecture"),
-]
-# the tabs of the coverage page, shown only on that page; the hash opens the tab
-COVSECTIONS = [
-    ("coverage.html#gaps", "Coverage gaps"), ("coverage.html#duplication", "Duplication check"),
-    ("coverage.html#matrix", "5Ws matrix"),  ("coverage.html#activity", "By activity"),
-    ("coverage.html#records", "Records received"), ("coverage.html#publish", "Publish"),
-]
+RAIL = [(k, l, h) for g in GROUPS for (k, l, h) in g[4]]
 
 RAIL_JS = """(function(){
   var rail=document.currentScript.parentNode, KEY='mhpss-rail-groups';
@@ -77,13 +84,45 @@ RAIL_JS = """(function(){
   var m=rail.querySelector('.rmenu');
   if(m){ m.addEventListener('click', function(){
     var open=rail.classList.toggle('menu-open'); m.setAttribute('aria-expanded', open); }); }
+  /* The lit item follows the address: a hub page's sections are hashes, and
+     the same section can be reached from two groups (the activity report's
+     output home IS the dashboard's Reports received), so every link that
+     matches is lit, not just one. */
+  function mark(){
+    var path=location.pathname.split('/').pop()||'index.html', hash=location.hash||'';
+    rail.querySelectorAll('.rgb > a').forEach(function(a){
+      var href=a.getAttribute('href'); if(href.indexOf('../')===0) return;
+      var file=href.split('#')[0], ah=href.indexOf('#')>=0 ? href.slice(href.indexOf('#')) : '';
+      if(file==='./'||file==='') file='index.html';
+      var on = file===path && (hash ? ah===hash : a.hasAttribute('data-default'));
+      a.classList.toggle('on', on);
+      if(on) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current');
+    });
+    if(rail.classList.contains('menu-open')){ rail.classList.remove('menu-open'); if(m) m.setAttribute('aria-expanded', false); }
+  }
+  window.addEventListener('hashchange', mark);
+  document.addEventListener('DOMContentLoaded', mark);
+  window.__railMark = mark;
+  /* Admin is drawn only for an admin account. The bridge (assets/fb.js)
+     loads after the rail, so the question is asked once the page is
+     complete; a page without the bridge simply never shows it. */
+  var adm=rail.querySelector('.rg.admin');
+  if(adm){ document.addEventListener('DOMContentLoaded', function(){
+    if(!(window.FB && window.FB.onStatus)) return;
+    window.FB.onStatus(function(st){
+      if(!(st && st.user && window.FB.myRole)){ adm.hidden=true; return; }
+      window.FB.myRole().then(function(r){ adm.hidden = !(r && r.role==='admin'); }).catch(function(){ adm.hidden=true; });
+    });
+  }); }
 })();"""
 
 def rail_block(key):
-    here_group = None
-    for gk, glabel, layer, items in GROUPS:
-        if any(k == key for k, _, _ in items):
-            here_group = gk
+    here_group = PAGE_GROUP.get(key)
+    if here_group is None:
+        for gk, glabel, layer, em, items in GROUPS:
+            if any(k == key for k, _, _ in items):
+                here_group = gk
+    default = PAGE_DEFAULT.get(key, key)
     out = ['<aside class="rail" aria-label="Coordination hub">',
            '  <a class="railid" href="./">',
            '    <span data-mark="30"></span>',
@@ -98,29 +137,23 @@ def rail_block(key):
            '  </div>',
            '  <button class="rmenu" type="button" aria-expanded="false"><span></span>Menu</button>',
            '  <nav>']
-    for gk, glabel, layer, items in GROUPS:
+    for gk, glabel, layer, em, items in GROUPS:
         cls = "rg" + (" open here" if gk == here_group else (" open" if gk == "coord" else ""))
-        out.append('    <div class="%s" data-g="%s">' % (cls, gk))
-        out.append('      <button class="rgh" type="button"><span class="dot l%s"></span>%s<em>layer %s</em><i class="chev"></i></button>' % (layer, glabel, layer))
+        if gk == "admin":
+            cls += " admin"
+        out.append('    <div class="%s" data-g="%s"%s>' % (cls, gk, " hidden" if gk == "admin" else ""))
+        out.append('      <button class="rgh" type="button"><span class="dot l%s"></span>%s<em>%s</em><i class="chev"></i></button>' % (layer, glabel, em))
         out.append('      <div class="rgb">')
         for k, label, href in items:
-            on = ' class="on" aria-current="page"' if k == key else ''
-            out.append('        <a%s href="%s">%s</a>' % (on, href, label))
-            if k == "hubindex" and key == "hubindex":
-                out.append('        <span class="rsub">')
-                for h, l in HUBSECTIONS:
-                    out.append('          <a href="%s">%s</a>' % (h, l))
-                out.append('        </span>')
-            if k == "hubcoverage" and key == "hubcoverage":
-                out.append('        <span class="rsub">')
-                for h, l in COVSECTIONS:
-                    out.append('          <a href="%s">%s</a>' % (h, l))
-                out.append('        </span>')
+            attrs = ''
+            if k == default:
+                attrs += ' class="on" aria-current="page" data-default'
+            out.append('        <a%s href="%s">%s</a>' % (attrs, href, label))
         out.append('      </div>')
         out.append('    </div>')
     out.append('  </nav>')
     # i18n.js mounts the language switch here. Without a slot it floats top
-    # right, where on these pages it lands on top of the synthetic-data banner.
+    # right, where on these pages it lands on top of the status line.
     out.append('  <span data-i18n-toggle class="railtoggle"></span>')
     out.append('  <p class="rfoot">Draft. Figures are provisional.</p>')
     out.append('  <script>%s</script>' % RAIL_JS)
@@ -164,9 +197,10 @@ def run(apply_it):
         print("  guaranteed: add the markers or remove this gate.")
         return 1
     for k, label, href in RAIL:
-        if k.startswith("out"):
+        if href.startswith("../"):
             continue
-        rel = "index.html" if href == "./" else href
+        rel = href.split("#")[0]
+        rel = "index.html" if rel in ("./", "") else rel
         if not os.path.exists(os.path.join(ROOT, rel)):
             print("\n  INCOMPLETE -- the rail points at %s, which does not exist." % rel)
             return 1

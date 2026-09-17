@@ -73,8 +73,24 @@ body.fx .steps a.on{background:var(--fx-blue-t); border-color:var(--fx-blue); co
 body.fx .steps a.on i{background:var(--fx-blue-d); color:#fff}
 body.fx .steps a.done i{background:var(--fx-ok); color:#fff}
 
-/* ---- the column ---- */
+/* ---- the column ----
+   A form is filled on a phone, so the form pages keep a 720px column: a
+   thumb reaches across it and a question never sits on a line of forty
+   words. A LANDING page is a different thing -- it is read on a laptop
+   beside the hub, and the coordinator's rule (17 Sep 2026) is that every
+   landing page opens at the same canvas width. So body.fx.landing takes the
+   one page frame declared in design.css, exactly as the hub's own landing
+   pages do, and the form-filling pages are the stated exception. */
 body.fx .wrap{max-width:720px; margin:0 auto; padding:0 12px 120px}
+/* The hub's landing pages stand beside a 250px rail, so their canvas is the
+   page frame OR what the rail leaves, whichever is smaller. A landing page
+   without a rail has to do the same arithmetic or it is wider than the hub
+   on the same screen -- which is the jump he pointed at. Below 1000px the
+   rail lies across the top and takes no width, so the frame alone applies. */
+body.fx.landing .wrap{max-width:min(var(--frame,1240px), calc(100% - 250px));
+                      padding:0 var(--gutter,28px) 110px}
+@media (max-width:999px){ body.fx.landing .wrap{max-width:var(--frame,1240px)} }
+@media (max-width:620px){ body.fx.landing .wrap{padding:0 15px 100px} }
 body.fx .wrap > h1{
   font-family:"Lora",Georgia,serif; font-size:23px; line-height:1.25; margin:20px 6px 6px; letter-spacing:-.005em; color:var(--fx-ink);
 }

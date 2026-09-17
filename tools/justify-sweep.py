@@ -30,7 +30,7 @@ PAGES = ["index.html","flood-response.html","bps.html","iec.html","referral-dire
          "method.html","architecture.html","access-explained.html","layer3.html",
          "form/index.html","form/5ws-report.html","form/contact.html","form/phq9.html",
          "form/referral.html","form/selfreport.html","form/cards.html",
-         "hub/index.html","hub/coverage.html","hub/inbox.html","hub/access.html"]
+         "hub/index.html","hub/forms.html","hub/access.html"]
 
 # Deliberately ragged, per the rules doc: labels, numerals, monospace.
 # A selector here means "this element is set, not justified", and the sweep

@@ -58,33 +58,37 @@
   </div>
   <button class="rmenu" type="button" aria-expanded="false"><span></span>Menu</button>
   <nav>
-    <div class="rg open here" data-g="coord">
+    <div class="rg open" data-g="coord">
       <button class="rgh" type="button"><span class="dot l2"></span>Coordination<em>layer 2</em><i class="chev"></i></button>
       <div class="rgb">
-        <a href="./">Coordination view</a>
-        <a href="coverage.html">Coverage &amp; 5Ws</a>
-        <a href="inbox.html">Field inbox</a>
-        <a class="on" aria-current="page" href="access.html">Access</a>
+        <a href="./#overview">Dashboard &middot; overview</a>
+        <a href="./#who-is-where">Who is where</a>
+        <a href="./#activities">Activities</a>
+        <a href="./#reports">Reports received</a>
+        <a href="./#publish">Publish</a>
       </div>
     </div>
     <div class="rg" data-g="forms">
-      <button class="rgh" type="button"><span class="dot l1"></span>Field forms<em>layer 1</em><i class="chev"></i></button>
+      <button class="rgh" type="button"><span class="dot l1"></span>Field forms<em>outputs</em><i class="chev"></i></button>
       <div class="rgb">
-        <a href="../form/">All forms</a>
-        <a href="../form/5ws-report.html">Activity report (5Ws)</a>
-        <a href="../form/contact.html">Service contact</a>
-        <a href="../form/referral.html">Referral</a>
-        <a href="../form/phq9.html">PHQ-9 follow-up</a>
-        <a href="../form/selfreport.html">Self-report</a>
-        <a href="../form/cards.html">Printable QR cards</a>
+        <a href="./#reports">Activity report (5Ws)</a>
+        <a href="forms.html#contact">Service contact</a>
+        <a href="forms.html#referral">Referral</a>
+        <a href="forms.html#phq9">PHQ-9 follow-up</a>
+        <a href="forms.html#selfreport">Self-report</a>
+        <a href="../form/">Open the forms &rarr;</a>
       </div>
     </div>
     <div class="rg" data-g="public">
       <button class="rgh" type="button"><span class="dot l3"></span>Public site<em>layer 3</em><i class="chev"></i></button>
       <div class="rgb">
         <a href="../">Home</a>
-        <a href="../flood-response.html">Flood response</a>
-        <a href="../referral-directory.html">Referral directory</a>
+      </div>
+    </div>
+    <div class="rg open here admin" data-g="admin" hidden>
+      <button class="rgh" type="button"><span class="dot l2"></span>Admin<em>admin only</em><i class="chev"></i></button>
+      <div class="rgb">
+        <a class="on" aria-current="page" data-default href="access.html">Access &amp; sign-in</a>
       </div>
     </div>
   </nav>
@@ -106,6 +110,36 @@
   var m=rail.querySelector('.rmenu');
   if(m){ m.addEventListener('click', function(){
     var open=rail.classList.toggle('menu-open'); m.setAttribute('aria-expanded', open); }); }
+  /* The lit item follows the address: a hub page's sections are hashes, and
+     the same section can be reached from two groups (the activity report's
+     output home IS the dashboard's Reports received), so every link that
+     matches is lit, not just one. */
+  function mark(){
+    var path=location.pathname.split('/').pop()||'index.html', hash=location.hash||'';
+    rail.querySelectorAll('.rgb > a').forEach(function(a){
+      var href=a.getAttribute('href'); if(href.indexOf('../')===0) return;
+      var file=href.split('#')[0], ah=href.indexOf('#')>=0 ? href.slice(href.indexOf('#')) : '';
+      if(file==='./'||file==='') file='index.html';
+      var on = file===path && (hash ? ah===hash : a.hasAttribute('data-default'));
+      a.classList.toggle('on', on);
+      if(on) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current');
+    });
+    if(rail.classList.contains('menu-open')){ rail.classList.remove('menu-open'); if(m) m.setAttribute('aria-expanded', false); }
+  }
+  window.addEventListener('hashchange', mark);
+  document.addEventListener('DOMContentLoaded', mark);
+  window.__railMark = mark;
+  /* Admin is drawn only for an admin account. The bridge (assets/fb.js)
+     loads after the rail, so the question is asked once the page is
+     complete; a page without the bridge simply never shows it. */
+  var adm=rail.querySelector('.rg.admin');
+  if(adm){ document.addEventListener('DOMContentLoaded', function(){
+    if(!(window.FB && window.FB.onStatus)) return;
+    window.FB.onStatus(function(st){
+      if(!(st && st.user && window.FB.myRole)){ adm.hidden=true; return; }
+      window.FB.myRole().then(function(r){ adm.hidden = !(r && r.role==='admin'); }).catch(function(){ adm.hidden=true; });
+    });
+  }); }
 })();</script>
 </aside>
 <!--/NAV-->
@@ -288,7 +322,8 @@
         $("adminArea").innerHTML =
           '<div class="card"><div class="step"><span class="n">2</span><h2>Your access</h2></div>' +
           '<p style="margin:0 0 10px">You are <span class="rp ' + esc(mine.role) + '">' + esc(mine.role) +
-          '</span> — you can read the records in the <a href="inbox.html">field inbox</a>.</p>' +
+          '</span> — you can read the records on the <a href="./">dashboard</a> and in each ' +
+          'form’s own home on <a href="forms.html">the forms page</a>.</p>' +
           '<p class="rk" style="margin:0">Granting access to other people needs the admin level. ' +
           'That is deliberate: the fewer people who can widen access, the easier it is to say ' +
           'who can see what.</p></div>';
