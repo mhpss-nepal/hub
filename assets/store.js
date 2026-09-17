@@ -12,7 +12,7 @@
    ===================================================================== */
 
 const KEY = "mhpss-np-4ws-v1";
-const SCHEMA_VERSION = "4ws-np-0.3.0";  /* 0.2.0: four age bands · 0.3.0: donors list, partners, palika, iascSub, 16 Sep 2026 */
+const SCHEMA_VERSION = "4ws-np-0.4.0";  /* 0.2.0: four age bands · 0.3.0: donors list, partners, palika, iascSub, 16 Sep 2026 · 0.4.0: five age groups, settings, cadre list, "Other" text fields, funding source off the form — EDCD review 17 Sep 2026 */
 
 /* ---------------------------------------------------------------------
    Deterministic record id.
@@ -145,51 +145,89 @@ function active() {
 
 /* ---------------------------------------------------------------------
    AGE BANDS — the one place they are defined.
-   The form collects four; the official Nepal 5Ws asks for two. The four
-   were chosen so that no second collection is ever needed:
-       0-4  +  5-17   = the official "under 18"
-       18-59 + 60+    = the official "18 and over"
-   so one grid satisfies the team's ask for an under-5 figure and the
-   5Ws rollup at the same time. Any page that needs the official two
-   bands calls fold(); nothing else knows both shapes.
+   Five groups, agreed with EDCD (NCD and mental health) on 17 September
+   2026: 18–59 was too wide and mixed very different needs. The groups are
+   0–4 · 5–14 · 15–49 · 50–59 · 60+. Two of them cross the 18-year line
+   the national 5W has used, so the on-screen fold is now at 15 and is
+   labelled by that boundary, never as "under 18". How the 5W return is
+   compiled from these groups is a ruling still to come (R-U1 / R-D1);
+   nothing here pretends to know it.
+   Records filed under the four bands of 16–17 Sep (0–4, 5–17, 18–59, 60+)
+   still fold, at 18, through BANDS_V03. Any page that needs the fold calls
+   fold(); nothing else knows the shapes.
    ------------------------------------------------------------------- */
 const BANDS = [
+  { key: "04",   lo: 0,  hi: 4,    label: "0–4",   f: "f04",   m: "m04",   o: "o04",   child: true  },
+  { key: "514",  lo: 5,  hi: 14,   label: "5–14",  f: "f514",  m: "m514",  o: "o514",  child: true  },
+  { key: "1549", lo: 15, hi: 49,   label: "15–49", f: "f1549", m: "m1549", o: "o1549", child: false },
+  { key: "5059", lo: 50, hi: 59,   label: "50–59", f: "f5059", m: "m5059", o: "o5059", child: false },
+  { key: "60",   lo: 60, hi: null, label: "60+",   f: "f60",   m: "m60",   o: "o60",   child: false },
+];
+const FOLD_BOUNDARY = 15;   /* child: true means younger than this */
+const PART_IDS = BANDS.reduce((a, b) => a.concat([b.f, b.m, b.o]), []);
+
+/* Schema 0.3.0 (16–17 Sep 2026): kept so those records still read and
+   fold; never offered on the form. */
+const BANDS_V03 = [
   { key: "04",   lo: 0,  hi: 4,    label: "0–4",   f: "f04",   m: "m04",   o: "o04",   child: true  },
   { key: "517",  lo: 5,  hi: 17,   label: "5–17",  f: "f517",  m: "m517",  o: "o517",  child: true  },
   { key: "1859", lo: 18, hi: 59,   label: "18–59", f: "f1859", m: "m1859", o: "o1859", child: false },
   { key: "60",   lo: 60, hi: null, label: "60+",   f: "f60",   m: "m60",   o: "o60",   child: false },
 ];
-const PART_IDS = BANDS.reduce((a, b) => a.concat([b.f, b.m, b.o]), []);
+const PART_IDS_V03 = BANDS_V03.reduce((a, b) => a.concat([b.f, b.m, b.o]), []);
 
 /* The two "of whom" counts. NOT additive: a person already counted in a
    band above can appear in either or both of these. They never enter the
-   sum check -- a pregnant woman counted once as 18-59 female and once
-   here is one person, not two. */
+   sum check -- a pregnant woman counted once as 15-49 female and once
+   here is one person, not two. Kept optional: EDCD raised them on 17 Sep
+   without a decision. */
 const OF_WHOM = ["ofPwd", "ofPreg"];
 
-/* Fold a record to the official two bands.
-   A record filed before 16 Sep 2026 carries only fU18/f18 and no band
-   fields at all, so the fold reads the legacy pair when no band is
-   filled. Both shapes therefore count in the same total, which is what
-   lets the coordination view read the whole file rather than the part
-   filed since the change. */
+/* Which age shape a record carries. "v04" = the five groups (fold at 15);
+   "v03" = the four bands of 16–17 Sep (fold at 18); "pair" = the earliest
+   records, which carry only fU18/f18. f04 and f60 exist in both banded
+   shapes, so the shape is read from the keys only one of them has, and
+   from the schema version when neither is filled. */
+function ageShape(r) {
+  const has = (k) => num(r[k]) !== null;
+  const v04only = ["f514", "m514", "o514", "f1549", "m1549", "o1549", "f5059", "m5059", "o5059"];
+  const v03only = ["f517", "m517", "o517", "f1859", "m1859", "o1859"];
+  if (v04only.some(has)) return "v04";
+  if (v03only.some(has)) return "v03";
+  if (PART_IDS.some(has)) return /0\.4\./.test(r.schemaVersion || "") || !(r.schemaVersion) ? "v04" : "v03";
+  return "pair";
+}
+
+/* Fold a record to two groups, labelled by the boundary that applies to
+   its shape: 15 for the five groups, 18 for everything filed before.
+   Generic names (fLow …) are the ones to use; fU18 … are kept as aliases
+   for pages written against 0.3.0 and mean "below the boundary", not
+   "under 18", whenever boundary is 15. */
 function fold(r) {
-  const any = PART_IDS.some((k) => num(r[k]) !== null);
-  if (!any) {
-    return {
-      fU18: num(r.fU18) || 0, mU18: num(r.mU18) || 0, oU18: num(r.oU18) || 0,
-      f18:  num(r.f18)  || 0, m18:  num(r.m18)  || 0, o18:  num(r.o18)  || 0,
-      banded: false,
+  const shape = ageShape(r);
+  if (shape === "pair") {
+    const d = {
+      fLow: num(r.fU18) || 0, mLow: num(r.mU18) || 0, oLow: num(r.oU18) || 0,
+      fHigh: num(r.f18) || 0, mHigh: num(r.m18) || 0, oHigh: num(r.o18) || 0,
+      boundary: 18, banded: false, shape,
     };
+    return withAliases(d);
   }
+  const bands = shape === "v04" ? BANDS : BANDS_V03;
   const g = (k) => num(r[k]) || 0;
-  const kids = BANDS.filter((b) => b.child), adults = BANDS.filter((b) => !b.child);
+  const kids = bands.filter((b) => b.child), adults = bands.filter((b) => !b.child);
   const s = (set, sex) => set.reduce((a, b) => a + g(b[sex]), 0);
-  return {
-    fU18: s(kids, "f"),   mU18: s(kids, "m"),   oU18: s(kids, "o"),
-    f18:  s(adults, "f"), m18:  s(adults, "m"), o18:  s(adults, "o"),
-    banded: true,
+  const d = {
+    fLow: s(kids, "f"),    mLow: s(kids, "m"),    oLow: s(kids, "o"),
+    fHigh: s(adults, "f"), mHigh: s(adults, "m"), oHigh: s(adults, "o"),
+    boundary: shape === "v04" ? FOLD_BOUNDARY : 18, banded: true, shape,
   };
+  return withAliases(d);
+}
+function withAliases(d) {
+  d.fU18 = d.fLow; d.mU18 = d.mLow; d.oU18 = d.oLow;
+  d.f18 = d.fHigh; d.m18 = d.mHigh; d.o18 = d.oHigh;
+  return d;
 }
 
 /* Total disaggregated people in a record, either shape. */
@@ -211,6 +249,18 @@ function validate(r) {
   for (const [k, label] of Object.entries(need)) if (!r[k]) p.push(`${label} is required`);
   if (r.org === "OTHER" && !r.orgOther) p.push("Name the organisation");
   if (r.site === "OTHER" && !r.siteOther) p.push("Name the site");
+  /* "Other (free text)" on every list -- EDCD, 17 Sep 2026. Each one is a
+     name or a description, never a person: digits in bulk or an @ are
+     refused so a phone number or email cannot ride in on a text field. */
+  const OTHER_TEXT = { cadre: ["cadreOther", "Say which cadre"], modality: ["modalityOther", "Say where the activity took place"],
+                       district: ["districtOther", "Name the district"], activity: ["activityOther", "Say what activity was done"] };
+  for (const [k, [tk, msg]] of Object.entries(OTHER_TEXT)) {
+    if ((r[k] === "OTH" || r[k] === "OTHER") && !(r[tk] || "").trim()) p.push(msg);
+  }
+  if ((r.targetGroups || []).includes("TG-OTH") && !(r.targetGroupOther || "").trim()) p.push("Say which other group");
+  for (const tk of ["cadreOther", "modalityOther", "districtOther", "activityOther", "targetGroupOther", "orgOther", "siteOther"]) {
+    if (r[tk] && /\d{7,}|@/.test(r[tk])) p.push("Free-text fields are names of things, not of people — no phone numbers or emails");
+  }
   /* A report that covers a palika and no site is coded at palika level:
      it needs the palika, and it is never counted as a site. */
   if (r.site === "PALIKA" && !r.palika) p.push("Choose the palika the report covers");
@@ -230,7 +280,7 @@ function validate(r) {
      "people", and a series that mixes the two is not a series. R-U1
      (NDRRMA / EDCD) rules on what goes into the 5W; this field only records
      what the reporter actually counted. */
-  if (!r.countBasis) p.push("Say what the total counts — service contacts, distinct people, or not sure");
+  if (!r.countBasis) p.push("Say what the total counts — people who attended, or service contacts");
   const dp = num(r.distinctPeople);
   if (dp !== null && r.countBasis !== "CONTACTS") p.push("Distinct people applies only when the total is a contact count");
   if (dp !== null && t !== null && dp > t) p.push(`Distinct people (${dp}) cannot exceed the contact count of ${t}`);
@@ -261,14 +311,16 @@ function num(v) {
    ------------------------------------------------------------------- */
 const CSV_COLUMNS = [
   "id", "createdAt", "revision", "dateAD", "dateBS", "district", "palika", "site", "siteOther", "siteSource",
-  "org", "orgOther", "donors", "partners", "focalName", "focalPhone", "focalEmail", "cadre",
-  "activity", "iascSub", "modality", "status", "targetGroups", "description",
+  "org", "orgOther", "donors", "partners", "focalName", "focalPhone", "focalEmail", "cadre", "cadreOther",
+  "activity", "activityOther", "iascSub", "modality", "modalityOther", "status", "targetGroups", "targetGroupOther", "districtOther", "description",
   "reachedTotal", "countBasis", "distinctPeople",
-  /* four bands as collected */
-  "f04", "m04", "o04", "f517", "m517", "o517", "f1859", "m1859", "o1859", "f60", "m60", "o60",
-  /* the official two, folded, so a 5Ws submission needs no arithmetic and
-     a legacy record exports in the same columns as a new one */
-  "fU18", "mU18", "oU18", "f18", "m18", "o18",
+  /* the five groups as collected (0.4.0) and the four bands of 0.3.0, so a
+     record of either vintage exports in full */
+  "f04", "m04", "o04", "f514", "m514", "o514", "f1549", "m1549", "o1549", "f5059", "m5059", "o5059", "f60", "m60", "o60",
+  "f517", "m517", "o517", "f1859", "m1859", "o1859",
+  /* folded to two at export, never stored; foldBoundary says whether the
+     split is at 15 (five groups) or 18 (earlier records) */
+  "fLow", "mLow", "oLow", "fHigh", "mHigh", "oHigh", "foldBoundary",
   /* counted inside the figures above, never added to them */
   "ofPwd", "ofPreg",
   "schemaVersion",
@@ -283,7 +335,8 @@ function toCSV(rows) {
   /* The folded columns are computed at export, not stored on the record:
      one figure in two places is one figure that can disagree with itself. */
   const body = rows.map((r) => {
-    const row = { ...r, ...fold(r), donors: donorsOf(r) };
+    const d = fold(r);
+    const row = { ...r, ...d, foldBoundary: d.boundary, donors: donorsOf(r) };
     return CSV_COLUMNS.map((c) => esc(row[c])).join(",");
   }).join("\n");
   return "﻿" + head + "\n" + body + "\n"; // BOM so Excel reads UTF-8
@@ -325,7 +378,7 @@ function donorsOf(r) {
 
 /* Global for the same reason as codes.js — see the note there. */
 window.STORE = {
-  SCHEMA_VERSION, CSV_COLUMNS, BANDS, PART_IDS, OF_WHOM, fold, disaggTotal, donorsOf,
+  SCHEMA_VERSION, CSV_COLUMNS, BANDS, BANDS_V03, PART_IDS, PART_IDS_V03, FOLD_BOUNDARY, OF_WHOM, fold, ageShape, disaggTotal, donorsOf, todayLocal,
   recordId, all, active, save, archive,
   validate, toCSV, download, stamp, clearAll
 };

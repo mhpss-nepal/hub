@@ -433,19 +433,17 @@
           focalName: "Focal point", focalPhone: "98XXXXXXXX", focalEmail: "",
           cadre: rand() > 0.6 ? "PSY" : "PSC",
           activity: acts[Math.floor(rand() * acts.length)],
-          modality: "INP", status: "CMP",
+          modality: ["HC", "COM", "FAC"][Math.floor(rand() * 3)], status: "CMP",
           targetGroups: [tgs[Math.floor(rand() * tgs.length)]],
           description: "Synthetic record — not real data",
-          reachedTotal: tot,
-          /* four bands, so the synthetic file exercises the shape the form
-             now files. The under-18 split is arbitrary but plausible: a
-             third of the children in the 0-4 band. */
+          reachedTotal: tot, countBasis: "PEOPLE",
+          /* the five age groups, so the synthetic file exercises the shape the
+             form now files; shares are arbitrary but plausible */
           f04: Math.floor(fu / 3), m04: Math.floor(mu / 3), o04: 0,
-          f517: fu - Math.floor(fu / 3), m517: mu - Math.floor(mu / 3), o517: 0,
-          /* a 60+ share too, so the oldest band is exercised rather than
-             rendering as an all-zero row that reads like a bug */
-          f1859: f - Math.floor(f * 0.12), m1859: (tot - fu - mu - f) - Math.floor((tot - fu - mu - f) * 0.1), o1859: 0,
-          f60: Math.floor(f * 0.12), m60: Math.floor((tot - fu - mu - f) * 0.1), o60: 0,
+          f514: fu - Math.floor(fu / 3), m514: mu - Math.floor(mu / 3), o514: 0,
+          f1549: f - Math.floor(f * 0.3), m1549: (tot - fu - mu - f) - Math.floor((tot - fu - mu - f) * 0.3), o1549: 0,
+          f5059: Math.floor(f * 0.18), m5059: Math.floor((tot - fu - mu - f) * 0.2), o5059: 0,
+          f60: Math.floor(f * 0.3) - Math.floor(f * 0.18), m60: Math.floor((tot - fu - mu - f) * 0.3) - Math.floor((tot - fu - mu - f) * 0.2), o60: 0,
           ofPwd: rand() > 0.75 ? 1 + Math.floor(rand() * 3) : 0,
           ofPreg: rand() > 0.85 ? 1 + Math.floor(rand() * 2) : 0,
           schemaVersion: S.SCHEMA_VERSION
@@ -1060,21 +1058,36 @@
        shown, and both fold into the official two rows, so the table never
        silently drops the half of the file that is in the other shape.
        The band list comes from store.js -- this page keeps no copy. */
-    var band = {}, legacy = { fU18: 0, mU18: 0, oU18: 0, f18: 0, m18: 0, o18: 0 };
+    /* Three shapes can sit in one file: the five groups (fold at 15), the
+       four bands of 16-17 Sep (fold at 18) and the earliest two-band pair
+       (18). Each shape is summed on its own bands and folded at its own
+       boundary; the fold rows are labelled by that boundary and never mixed. */
+    var band = {}, band03 = {}, legacy = { fU18: 0, mU18: 0, oU18: 0, f18: 0, m18: 0, o18: 0 };
     S.BANDS.forEach(function (b) { band[b.key] = { f: 0, m: 0, o: 0, any: false }; });
-    var nBanded = 0, nLegacy = 0;
+    S.BANDS_V03.forEach(function (b) { band03[b.key] = { f: 0, m: 0, o: 0, any: false }; });
+    var fold15 = { f: 0, m: 0, o: 0, F: 0, M: 0, O: 0 }, fold18 = { f: 0, m: 0, o: 0, F: 0, M: 0, O: 0 };
+    var nBanded = 0, nBanded03 = 0, nLegacy = 0;
     DATA.forEach(function (r) {
       var d = S.fold(r);
-      if (d.banded) {
-        nBanded++;
+      var acc = function (tgt) { tgt.f += d.fLow; tgt.m += d.mLow; tgt.o += d.oLow; tgt.F += d.fHigh; tgt.M += d.mHigh; tgt.O += d.oHigh; };
+      if (d.shape === "v04") {
+        nBanded++; acc(fold15);
         S.BANDS.forEach(function (b) {
           var c = band[b.key];
           c.f += n(r[b.f]); c.m += n(r[b.m]); c.o += n(r[b.o]);
           if (r[b.f] != null || r[b.m] != null || r[b.o] != null) { c.any = true; }
         });
-      } else if (d.fU18 + d.mU18 + d.oU18 + d.f18 + d.m18 + d.o18 > 0) {
-        nLegacy++;
-        Object.keys(legacy).forEach(function (k) { legacy[k] += d[k]; });
+      } else if (d.shape === "v03") {
+        nBanded03++; acc(fold18);
+        S.BANDS_V03.forEach(function (b) {
+          var c = band03[b.key];
+          c.f += n(r[b.f]); c.m += n(r[b.m]); c.o += n(r[b.o]);
+          if (r[b.f] != null || r[b.m] != null || r[b.o] != null) { c.any = true; }
+        });
+      } else if (d.fLow + d.mLow + d.oLow + d.fHigh + d.mHigh + d.oHigh > 0) {
+        nLegacy++; acc(fold18);
+        legacy.fU18 += d.fLow; legacy.mU18 += d.mLow; legacy.oU18 += d.oLow;
+        legacy.f18 += d.fHigh; legacy.m18 += d.mHigh; legacy.o18 += d.oHigh;
       }
     });
     var ofPwd = 0, ofPreg = 0;
@@ -1087,44 +1100,59 @@
       if (!c.any) { return; }
       rows.push("<tr><td>" + b.label + "</td>" + cell(c.f) + cell(c.m) + cell(c.o) + cell(c.f + c.m + c.o) + "</tr>");
     });
+    if (nBanded03) {
+      S.BANDS_V03.forEach(function (b) {
+        var c = band03[b.key];
+        if (!c.any) { return; }
+        rows.push("<tr><td>" + b.label + ' <span class="xs">· four-band records of 16–17 Sep</span></td>' + cell(c.f) + cell(c.m) + cell(c.o) + cell(c.f + c.m + c.o) + "</tr>");
+      });
+    }
     if (nLegacy) {
       rows.push('<tr><td>Under 18 <span class="xs">· reported before the bands</span></td>' +
         cell(legacy.fU18) + cell(legacy.mU18) + cell(legacy.oU18) + cell(legacy.fU18 + legacy.mU18 + legacy.oU18) + "</tr>");
       rows.push('<tr><td>18 and over <span class="xs">· reported before the bands</span></td>' +
         cell(legacy.f18) + cell(legacy.m18) + cell(legacy.o18) + cell(legacy.f18 + legacy.m18 + legacy.o18) + "</tr>");
     }
-    /* The official 5Ws view: four bands folded to two, legacy rows added in. */
-    var oF18 = legacy.fU18, oM18 = legacy.mU18, oO18 = legacy.oU18;
-    var aF = legacy.f18, aM = legacy.m18, aO = legacy.o18;
-    S.BANDS.forEach(function (b) {
-      var c = band[b.key];
-      if (b.child) { oF18 += c.f; oM18 += c.m; oO18 += c.o; } else { aF += c.f; aM += c.m; aO += c.o; }
-    });
-    rows.push('<tr class="fold"><td><b>Under 18</b> <span class="xs">· official 5Ws</span></td>' +
-      cell(oF18) + cell(oM18) + cell(oO18) + cell(oF18 + oM18 + oO18) + "</tr>");
-    rows.push('<tr class="fold"><td><b>18 and over</b> <span class="xs">· official 5Ws</span></td>' +
-      cell(aF) + cell(aM) + cell(aO) + cell(aF + aM + aO) + "</tr>");
+    /* Two-way folds, one per boundary. They are not added to each other:
+       0-14 and under-18 are different populations, and how the national
+       return is compiled from the five groups is a ruling still to come. */
+    if (nBanded) {
+      rows.push('<tr class="fold"><td><b>Aged 0–14</b> <span class="xs">· five groups, split at 15</span></td>' +
+        cell(fold15.f) + cell(fold15.m) + cell(fold15.o) + cell(fold15.f + fold15.m + fold15.o) + "</tr>");
+      rows.push('<tr class="fold"><td><b>Aged 15 and over</b> <span class="xs">· five groups, split at 15</span></td>' +
+        cell(fold15.F) + cell(fold15.M) + cell(fold15.O) + cell(fold15.F + fold15.M + fold15.O) + "</tr>");
+    }
+    if (nBanded03 || nLegacy) {
+      rows.push('<tr class="fold"><td><b>Under 18</b> <span class="xs">· earlier records, split at 18</span></td>' +
+        cell(fold18.f) + cell(fold18.m) + cell(fold18.o) + cell(fold18.f + fold18.m + fold18.o) + "</tr>");
+      rows.push('<tr class="fold"><td><b>18 and over</b> <span class="xs">· earlier records, split at 18</span></td>' +
+        cell(fold18.F) + cell(fold18.M) + cell(fold18.O) + cell(fold18.F + fold18.M + fold18.O) + "</tr>");
+    }
+    var oF18 = fold18.f, oM18 = fold18.m, oO18 = fold18.o, aF = fold18.F, aM = fold18.M, aO = fold18.O;
     if (ofPwd || ofPreg) {
       rows.push('<tr class="ofw"><td colspan="5" class="xs">Of whom — inside the figures above, not added to them: <b>' +
         ofPwd.toLocaleString() + "</b> persons with disabilities, <b>" + ofPreg.toLocaleString() +
         "</b> pregnant or postpartum.</td></tr>");
     }
-    var dgTotal = oF18 + oM18 + oO18 + aF + aM + aO;
+    var dgTotal = oF18 + oM18 + oO18 + aF + aM + aO + fold15.f + fold15.m + fold15.o + fold15.F + fold15.M + fold15.O;
     $("disBody").innerHTML = rows.join("");
     $("disNote").innerHTML = dgTotal
       ? "Disaggregated figures account for <b>" + dgTotal.toLocaleString() + " of " + total.toLocaleString() + "</b> people reached (" +
         (total ? (dgTotal / total * 100).toFixed(1) : 0) + "%)." + (dgTotal < total ? " The remaining " + (total - dgTotal).toLocaleString() + " was reported as a total only." : "")
       : "No disaggregation was supplied in this file.";
-    if (nBanded || nLegacy) {
-      $("disNote").innerHTML += " Of the records carrying a breakdown, <b>" + nBanded +
-        "</b> use the four age bands and <b>" + nLegacy + "</b> the earlier two. Both fold into the official rows.";
+    if (nBanded || nBanded03 || nLegacy) {
+      $("disNote").innerHTML += " Of the records carrying a breakdown, <b>" + nBanded + "</b> use the five age groups" +
+        (nBanded03 ? ", <b>" + nBanded03 + "</b> the four bands of 16–17 September" : "") +
+        (nLegacy ? " and <b>" + nLegacy + "</b> the earliest two" : "") + ". Each shape folds at its own boundary; the folds are not added together.";
     }
 
     /* what the publish step reads -- the same objects the tables were drawn from,
        so the public documents can never disagree with the screen */
     PUBSRC = { ROSTER: ROSTER, GAPS: GAPS, bySite: bySite, byOrg: byOrg, byAct: byAct, flags: flags,
-               sadd: { band: band, legacy: legacy, ofPwd: ofPwd, ofPreg: ofPreg, total: total, dgTotal: dgTotal,
-                       u18: { f: oF18, m: oM18, o: oO18 }, a18: { f: aF, m: aM, o: aO } } };
+               sadd: { band: band, band03: band03, legacy: legacy, ofPwd: ofPwd, ofPreg: ofPreg, total: total, dgTotal: dgTotal,
+                       u18: { f: oF18, m: oM18, o: oO18 }, a18: { f: aF, m: aM, o: aO },
+                       u15: { f: fold15.f, m: fold15.m, o: fold15.o }, a15: { f: fold15.F, m: fold15.M, o: fold15.O },
+                       n: { v04: nBanded, v03: nBanded03, pair: nLegacy } } };
     if ($("p-pub").classList.contains("on")) { pubDocsPanel(); }
 
     /* --- raw --- */
@@ -1242,7 +1270,15 @@
     });
     var matrix = MX_LONG.map(function (r) { return { organisation: r[0], district: r[1], palika: r[2], pcode: r[3], activity: r[4], activity_name: r[5], reports: r[6], contacts_org_palika: r.length > 7 ? r[7] : null }; });
     var bands = S.BANDS.map(function (b) { var c = P.sadd.band[b.key]; return { band: b.label, f: c.f, m: c.m, o: c.o }; });
-    var sadd = { bands: bands, legacy_two_band: P.sadd.legacy, official_under18: P.sadd.u18, official_18plus: P.sadd.a18,
+    var bands03 = S.BANDS_V03.map(function (b) { var c = P.sadd.band03[b.key]; return { band: b.label, f: c.f, m: c.m, o: c.o }; });
+    /* official_under18 / official_18plus keep their 0.3.0 meaning (records
+       split at 18) and are NOT fed by the five groups; the five-group fold
+       is published under its own names, split at 15. See the contract, §9. */
+    var sadd = { age_bands: S.BANDS.map(function (b) { return b.label; }), bands: bands, bands_v03: bands03,
+                 fold_under_15: P.sadd.u15, fold_15_and_over: P.sadd.a15,
+                 legacy_two_band: P.sadd.legacy, official_under18: P.sadd.u18, official_18plus: P.sadd.a18,
+                 records_by_shape: P.sadd.n,
+                 fold_note: "five groups agreed with EDCD 17 Sep 2026 (0-4, 5-14, 15-49, 50-59, 60+) fold at 15; earlier records fold at 18; the two folds are not added together",
                  of_whom_pwd: P.sadd.ofPwd, of_whom_pregnant_postpartum: P.sadd.ofPreg, disaggregated_total: P.sadd.dgTotal, total: P.sadd.total };
     var gaps = P.GAPS.map(function (s) { return { code: s.code, name: s.name, district: s.district, palika: s.palika || "" }; });
     var duplication = P.flags.map(function (g) {
