@@ -15,47 +15,115 @@ import os, re, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # ------------------------------------------------------------------- the hub
-RAIL = [
-    ("group", "Dashboard", None),
-    ("hubindex",    "Coordination view",   "./"),
-    ("hubcoverage", "Coverage &amp; 5Ws",  "coverage.html"),
-    ("hubinbox",    "Field inbox",         "inbox.html"),
-    ("hubaccess",   "Access",              "access.html"),
-    ("group", "Elsewhere", None),
-    ("outforms",  "Field forms",   "../form/"),
-    ("outpublic", "Public page",   "../"),
-    ("outmethod", "Method",        "../method.html"),
+# The rail follows the structure of the Sadar Hati internal dashboard (read
+# 17 Sep 2026, read-only): a brand block, then GROUPS that collapse and
+# expand on a chevron, items inside them, and a footer. Two things added for
+# this hub: the ARCHITECTURE STRIP at the very top -- the three layers, with
+# the one the reader is standing in marked -- so nobody has to guess where
+# they are; and the group state is remembered per browser. The "Method" link
+# to the public site's design page is gone (17 Sep 2026): it took readers out
+# of the hub without warning.
+GROUPS = [
+    # (key, label, layer, items) -- items: (key, label, href)
+    ("coord", "Coordination", "2", [
+        ("hubindex",    "Coordination view",   "./"),
+        ("hubcoverage", "Coverage &amp; 5Ws",  "coverage.html"),
+        ("hubinbox",    "Field inbox",         "inbox.html"),
+        ("hubaccess",   "Access",              "access.html"),
+    ]),
+    ("forms", "Field forms", "1", [
+        ("outforms",    "All forms",              "../form/"),
+        ("outact",      "Activity report (5Ws)",  "../form/5ws-report.html"),
+        ("outcontact",  "Service contact",        "../form/contact.html"),
+        ("outref",      "Referral",               "../form/referral.html"),
+        ("outphq",      "PHQ-9 follow-up",        "../form/phq9.html"),
+        ("outself",     "Self-report",            "../form/selfreport.html"),
+        ("outcards",    "Printable QR cards",     "../form/cards.html"),
+    ]),
+    ("public", "Public site", "3", [
+        ("outpublic",   "Home",                   "../"),
+        ("outflood",    "Flood response",         "../flood-response.html"),
+        ("outrefdir",   "Referral directory",     "../referral-directory.html"),
+    ]),
 ]
+# kept for the completeness check below: every hub page the rail points at
+RAIL = [(k, l, h) for g in GROUPS for (k, l, h) in g[3]]
 # the sections of the coordination view itself, shown only on that page
 HUBSECTIONS = [
     ("#coverage", "Coverage"), ("#who", "Who is doing what"), ("#when", "Over time"),
     ("#what", "Activities"),   ("#people", "Workforce"),      ("#helpline", "Helplines"),
     ("#layers", "Architecture"),
 ]
+# the tabs of the coverage page, shown only on that page; the hash opens the tab
+COVSECTIONS = [
+    ("coverage.html#gaps", "Coverage gaps"), ("coverage.html#duplication", "Duplication check"),
+    ("coverage.html#matrix", "5Ws matrix"),  ("coverage.html#activity", "By activity"),
+    ("coverage.html#records", "Records received"), ("coverage.html#publish", "Publish"),
+]
+
+RAIL_JS = """(function(){
+  var rail=document.currentScript.parentNode, KEY='mhpss-rail-groups';
+  var saved={}; try{ saved=JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){}
+  rail.querySelectorAll('.rg').forEach(function(g){
+    var k=g.getAttribute('data-g'), h=g.querySelector('.rgh');
+    if(!g.classList.contains('here') && k in saved) g.classList.toggle('open', !!saved[k]);
+    h.setAttribute('aria-expanded', g.classList.contains('open'));
+    h.addEventListener('click', function(){
+      g.classList.toggle('open'); var on=g.classList.contains('open');
+      h.setAttribute('aria-expanded', on); saved[k]=on;
+      try{ localStorage.setItem(KEY, JSON.stringify(saved)); }catch(e){}
+    });
+  });
+  var m=rail.querySelector('.rmenu');
+  if(m){ m.addEventListener('click', function(){
+    var open=rail.classList.toggle('menu-open'); m.setAttribute('aria-expanded', open); }); }
+})();"""
 
 def rail_block(key):
+    here_group = None
+    for gk, glabel, layer, items in GROUPS:
+        if any(k == key for k, _, _ in items):
+            here_group = gk
     out = ['<aside class="rail" aria-label="Coordination hub">',
            '  <a class="railid" href="./">',
            '    <span data-mark="30"></span>',
            '    <span><b>MHPSS Nepal</b><i>Layer 2 &middot; coordination</i></span>',
            '  </a>',
+           # -- the architecture strip: where the reader is, before anything else
+           '  <div class="where" aria-label="Where you are in the system">',
+           '    <span class="wlab">Architecture &middot; you are here</span>',
+           '    <a class="lyr" href="../form/"><b>1</b><span>Field forms<i>on phones, works offline</i></span></a>',
+           '    <a class="lyr on" href="./" aria-current="true"><b>2</b><span>Coordination<i>this hub &middot; restricted</i></span></a>',
+           '    <a class="lyr" href="../"><b>3</b><span>Public site<i>published summaries only</i></span></a>',
+           '  </div>',
+           '  <button class="rmenu" type="button" aria-expanded="false"><span></span>Menu</button>',
            '  <nav>']
-    for k, label, href in RAIL:
-        if k == "group":
-            out.append('    <span class="rgrp">%s</span>' % label)
-            continue
-        on = ' class="on" aria-current="page"' if k == key else ''
-        out.append('    <a%s href="%s">%s</a>' % (on, href, label))
-        if k == "hubindex" and key == "hubindex":
-            out.append('    <span class="rsub">')
-            for h, l in HUBSECTIONS:
-                out.append('      <a href="%s">%s</a>' % (h, l))
-            out.append('    </span>')
+    for gk, glabel, layer, items in GROUPS:
+        cls = "rg" + (" open here" if gk == here_group else (" open" if gk == "coord" else ""))
+        out.append('    <div class="%s" data-g="%s">' % (cls, gk))
+        out.append('      <button class="rgh" type="button"><span class="dot l%s"></span>%s<em>layer %s</em><i class="chev"></i></button>' % (layer, glabel, layer))
+        out.append('      <div class="rgb">')
+        for k, label, href in items:
+            on = ' class="on" aria-current="page"' if k == key else ''
+            out.append('        <a%s href="%s">%s</a>' % (on, href, label))
+            if k == "hubindex" and key == "hubindex":
+                out.append('        <span class="rsub">')
+                for h, l in HUBSECTIONS:
+                    out.append('          <a href="%s">%s</a>' % (h, l))
+                out.append('        </span>')
+            if k == "hubcoverage" and key == "hubcoverage":
+                out.append('        <span class="rsub">')
+                for h, l in COVSECTIONS:
+                    out.append('          <a href="%s">%s</a>' % (h, l))
+                out.append('        </span>')
+        out.append('      </div>')
+        out.append('    </div>')
     out.append('  </nav>')
     # i18n.js mounts the language switch here. Without a slot it floats top
     # right, where on these pages it lands on top of the synthetic-data banner.
     out.append('  <span data-i18n-toggle class="railtoggle"></span>')
     out.append('  <p class="rfoot">Draft. Figures are provisional.</p>')
+    out.append('  <script>%s</script>' % RAIL_JS)
     out.append('</aside>')
     return "\n".join(out)
 
@@ -96,7 +164,7 @@ def run(apply_it):
         print("  guaranteed: add the markers or remove this gate.")
         return 1
     for k, label, href in RAIL:
-        if k == "group" or k.startswith("out"):
+        if k.startswith("out"):
             continue
         rel = "index.html" if href == "./" else href
         if not os.path.exists(os.path.join(ROOT, rel)):

@@ -109,19 +109,71 @@
     <span data-mark="30"></span>
     <span><b>MHPSS Nepal</b><i>Layer 2 &middot; coordination</i></span>
   </a>
+  <div class="where" aria-label="Where you are in the system">
+    <span class="wlab">Architecture &middot; you are here</span>
+    <a class="lyr" href="../form/"><b>1</b><span>Field forms<i>on phones, works offline</i></span></a>
+    <a class="lyr on" href="./" aria-current="true"><b>2</b><span>Coordination<i>this hub &middot; restricted</i></span></a>
+    <a class="lyr" href="../"><b>3</b><span>Public site<i>published summaries only</i></span></a>
+  </div>
+  <button class="rmenu" type="button" aria-expanded="false"><span></span>Menu</button>
   <nav>
-    <span class="rgrp">Dashboard</span>
-    <a href="./">Coordination view</a>
-    <a class="on" aria-current="page" href="coverage.html">Coverage &amp; 5Ws</a>
-    <a href="inbox.html">Field inbox</a>
-    <a href="access.html">Access</a>
-    <span class="rgrp">Elsewhere</span>
-    <a href="../form/">Field forms</a>
-    <a href="../">Public page</a>
-    <a href="../method.html">Method</a>
+    <div class="rg open here" data-g="coord">
+      <button class="rgh" type="button"><span class="dot l2"></span>Coordination<em>layer 2</em><i class="chev"></i></button>
+      <div class="rgb">
+        <a href="./">Coordination view</a>
+        <a class="on" aria-current="page" href="coverage.html">Coverage &amp; 5Ws</a>
+        <span class="rsub">
+          <a href="coverage.html#gaps">Coverage gaps</a>
+          <a href="coverage.html#duplication">Duplication check</a>
+          <a href="coverage.html#matrix">5Ws matrix</a>
+          <a href="coverage.html#activity">By activity</a>
+          <a href="coverage.html#records">Records received</a>
+          <a href="coverage.html#publish">Publish</a>
+        </span>
+        <a href="inbox.html">Field inbox</a>
+        <a href="access.html">Access</a>
+      </div>
+    </div>
+    <div class="rg" data-g="forms">
+      <button class="rgh" type="button"><span class="dot l1"></span>Field forms<em>layer 1</em><i class="chev"></i></button>
+      <div class="rgb">
+        <a href="../form/">All forms</a>
+        <a href="../form/5ws-report.html">Activity report (5Ws)</a>
+        <a href="../form/contact.html">Service contact</a>
+        <a href="../form/referral.html">Referral</a>
+        <a href="../form/phq9.html">PHQ-9 follow-up</a>
+        <a href="../form/selfreport.html">Self-report</a>
+        <a href="../form/cards.html">Printable QR cards</a>
+      </div>
+    </div>
+    <div class="rg" data-g="public">
+      <button class="rgh" type="button"><span class="dot l3"></span>Public site<em>layer 3</em><i class="chev"></i></button>
+      <div class="rgb">
+        <a href="../">Home</a>
+        <a href="../flood-response.html">Flood response</a>
+        <a href="../referral-directory.html">Referral directory</a>
+      </div>
+    </div>
   </nav>
   <span data-i18n-toggle class="railtoggle"></span>
   <p class="rfoot">Draft. Figures are provisional.</p>
+  <script>(function(){
+  var rail=document.currentScript.parentNode, KEY='mhpss-rail-groups';
+  var saved={}; try{ saved=JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){}
+  rail.querySelectorAll('.rg').forEach(function(g){
+    var k=g.getAttribute('data-g'), h=g.querySelector('.rgh');
+    if(!g.classList.contains('here') && k in saved) g.classList.toggle('open', !!saved[k]);
+    h.setAttribute('aria-expanded', g.classList.contains('open'));
+    h.addEventListener('click', function(){
+      g.classList.toggle('open'); var on=g.classList.contains('open');
+      h.setAttribute('aria-expanded', on); saved[k]=on;
+      try{ localStorage.setItem(KEY, JSON.stringify(saved)); }catch(e){}
+    });
+  });
+  var m=rail.querySelector('.rmenu');
+  if(m){ m.addEventListener('click', function(){
+    var open=rail.classList.toggle('menu-open'); m.setAttribute('aria-expanded', open); }); }
+})();</script>
 </aside>
 <!--/NAV-->
 
@@ -286,15 +338,20 @@
       <p class="xs" style="margin-top:10px" id="disNote"></p>
     </div>
 
-    <!-- RAW -->
+    <!-- RAW: the list of reports received -- where a report filed on a phone
+         can be found again. Newest received first; the filter box narrows by
+         any word (organisation, site, activity, date, id). -->
     <div class="panel" id="p-raw">
-      <div class="btns" style="margin-bottom:12px">
+      <p class="lede" style="margin:0 0 10px"><b>Reports received</b> — every activity report in the register that passes the filters above, newest first. A report filed on the 5Ws form appears here the moment the phone has signal; the same report saved twice on one phone stays one row.</p>
+      <div class="btns" style="margin-bottom:12px;align-items:center;flex-wrap:wrap">
+        <input type="search" id="rawFind" placeholder="Find — organisation, site, activity, date, id" style="flex:1 1 260px;min-width:200px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;font:inherit;font-size:13px">
+        <span class="xs" id="rawCount"></span>
         <button type="button" class="btn ghost sm" id="expAll">Export everything loaded as CSV</button>
         <button type="button" class="btn grey sm" id="reload">Change source</button>
       </div>
       <div class="tbl-wrap">
         <table class="data">
-          <thead><tr><th>Date</th><th>Site</th><th>Organisation</th><th>Activity</th><th class="n">Reached</th><th>Target groups</th><th>ID</th></tr></thead>
+          <thead><tr><th>Received</th><th>Date of activity</th><th>Site</th><th>Organisation</th><th>Activity</th><th class="n">Attendance</th><th>Target groups</th><th>ID</th></tr></thead>
           <tbody id="rawBody"></tbody>
         </table>
       </div>
@@ -871,13 +928,27 @@
   });
 
   /* ---------- tabs ---------- */
+  /* A tab has an address: #gaps #duplication #matrix #activity #records
+     #publish. The rail's sub-links and any shared link open the tab, and a
+     click writes the hash, so "where the reports are" can be sent as a URL:
+     coverage.html#records. */
+  var TAB_HASH = { cov: "gaps", dup: "duplication", mx: "matrix", act: "activity", raw: "records", pub: "publish" };
+  var HASH_TAB = {}; Object.keys(TAB_HASH).forEach(function (k) { HASH_TAB[TAB_HASH[k]] = k; });
+  function showTab(p) {
+    var b = document.querySelector('.tab[data-p="' + p + '"]'); if (!b) return;
+    document.querySelectorAll(".tab").forEach(function (x) { x.classList.remove("on"); });
+    document.querySelectorAll(".panel").forEach(function (x) { x.classList.remove("on"); });
+    b.classList.add("on"); $("p-" + p).classList.add("on");
+  }
   document.querySelectorAll(".tab").forEach(function (b) {
     b.addEventListener("click", function () {
-      document.querySelectorAll(".tab").forEach(function (x) { x.classList.remove("on"); });
-      document.querySelectorAll(".panel").forEach(function (x) { x.classList.remove("on"); });
-      b.classList.add("on"); $("p-" + b.dataset.p).classList.add("on");
+      showTab(b.dataset.p);
+      if (history.replaceState) history.replaceState(null, "", "#" + TAB_HASH[b.dataset.p]);
     });
   });
+  function tabFromHash() { var h = (location.hash || "").replace("#", ""); if (HASH_TAB[h]) showTab(HASH_TAB[h]); }
+  window.addEventListener("hashchange", tabFromHash);
+  tabFromHash();
 
   /* ---------- render ---------- */
   var GAPS = [], MX_LONG = [], PUBSRC = null;
@@ -1185,12 +1256,38 @@
     if ($("p-pub").classList.contains("on")) { pubDocsPanel(); }
 
     /* --- raw --- */
-    $("rawBody").innerHTML = DATA.slice(0, 400).map(function (r) {
-      return "<tr><td>" + esc(r.dateAD || "—") + "</td><td>" + esc(siteName(r)) + "</td><td>" + esc(orgName(r)) +
+    renderRaw();
+  }
+
+  /* the list of reports received: newest first by the time the register
+     took it (server_ts, then createdAt), narrowed by the find box */
+  function receivedAt(r) {
+    var t = r.server_ts || r.created_at || r.createdAt || "";
+    if (t && typeof t === "object" && typeof t.toDate === "function") t = t.toDate().toISOString();
+    if (t && typeof t === "object" && t.seconds) t = new Date(t.seconds * 1000).toISOString();
+    return typeof t === "string" ? t : "";
+  }
+  function fmtReceived(t) {
+    if (!t) return "—";
+    var d = new Date(t); if (isNaN(d)) return esc(String(t).slice(0, 16));
+    return d.toLocaleDateString("en-GB", { day: "numeric", month: "short" }) + " " + d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+  }
+  function renderRaw() {
+    var q = ($("rawFind").value || "").trim().toLowerCase();
+    var rows = DATA.slice().sort(function (a, b) { return receivedAt(b).localeCompare(receivedAt(a)); });
+    if (q) rows = rows.filter(function (r) {
+      return [r.dateAD, r.dateBS, siteName(r), orgName(r), actName(r.activity), r.activity, r.id, r.sessionTime, (r.targetGroups || []).join(" ")]
+        .join(" ").toLowerCase().indexOf(q) >= 0;
+    });
+    $("rawCount").textContent = rows.length + " of " + DATA.length + " report" + (DATA.length === 1 ? "" : "s") + (rows.length > 400 ? " · first 400 shown" : "");
+    $("rawBody").innerHTML = rows.slice(0, 400).map(function (r) {
+      return "<tr><td class='xs'>" + fmtReceived(receivedAt(r)) + "</td><td>" + esc(r.dateAD || (r.dateBS ? "BS " + r.dateBS : "—")) + (r.sessionTime ? " <span class='xs'>" + esc(r.sessionTime) + "</span>" : "") +
+        "</td><td>" + esc(siteName(r)) + "</td><td>" + esc(orgName(r)) +
         "</td><td>" + esc(actName(r.activity)) + '</td><td class="n">' + esc(r.reachedTotal) + "</td><td class='xs'>" +
         esc((r.targetGroups || []).join(", ")) + "</td><td class='xs'>" + esc(r.id) + "</td></tr>";
-    }).join("");
+    }).join("") || "<tr><td colspan='8' class='xs'>No report matches.</td></tr>";
   }
+  $("rawFind").addEventListener("input", renderRaw);
 
   function stat(v, k, s, cls) {
     return '<div class="stat ' + (cls || "") + '"><div class="v">' + v + '</div><div class="k">' + k + "</div>" + (s ? '<div class="s">' + s + "</div>" : "") + "</div>";

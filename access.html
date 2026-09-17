@@ -50,19 +50,63 @@
     <span data-mark="30"></span>
     <span><b>MHPSS Nepal</b><i>Layer 2 &middot; coordination</i></span>
   </a>
+  <div class="where" aria-label="Where you are in the system">
+    <span class="wlab">Architecture &middot; you are here</span>
+    <a class="lyr" href="../form/"><b>1</b><span>Field forms<i>on phones, works offline</i></span></a>
+    <a class="lyr on" href="./" aria-current="true"><b>2</b><span>Coordination<i>this hub &middot; restricted</i></span></a>
+    <a class="lyr" href="../"><b>3</b><span>Public site<i>published summaries only</i></span></a>
+  </div>
+  <button class="rmenu" type="button" aria-expanded="false"><span></span>Menu</button>
   <nav>
-    <span class="rgrp">Dashboard</span>
-    <a href="./">Coordination view</a>
-    <a href="coverage.html">Coverage &amp; 5Ws</a>
-    <a href="inbox.html">Field inbox</a>
-    <a class="on" aria-current="page" href="access.html">Access</a>
-    <span class="rgrp">Elsewhere</span>
-    <a href="../form/">Field forms</a>
-    <a href="../">Public page</a>
-    <a href="../method.html">Method</a>
+    <div class="rg open here" data-g="coord">
+      <button class="rgh" type="button"><span class="dot l2"></span>Coordination<em>layer 2</em><i class="chev"></i></button>
+      <div class="rgb">
+        <a href="./">Coordination view</a>
+        <a href="coverage.html">Coverage &amp; 5Ws</a>
+        <a href="inbox.html">Field inbox</a>
+        <a class="on" aria-current="page" href="access.html">Access</a>
+      </div>
+    </div>
+    <div class="rg" data-g="forms">
+      <button class="rgh" type="button"><span class="dot l1"></span>Field forms<em>layer 1</em><i class="chev"></i></button>
+      <div class="rgb">
+        <a href="../form/">All forms</a>
+        <a href="../form/5ws-report.html">Activity report (5Ws)</a>
+        <a href="../form/contact.html">Service contact</a>
+        <a href="../form/referral.html">Referral</a>
+        <a href="../form/phq9.html">PHQ-9 follow-up</a>
+        <a href="../form/selfreport.html">Self-report</a>
+        <a href="../form/cards.html">Printable QR cards</a>
+      </div>
+    </div>
+    <div class="rg" data-g="public">
+      <button class="rgh" type="button"><span class="dot l3"></span>Public site<em>layer 3</em><i class="chev"></i></button>
+      <div class="rgb">
+        <a href="../">Home</a>
+        <a href="../flood-response.html">Flood response</a>
+        <a href="../referral-directory.html">Referral directory</a>
+      </div>
+    </div>
   </nav>
   <span data-i18n-toggle class="railtoggle"></span>
   <p class="rfoot">Draft. Figures are provisional.</p>
+  <script>(function(){
+  var rail=document.currentScript.parentNode, KEY='mhpss-rail-groups';
+  var saved={}; try{ saved=JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){}
+  rail.querySelectorAll('.rg').forEach(function(g){
+    var k=g.getAttribute('data-g'), h=g.querySelector('.rgh');
+    if(!g.classList.contains('here') && k in saved) g.classList.toggle('open', !!saved[k]);
+    h.setAttribute('aria-expanded', g.classList.contains('open'));
+    h.addEventListener('click', function(){
+      g.classList.toggle('open'); var on=g.classList.contains('open');
+      h.setAttribute('aria-expanded', on); saved[k]=on;
+      try{ localStorage.setItem(KEY, JSON.stringify(saved)); }catch(e){}
+    });
+  });
+  var m=rail.querySelector('.rmenu');
+  if(m){ m.addEventListener('click', function(){
+    var open=rail.classList.toggle('menu-open'); m.setAttribute('aria-expanded', open); }); }
+})();</script>
 </aside>
 <!--/NAV-->
 
