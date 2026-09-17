@@ -139,7 +139,7 @@ main{padding:24px 0 56px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
       box-shadow:var(--shadow);padding:18px 20px;margin-bottom:18px}
 .card h2{font-size:19px;font-weight:700;letter-spacing:-.018em;margin-bottom:4px;line-height:1.25}
-.card .note{font-size:12.5px;color:var(--slate);margin-bottom:14px;max-width:78ch}
+.card .note{font-size:12.5px;color:var(--slate);margin-bottom:14px;max-width:none}
 .chead{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:12px}
 .chead .grow{flex:1;min-width:220px}
 .chead h2{margin-bottom:4px}
@@ -149,7 +149,7 @@ main{padding:24px 0 56px}
       border-radius:var(--r);box-shadow:var(--shadow);padding:20px 22px;margin-bottom:18px}
 .hero .k{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--critical);font-weight:700}
 .hero .v{font-size:clamp(24px,4.4vw,34px);font-weight:700;letter-spacing:-.025em;line-height:1.15;margin:6px 0 8px}
-.hero p{font-size:13.5px;color:var(--slate);max-width:82ch}
+.hero p{font-size:13.5px;color:var(--slate);max-width:none}
 
 /* ── kpi ── */
 /* Eight figures, and the row is always FULL -- 8, 4 or 2 across. auto-fit was
@@ -226,7 +226,7 @@ line.axis,.axis line{stroke:var(--grid);stroke-width:1}
 .layer a:hover{text-decoration:underline}
 footer.site{border-top:1px solid var(--line);background:var(--surface);padding:22px 0 34px;
             font-size:12px;color:var(--slate)}
-footer.site p{margin-bottom:8px;max-width:88ch}
+footer.site p{margin-bottom:8px;max-width:none}
 footer.site b{color:var(--ink)}
 
 /* ── tooltip ── */
