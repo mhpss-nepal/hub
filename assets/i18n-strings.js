@@ -211,7 +211,7 @@ window.I18N_STRINGS = {
     "nav.access":         "Access",
     "nav.method":         "Method",
     "nav.whoSees":        "Who can see what",
-    "banner.trial":       "TRIAL INSTRUMENT — NOT THE LIVE REPORTING SYSTEM",
+    "banner.trial":       "Revised draft for field piloting",
     "lang.select":        "Select language",
 
     /* ---- attribution band ---- */
@@ -259,7 +259,7 @@ window.I18N_STRINGS = {
     "hub.meta.title": "MHPSS Nepal — Integrated Hub",
     "hub.meta.desc": "One door to the mental health and psychosocial support information system for the Rasuwa–Bhote Koshi flood response. Demonstration build; all figures synthetic.",
 
-    "banner.trialSub": "· drafts for the MHPSS Technical Working Group to approve · nothing you enter is sent anywhere",
+    "banner.trialSub": " · saved on this phone, sent to the coordination register when there is signal",
 
 
 
@@ -283,7 +283,7 @@ window.I18N_STRINGS = {
     "ml.p008": "Clinical follow-up · PHQ-9",
     "ml.p009": "Daily contact · new vs returning",
     "ml.p010": "Service delivery · 4Ws / 5W",
-    "ml.p011": "<b>None of these forms submits anywhere.</b> This site is a static site with no server behind it, so there is nothing for a form to send data to. Each form validates what you type, calculates what it should calculate, saves it in your own browser, and lets you export a file. They are here so the Technical Working Group can see and agree the questions <i>before</i> anything is collected for real. Do not use them to record a real service and assume it was captured — it was not.",
+    "ml.p011": "<b>Every form saves on the phone first.</b> What you enter is kept on this device and sent to the coordination register on its own when there is signal; without signal it waits. Each form validates what you type, calculates what it should calculate, and lets you export a file of your own. The questions are a revised draft agreed with EDCD on 17 September 2026 and go to the field for piloting before they are final.",
     "ml.p012": "Layer 1 · Field · Form master list",
     "ml.p013": "So that anyone can check a question against the meeting that asked for it, rather than taking it on trust.",
     "ml.p014": "Problem described 14 Sep 2026. Belongs in the backend, not here.",
@@ -303,7 +303,7 @@ window.I18N_STRINGS = {
     "ml.p028": "Feeds the 4Ws table and the national 5W. Fields follow IASC MHPSS 4Ws (2012) Table 1, plus four marked additions.",
     "ml.p029": "One row per activity, per site, per day. Coded sites and activities, sex and age disaggregation, both calendars. Records <b>services, not people</b> — there is no field for a name, and none is to be added.",
     "ml.p030": "<b>Open here</b> loads the form in this page. <b>Copy link</b> gives you a link to send a field worker over WhatsApp, so they fill it in on their own phone. <b>QR</b> shows a printable code for a noticeboard at a holding centre. Every form works on a phone, and keeps working with no signal.",
-    "ml.p031": "<b>Where the exports go</b> — the worker exports a file and sends it to you over WhatsApp or email; you drop it into the <a href=\"../hub/inbox.html\">field inbox</a>, which turns the files into one table. Nothing travels on its own, because there is no server behind this site.",
+    "ml.p031": "<b>Where the records go</b> \u2014 into the coordination register as soon as the phone has signal, where the coordination view reads them. The export remains for a copy of your own, or for a phone that never gets signal: send the file over WhatsApp or email and it is dropped into the <a href=\"../hub/inbox.html\">field inbox</a>.",
     "ml.p032": "<b>No signal</b> — once a form has been opened on a phone, it keeps working offline. Entries stay in that phone's browser until exported.",
     "ml.p033": "<b>QR</b> — print it and put it on the wall at a holding centre. A phone camera opens the form. Useful for the self-report form, where you want people to reach it without being handed a link.",
     "ml.p034": "<b>Copy link</b> — paste it into WhatsApp and send it to a field worker. They open it on their own phone, fill it in there, and export. No app, no account, no sign-in.",
@@ -364,8 +364,8 @@ window.I18N_STRINGS = {
     "f4.reachHelp":     "Enter the figure your organisation already records. The next question asks what it counts, so nothing has to be converted first.",
     "f4.basisLab":      "What does that number count?",
     "f4.basisPick":     "\u2014 choose \u2014",
-    "f4.basisContacts": "Service contacts \u2014 each time someone was seen, if that is all you can count",
-    "f4.basisPeople":   "People who attended \u2014 each person once",
+    "f4.basisContacts": "Service contacts (each time someone was seen)",
+    "f4.basisPeople":   "People who attended (each person once)",
     "f4.basisUnsure":   "Not sure",
     "f4.basisHelp":     "The daily form counts people who attended. If your records only hold contacts, say so \u2014 the two are kept apart, never added together. Sessions per person belong in the contact report, not here.",
     "f4.distLab":       "Distinct people, if you know it <span class=\"opt\">\u2014 optional</span>",
@@ -417,7 +417,7 @@ window.I18N_STRINGS = {
 
     /* ---- swept prose: sr ---- */
     "sr.p001": "<b>Free text is the risk on this form.</b> Question 5 is open, anonymous, and may be filled in by someone in distress or may name another person. Whoever exports these answers has to read them before they go anywhere, and remove anything that identifies someone. That is a named human responsibility — no form design removes it.",
-    "sr.p002": "“Send” saves the answer in this browser. There is no server behind this site, so nothing actually leaves the device — a worker exports the answers and passes them on.",
+    "sr.p002": "\u201cSend\u201d saves the answer on this device and passes it to the coordination register when there is signal. It carries no name and nothing that points back to you.",
     "sr.p003": "Please do not write your name or anyone else's name here.",
     "sr.p004": "Question 3 and question 4 together are the useful pair: a site where everyone knows about the service but nobody can reach it has a different problem from a site where nobody has been told it exists.",
     "sr.p005": "There is no score and no threshold here. This is not a test and it does not say anything about your health.",
