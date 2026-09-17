@@ -220,7 +220,7 @@
       </div>
       <div class="tbl-wrap">
         <table class="data">
-          <thead><tr><th>Site</th><th>District</th><th>Recorded population</th><th>Reports</th><th>People reached</th><th>Organisations</th><th>Last report</th></tr></thead>
+          <thead><tr><th>Site</th><th>District</th><th>Recorded population</th><th>Reports</th><th>Reach</th><th>Organisations</th><th>Last report</th></tr></thead>
           <tbody id="covBody"></tbody>
         </table>
       </div>
@@ -228,7 +228,7 @@
       <h2>Reported, but not on the roster</h2>
       <div class="tbl-wrap">
         <table class="data">
-          <thead><tr><th>Site as reported</th><th>District</th><th>Reports</th><th>People reached</th></tr></thead>
+          <thead><tr><th>Site as reported</th><th>District</th><th>Reports</th><th>Reach</th></tr></thead>
           <tbody id="offBody"></tbody>
         </table>
       </div>
@@ -239,7 +239,7 @@
       <div class="banner" id="dupLede"></div>
       <div class="tbl-wrap">
         <table class="data">
-          <thead><tr><th>Date</th><th>Site</th><th>Organisations reporting</th><th>Activities</th><th>People reached</th><th>Reading</th></tr></thead>
+          <thead><tr><th>Date</th><th>Site</th><th>Organisations reporting</th><th>Activities</th><th>Reach</th><th>Reading</th></tr></thead>
           <tbody id="dupBody"></tbody>
         </table>
       </div>
@@ -258,11 +258,11 @@
           <tbody id="pxBody"></tbody>
         </table>
       </div>
-      <p class="xs" style="margin-top:10px">Who is present where, doing what — the 4Ws proper, at palika level. A cell lists the activity codes an organisation has reported in that palika, with the number of reports per code and the people reached underneath. A site's palika comes from the site list; a palika-level report carries its own. Reports whose palika is not established sit in the last column rather than being dropped.</p>
+      <p class="xs" style="margin-top:10px">Who is present where, doing what — the 4Ws proper, at palika level. A cell lists the activity codes an organisation has reported in that palika, with the number of reports per code and the reach underneath. A site's palika comes from the site list; a palika-level report carries its own. Reports whose palika is not established sit in the last column rather than being dropped.</p>
       <h2>By organisation</h2>
       <div class="tbl-wrap">
         <table class="data">
-          <thead><tr><th>Organisation</th><th>District</th><th>Sites</th><th>Activities</th><th>Reports</th><th>People reached</th><th>First</th><th>Last</th></tr></thead>
+          <thead><tr><th>Organisation</th><th>District</th><th>Sites</th><th>Activities</th><th>Reports</th><th>Reach</th><th>First</th><th>Last</th></tr></thead>
           <tbody id="mxBody"></tbody>
         </table>
       </div>
@@ -272,7 +272,7 @@
     <div class="panel" id="p-act">
       <div class="tbl-wrap">
         <table class="data">
-          <thead><tr><th>Activity</th><th>Group</th><th>Reports</th><th>People reached</th><th>Share of reach</th><th>Organisations</th></tr></thead>
+          <thead><tr><th>Activity</th><th>Group</th><th>Reports</th><th>Reach</th><th>Share of reach</th><th>Organisations</th></tr></thead>
           <tbody id="actBody"></tbody>
         </table>
       </div>
@@ -848,10 +848,25 @@
     var covered = ROSTER.filter(function (s) { return sitesSeen.has(s.code); });
     GAPS = ROSTER.filter(function (s) { return !sitesSeen.has(s.code); });
     var gapPop = GAPS.reduce(function (a, s) { return a + (s.pop || 0); }, 0);
+    // The headline says what was actually counted. A record carries countBasis
+    // (CONTACTS / PEOPLE / UNSURE); contacts and people cannot share a label,
+    // let alone a sum, so the tile is named from the records on screen.
+    var nC = DATA.filter(function (r) { return r.countBasis === "CONTACTS"; }).length,
+        nP = DATA.filter(function (r) { return r.countBasis === "PEOPLE"; }).length,
+        nU = DATA.length - nC - nP;
+    var reachLabel, reachSub;
+    if (DATA.length && nC === DATA.length) {
+      reachLabel = "Service contacts"; reachSub = "sessions, not people — one person seen twice counts twice; no subtotals";
+    } else if (DATA.length && nP === DATA.length) {
+      reachLabel = "People reached"; reachSub = "distinct people as the reports state — no subtotals";
+    } else {
+      reachLabel = "Reach — mixed basis";
+      reachSub = nC + " reports count contacts, " + nP + " count people, " + nU + " do not say — not one series";
+    }
 
     $("stats").innerHTML = [
       stat(DATA.length, "Reports loaded", "one row per activity, site and day"),
-      stat(reach.toLocaleString(), "People reached", "sum of detail rows only — no subtotals"),
+      stat(reach.toLocaleString(), reachLabel, reachSub),
       stat(orgs.size, "Organisations reporting", ""),
       stat(covered.length + " / " + ROSTER.length, "Roster sites reached", "", covered.length === ROSTER.length ? "good" : ""),
       stat(GAPS.length, "Roster sites with no report", gapPop ? "≈" + gapPop.toLocaleString() + " people recorded there" : "", GAPS.length ? "alert" : "good")
@@ -904,7 +919,7 @@
     var total = DATA.reduce(function (a, r) { return a + n(r.reachedTotal); }, 0);
     $("dupLede").innerHTML = flags.length
       ? "<b>" + flags.length + " site-days have more than one organisation reporting</b>, covering " + flagged.toLocaleString() + " of " + total.toLocaleString() +
-        " people reached (" + (total ? (flagged / total * 100).toFixed(1) : "0") + "%). These need a conversation, not a correction."
+        " of the reach (" + (total ? (flagged / total * 100).toFixed(1) : "0") + "%). These need a conversation, not a correction."
       : "<b>No site-day has more than one organisation reporting.</b>";
     $("dupBody").innerHTML = flags.length ? flags.sort(function (a, b) { return (b.date || "").localeCompare(a.date || ""); }).map(function (g) {
       var byOrg = {};
@@ -946,7 +961,7 @@
     $("pxHead").innerHTML =
       "<tr><th rowspan=\"2\">Organisation</th>" + groups.map(function (g) {
         return '<th class="dist" colspan="' + g.n + '">' + esc(g.d === "zz" ? "—" : (distName(g.d) || "—")) + "</th>";
-      }).join("") + '<th rowspan="2" class="tot">Reports</th><th rowspan="2" class="tot">People reached</th></tr>' +
+      }).join("") + '<th rowspan="2" class="tot">Reports</th><th rowspan="2" class="tot">Reach</th></tr>' +
       "<tr>" + cols.map(function (k) {
         var c = palCols[k];
         return '<th class="pal">' + esc(c.name) + '<span class="xs">' + c.reports + " report" + (c.reports === 1 ? "" : "s") + " · " + c.reach.toLocaleString() + " reached</span></th>";
