@@ -125,7 +125,7 @@
 </aside>
 <!--/NAV-->
 
-<div style="background:#d03b3b;color:#fff;font:700 12.5px/1.45 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;letter-spacing:.02em;text-align:center;padding:7px 16px;padding-top:calc(7px + env(safe-area-inset-top,0px))">DEMONSTRATION — FIGURES SHOWN HERE COME FROM WHATEVER FILE YOU LOAD <span style="font-weight:400;opacity:.92">· draft, not agreed with EDCD or the MHPSS Technical Working Group · a file is read in the page and never uploaded; the live path reads the register and writes nothing</span></div>
+<div id="band" style="background:#d03b3b;color:#fff;font:700 12.5px/1.45 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;letter-spacing:.02em;text-align:center;padding:7px 16px;padding-top:calc(7px + env(safe-area-inset-top,0px))">DEMONSTRATION — FIGURES SHOWN HERE COME FROM WHATEVER FILE YOU LOAD <span style="font-weight:400;opacity:.92">· draft, not agreed with EDCD or the MHPSS Technical Working Group · a file is read in the page and never uploaded; the live path reads the register and writes nothing</span></div>
 
 
 <div class="top">
@@ -460,10 +460,30 @@
      worth a toast; an empty REGISTER is a true state of the system and has
      to render as itself, because a page of zeros looks exactly like a page
      that is broken. */
+  /* The band over the page says where the figures come from. It was written
+     for the file path ("whatever file you load"); on the live path that
+     sentence is false, so the band is renamed when the source is the register.
+     What stays true on both paths, and stays in the band: the classification
+     is provisional and nothing on this page writes anywhere. */
+  var BAND_FILE = $("band") ? $("band").innerHTML : "";
+  function setBand(live) {
+    var b = $("band"); if (!b) return;
+    if (live) {
+      b.style.background = "#245c86";
+      b.innerHTML = 'LIVE REGISTER — FIGURES RECOMPUTE AS REPORTS ARRIVE <span style="font-weight:400;opacity:.92">' +
+        '· classification provisional, not yet agreed with EDCD or the MHPSS Technical Working Group ' +
+        '· this page reads the register and writes nothing</span>';
+    } else {
+      b.style.background = "#d03b3b";
+      b.innerHTML = BAND_FILE;
+    }
+  }
+
   function load(rows, src, live) {
     if (!live && (!rows || !rows.length)) return toast("That file has no records in it", true);
     rows = rows || [];
     ALL = rows; SRC = src;
+    setBand(!!live);
     $("loader").hidden = true; $("app").hidden = false;
 
     /* !! is load-bearing. `live` is undefined on the file paths, so `empty`
@@ -765,6 +785,22 @@
     livePaint(st);
     liveAttach();
   });
+
+  /* A coordination screen opens on the register, not on a menu. The click is
+     issued only once the bridge reports ready, because before that moment the
+     handler cannot tell the open window from a shut one and would ask for a
+     password it does not need. `?source=choose` keeps the chooser, for loading
+     a file or the synthetic set. Change source still works afterwards. */
+  (function openOnLive() {
+    if (/[?&]source=choose\b/.test(location.search) || !window.FB || !window.FB.onStatus) return;
+    var done = false;
+    window.FB.onStatus(function (st) {
+      if (done || !st || !st.ready) return;
+      done = true;
+      if ($("loader").hidden) return;          /* a file was loaded first */
+      $("useLive").click();
+    });
+  })();
 
   $("file").addEventListener("change", function (e) {
     var f = e.target.files[0]; if (!f) return;
