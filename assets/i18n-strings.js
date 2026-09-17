@@ -282,7 +282,7 @@ window.I18N_STRINGS = {
     "ml.p007": "Referral pathway",
     "ml.p008": "Clinical follow-up · PHQ-9",
     "ml.p009": "Daily contact · new vs returning",
-    "ml.p010": "Service delivery · 4Ws / 5W",
+    "ml.p010": "Service delivery · 5Ws",
     "ml.p011": "<b>Every form saves on the phone first.</b> What you enter is kept on this device and sent to the coordination register on its own when there is signal; without signal it waits. Each form validates what you type, calculates what it should calculate, and lets you export a file of your own. The questions are a revised draft agreed with EDCD on 17 September 2026 and go to the field for piloting before they are final.",
     "ml.p012": "Layer 1 · Field · Form master list",
     "ml.p013": "So that anyone can check a question against the meeting that asked for it, rather than taking it on trust.",
@@ -300,8 +300,8 @@ window.I18N_STRINGS = {
     "ml.p025": "Nine items, scored and interpreted on the handset. Used to follow <b>one person over time</b> after they have been referred for care — not to screen a shelter. The form states plainly what the score does and does not mean.",
     "ml.p026": "From the NCD data-system meeting, 15 Sep 2026: new vs returning client, province/subdistrict, focal person, type of service provider, GPS pin, unique-ID anchor.",
     "ml.p027": "The daily form. New or returning, municipality and ward, who delivered it, what kind of provider, and a location pin. A <b>contact code</b> is worked out on your own phone so a returning person is recognised without their name or number ever leaving the handset.",
-    "ml.p028": "Feeds the 4Ws table and the national 5W. Fields follow IASC MHPSS 4Ws (2012) Table 1, plus four marked additions.",
-    "ml.p029": "One row per activity, per site, per day. Coded sites and activities, sex and age disaggregation, both calendars. Records <b>services, not people</b> — there is no field for a name, and none is to be added.",
+    "ml.p028": "Feeds the coordination dashboard and the national 5W. Fields follow the IASC MHPSS 4Ws manual (2012), Table 1, plus marked additions; activity list on the IASC layers, 17 September 2026.",
+    "ml.p029": "Who did what, where and when, and for whom — one report per session, with its attendance. Coded sites and activities, sex and age disaggregation, both calendars. Records <b>services, not people</b> — there is no field for a name, and none is to be added.",
     "ml.p030": "<b>Open here</b> loads the form in this page. <b>Copy link</b> gives you a link to send a field worker over WhatsApp, so they fill it in on their own phone. <b>QR</b> shows a printable code for a noticeboard at a holding centre. Every form works on a phone, and keeps working with no signal.",
     "ml.p031": "<b>Where the records go</b> \u2014 into the coordination register as soon as the phone has signal, where the coordination view reads them. The export remains for a copy of your own, or for a phone that never gets signal: send the file over WhatsApp or email and it is dropped into the <a href=\"../hub/inbox.html\">field inbox</a>.",
     "ml.p032": "<b>No signal</b> — once a form has been opened on a phone, it keeps working offline. Entries stay in that phone's browser until exported.",
@@ -320,7 +320,7 @@ window.I18N_STRINGS = {
     "ml.p045": "Referral out / in",
     "ml.p046": "Depression measure (Nepali)",
     "ml.p047": "Service contact record",
-    "ml.p048": "Activity report",
+    "ml.p048": "Activity report (5Ws)",
     "ml.p049": "What the record says",
     "ml.p050": "Source",
     "ml.p051": "Form",
@@ -341,7 +341,7 @@ window.I18N_STRINGS = {
     "ml.p066": "Service contact",
     "ml.p067": "Published tool. Four additions are marked as additions on the Method page, with the reason for each.",
     "ml.p068": "IASC MHPSS 4Ws (2012), Table 1",
-    "ml.p069": "Activity report",
+    "ml.p069": "Activity report (5Ws)",
     "ml.p070": "🔗 Copy link",
     "ml.p071": "🔗 Copy link",
     "ml.p072": "🔗 Copy link",
@@ -353,29 +353,22 @@ window.I18N_STRINGS = {
     "ml.p078": "Printable card sheet",
     "ml.p079": "One A4 sheet, six cut-out cards, every form's QR on it — asked for by the data system review on 16 September.",
 
-    /* ---- 4Ws form: what the total counts ----
-       The single field that decides whether any figure here can enter the
-       5W. The cleaned backlog is 11,973 service contacts; the form used to
-       instruct "people, count them once", so the two could not be joined.
-       R-U1 (NDRRMA / EDCD) still rules on what the 5W takes. */
-    "f4.h4":            "How many",
-    "f4.h4hint":        "counts only, never a list",
-    "f4.reachLab":      "Total reached",
-    "f4.reachHelp":     "Enter the figure your organisation already records. The next question asks what it counts, so nothing has to be converted first.",
-    "f4.basisLab":      "What does that number count?",
-    "f4.basisPick":     "\u2014 choose \u2014",
-    "f4.basisContacts": "Contacts (each time seen)",
-    "f4.basisPeople":   "People (each person once)",
-    "f4.basisUnsure":   "Not sure",
-    "f4.basisHelp":     "The daily form counts people who attended. If your records only hold contacts, say so \u2014 the two are kept apart, never added together. Sessions per person belong in the contact report, not here.",
-    "f4.distLab":       "Distinct people, if you know it <span class=\"opt\">\u2014 optional</span>",
-    "f4.distHelp":      "If your organisation has already removed its own repeat visits, put that figure here. It is kept beside the contact count, never in place of it.",
+    /* ---- 5Ws form: for whom -- attendance ----
+       Since 17 Sep 2026 (afternoon) a report is one session and the figure
+       is its attendance; the form no longer asks what the figure counts and
+       the record carries CONTACTS (attendances summed across sessions).
+       The backlog was imported as service contacts, so one basis holds for
+       everything in the register. R-U1 (NDRRMA / EDCD) still rules on what
+       the national 5W takes. */
+    "f4.h4":            "For whom",
+    "f4.h4hint":        "who took part, as counts \u2014 never a list",
+    "f4.reachLab":      "Attendance",
+    "f4.reachHelp":     "Everyone who took part in this session, counted once. A person who comes to another session is counted there again.",
 
-    /* ---- 4Ws form: age and sex disaggregation ----
-       Four bands, chosen so 0-4 + 5-17 is the official "under 18" and
-       18-59 + 60+ is the official "18 and over". The team asked for an
-       under-5 figure and the official 5Ws has only the two bands; this
-       grid answers both, so nothing has to be collected twice. */
+    /* ---- 5Ws form: age and sex disaggregation ----
+       Five groups since the EDCD review of 17 Sep 2026 (0-4, 5-14, 15-49,
+       50-59, 60+), folded on screen at 15 -- two of them cross the 18-year
+       line, so an under-18 figure cannot be derived from them. */
     "f4.disLabel": "Disaggregation <span class=\"opt\">— optional, but leave a row blank rather than partly filled</span>",
     "f4.hAge":     "Age",
     "f4.hFemale":  "Female",
@@ -391,7 +384,7 @@ window.I18N_STRINGS = {
     "f4.ofPwd":    "Visible disability or needing help to move",
     "f4.ofPreg":   "Pregnant women or women with an infant",
     "f4.ofwNote":  "Five things a PFA provider can count by looking, without asking. One person can be on more than one line and is in an age group above as well; these are checked against the total but never summed with it or with each other. Leave blank what you did not see.",
-    "f4.disHelp":  "Five age groups, as agreed with EDCD on 17 September 2026. Leave a row blank rather than partly filled; the parts are checked against the total.",
+    "f4.disHelp":  "Five age groups, as agreed with EDCD on 17 September 2026. Leave a row blank rather than partly filled; the parts are checked against the attendance.",
     /* 0.3.0 fields, 16 Sep 2026: funding as a list, joint-activity partners,
        palika-level reports. English only until the translator returns. */
     "f4.donorsLab":    "Funding source <span class=\"opt\">\u2014 optional, tick all that apply</span>",

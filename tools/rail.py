@@ -18,7 +18,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RAIL = [
     ("group", "Dashboard", None),
     ("hubindex",    "Coordination view",   "./"),
-    ("hubcoverage", "Coverage &amp; 4Ws",  "coverage.html"),
+    ("hubcoverage", "Coverage &amp; 5Ws",  "coverage.html"),
     ("hubinbox",    "Field inbox",         "inbox.html"),
     ("hubaccess",   "Access",              "access.html"),
     ("group", "Elsewhere", None),
@@ -55,7 +55,7 @@ def rail_block(key):
     # i18n.js mounts the language switch here. Without a slot it floats top
     # right, where on these pages it lands on top of the synthetic-data banner.
     out.append('  <span data-i18n-toggle class="railtoggle"></span>')
-    out.append('  <p class="rfoot">Draft. Synthetic data only.</p>')
+    out.append('  <p class="rfoot">Draft. Figures are provisional.</p>')
     out.append('</aside>')
     return "\n".join(out)
 

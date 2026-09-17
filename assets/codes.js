@@ -18,10 +18,10 @@
                     14 Mar 2024, last updated 14 Aug 2026).
      - ORGS       : provider names actually appearing in submitted reports;
                     official names where the workstream verified them.
-     - ACTIVITIES : activity descriptions actually submitted, consolidated,
-                    now carrying the IASC 4Ws activity subcodes of the 2012
-                    manual (Table 2) where the match is direct, and a rule
-                    where it is conditional.
+     - ACTIVITIES : the activity list agreed 17 Sep 2026 -- plain labels on
+                    the form, IASC layer and 4Ws 2012 subcodes in the
+                    backend, one code for both; the previous list is kept
+                    as ACTIVITIES_V03 with its crosswalk.
      - DISTRICTS / TARGET GROUPS / CADRES : standard operational categories.
 
    Anything unverified is marked. Open questions are listed in META and in
@@ -30,9 +30,9 @@
    ===================================================================== */
 
 const META = {
-  version: "0.3.0-draft",
+  version: "0.4.0-draft",
   compiled: "2026-09-17",
-  basis: "Data workstream code lists of 15 Sep 2026 and delta list D-S01..D-M07; palika P-codes from OCHA COD-AB NPL v02; EDCD review of 17 Sep 2026 (cadre list, service settings, districts); districts from the RDNA Rasuwa-Bhotekoshi Flood 2026 (NDRRMA/NPC) and NDRRMA SitRep #1 of 1 Sep 2026",
+  basis: "Data workstream code lists of 15 Sep 2026 and delta list D-S01..D-M07; palika P-codes from OCHA COD-AB NPL v02; EDCD review of 17 Sep 2026 (cadre list, service settings, districts); districts from the RDNA Rasuwa-Bhotekoshi Flood 2026 (NDRRMA/NPC) and NDRRMA SitRep #1 of 1 Sep 2026; activity list v3 of 17 Sep 2026 (layer.item codes on the IASC pyramid, 4Ws 2012 subcodes in the backend)",
   status: "DRAFT — not agreed with EDCD or the MHPSS Technical Working Group",
   /* held open, not decided here: see the block each one concerns */
   questions: ["D-S14", "D-S23", "D-O02", "D-C01", "D-C02", "D-A03", "D-A05"],
@@ -215,44 +215,157 @@ const SITES = [
 ];
 
 /* ---------------------------------------------------------------------
-   ACTIVITIES
-   Consolidated from what partners actually submitted. `iasc` is the IASC
-   4Ws activity subcode from the 2012 manual, Table 2 (back cover) [S10],
-   transcribed by the data workstream from the PDF text layer and checked
-   against the page image. Three shapes:
-     iasc: "7.1"            a direct match          (D-A01)
-     iasc: null, iasc_of:[] the subcode depends on content or on the cadre
-                            of the person delivering; the rule says how
-                                                    (D-A02)
-     question: "D-A03"      whether the code belongs in a 4Ws activity list
-                            at all is open -- kept until ruled
-   `iasc_conf` is the workstream's confidence in the match.
-   OPEN: D-A05 -- the MHPSS MSP platform calls these the "old" 2014 codes and
-   points to an updated set in a May 2024 draft toolkit that could not be
-   obtained; which version to use is ruling R-A2. A record that combines
-   several activities carries several subcodes only under ruling R-A1.
+   ACTIVITIES — the list agreed on 17 September 2026 (activity list v3)
+   ---------------------------------------------------------------------
+   ONE ACTIVITY, TWO READINGS. The field form shows `name` and `help` in
+   plain language and nothing else. The register, the dashboard's backend
+   view and every export read the SAME code through the IASC fields:
+     layer / group   the IASC intervention pyramid layer (IASC Guidelines
+                     2007, pp. 11-13) -- ACTIVITY_GROUPS below
+     iasc_sub        the IASC 4Ws 2012 Table 2 subcode, when the match is
+                     direct; it travels on the record as `iascSub`
+     iasc_of         the candidate subcodes when the subcode is set at
+                     coordination from the description -- the reporter is
+                     never asked; the record carries no subcode until then
+     iasc_rule       how the subcode is set
+   The reporter never sees an IASC term; the coordinator never sees only a
+   plain label. Both readings point at one code, so they cannot drift.
+
+   Code = layer.item, stored as TEXT ("3.1", never a number). First digit =
+   layer 1-4; x.9 = Other (describe) within the layer, so no code shifts
+   when an item is added; "9" = fits no layer. These are NOT 4Ws codes:
+   3.1 here is PFA, 4Ws subcode 3.1 is community-initiated social support.
+   The 4Ws subcode labels are IASC_4WS_SUBCODES, as printed in Table 2.
+
+   Three copies of one list, changed together: this file; the master JSON
+   MHPSS_Nepal_ActivityCategories_IASC_17Sep2026.json and its .xlsx in
+   Information Management/; the project note claude/activity-categories.md
+   (choosing rules R1-R15, the crosswalk, sources S1-S4). The subject
+   expert of the Ministry (EDCD) leads the categorisation and may still
+   change labels or placement. Nepali labels wait for the health-sector
+   glossary requested at the EDCD review of 17 Sep 2026.
    ------------------------------------------------------------------- */
+const ACTIVITY_GROUPS = [
+  { code: "1", name: "Information and basic services",        iasc_layer: "i",   iasc_name: "Basic services and security",          me2017: "Social considerations in basic services and security" },
+  { code: "2", name: "Community and family activities",       iasc_layer: "ii",  iasc_name: "Community and family supports",        me2017: "Strengthening community and family supports" },
+  { code: "3", name: "Support for individuals and families",  iasc_layer: "iii", iasc_name: "Focused, non-specialised supports",    me2017: "Focused (person-to-person) non-specialised supports" },
+  { code: "4", name: "Specialist mental health care",         iasc_layer: "iv",  iasc_name: "Specialised services",                 me2017: "Specialised services" },
+  { code: "9", name: "Other activity",                        iasc_layer: null,  iasc_name: null,                                   me2017: null },
+];
 const ACTIVITIES = [
-  { code: "PFA",   iasc: "7.1",  iasc_conf: "High",   iasc_rule: "Direct match.", name: "Psychological first aid",                group: "Focused support", groupNp: "केन्द्रित सहयोग", np: "मनोवैज्ञानिक प्राथमिक उपचार", np_src: "draft", np_note: "PFA has an official WHO Nepali translation -- adopt ITS term, do not keep ours" },
-  { code: "CNS-I", iasc: "8.1",  iasc_conf: "High",   iasc_rule: "Basic counselling for individuals. Use 8.4 only if the partner reports psychotherapy.", name: "Individual psychosocial counselling",    group: "Focused support", groupNp: "केन्द्रित सहयोग", np: "व्यक्तिगत मनोसामाजिक परामर्श", np_src: "draft" },
-  { code: "CNS-G", iasc: "8.2",  iasc_conf: "High",   iasc_rule: "Basic counselling for groups or families.", name: "Group psychosocial counselling",         group: "Focused support", groupNp: "केन्द्रित सहयोग", np: "सामूहिक मनोसामाजिक परामर्श", np_src: "draft" },
-  { code: "PSED",  iasc: "1.2",  iasc_conf: "Medium", iasc_rule: "1.2 raising awareness on MHPSS fits community sessions. Psychoeducation for identified individuals has no specific subcode (8.6 Other, describe).", name: "Psychoeducation / awareness session",    group: "Community support", groupNp: "समुदायस्तरीय सहयोग", np: "मनोशिक्षा / जनचेतना सत्र", np_src: "draft" },
-  { code: "RECR",  iasc: "3.5",  iasc_conf: "High",   iasc_rule: "3.5 excludes activities at child-friendly spaces; those are 4.1.", name: "Recreational / structured activity",     group: "Community support", groupNp: "समुदायस्तरीय सहयोग", np: "मनोरञ्जनात्मक / संरचित क्रियाकलाप", np_src: "draft" },
-  { code: "CFS",   iasc: "4.1",  iasc_conf: "High",   iasc_rule: "Direct match.", name: "Child-friendly space activity",          group: "Community support", groupNp: "समुदायस्तरीय सहयोग", np: "बालमैत्री क्षेत्रको क्रियाकलाप", np_src: "draft" },
-  { code: "SPEC",  iasc: null, iasc_of: ["10.1", "10.2", "9.1", "9.2"], iasc_conf: "Medium", iasc_rule: "10.1 non-pharmacological, 10.2 pharmacological, by specialised providers. If delivered by non-specialised providers use 9.1 / 9.2. Needs the cadre field.", name: "Specialised mental health service",      group: "Specialised", groupNp: "विशेषज्ञ सेवा", np: "विशेषज्ञ मानसिक स्वास्थ्य सेवा", np_src: "draft" },
-  { code: "MEDS",  iasc: null, iasc_of: ["10.2", "9.2"], iasc_conf: "Medium", iasc_rule: "10.2 if the prescriber is a specialised provider, 9.2 if non-specialised. Cannot be assigned without cadre.", name: "Psychotropic medication provision",      group: "Specialised", groupNp: "विशेषज्ञ सेवा", np: "मनोरोग औषधि उपलब्ध गराइएको", np_src: "draft" },
-  { code: "REF",   iasc: null, iasc_of: ["7.2", "9.3"], iasc_conf: "Medium", iasc_rule: "7.2 linking vulnerable people to resources with follow-up; 9.3 when community workers identify and refer people with mental disorders.", name: "Referral made to another service",       group: "Referral", groupNp: "प्रेषण", np: "अन्य सेवामा प्रेषण (रेफर)", np_src: "draft" },
-  { code: "HELP",  iasc: null, question: "D-A03", iasc_rule: "No IASC subcode describes a channel. Record what was delivered (7.1, 8.1, 7.2 ...) with modality TEL. Whether HELP stays an activity is open.", name: "Helpline contact",                       group: "Remote support", groupNp: "दूरस्थ सहयोग", np: "हेल्पलाइन सम्पर्क", np_src: "draft" },
-  { code: "IEC",   iasc: null, iasc_of: ["1.1", "1.2"], iasc_conf: "Medium", iasc_rule: "1.1 information on the situation or available services; 1.2 MHPSS messages.", name: "IEC material distribution",              group: "Community support", groupNp: "समुदायस्तरीय सहयोग", np: "सूचना-शिक्षा-सञ्चार सामग्री वितरण", np_src: "draft" },
-  { code: "ASMT",  iasc: null, iasc_of: ["11.1", "9.3"], iasc_conf: "Medium", iasc_rule: "11.1 situation analysis or assessment (no people count). Screening that identifies individuals with mental disorders is 9.3.", name: "Rapid assessment / identification",      group: "Assessment", groupNp: "आकलन", np: "द्रुत आकलन / पहिचान", np_src: "draft" },
-  { code: "COORD", iasc: null, question: "D-A03", iasc_conf: "Low", iasc_rule: "Not an MHPSS service activity; attach no people count. 6.1 only if it is orientation of, or advocacy with, aid agencies. Whether COORD stays in a 4Ws activity list is open.", name: "Coordination meeting",                   group: "Coordination", groupNp: "समन्वय", np: "समन्वय बैठक", np_src: "draft" },
-  { code: "TRAIN", iasc: "11.3", iasc_conf: "High",   iasc_rule: "Training / orienting (specify topic).", name: "Training / orientation delivered",       group: "Capacity", groupNp: "क्षमता विकास", np: "तालिम / अभिमुखीकरण सञ्चालन", np_src: "draft" },
-  { code: "STAFF", iasc: "11.5", iasc_conf: "High",   iasc_rule: "The manual records support to aid workers as 11.5 and never under codes 7-10. Whether police, army and search-and-rescue staff count as aid workers is not stated in the manual (open).", name: "Support to responders / staff care",     group: "Focused support", groupNp: "केन्द्रित सहयोग", np: "कार्यकर्तालाई सहयोग / स्टाफ केयर", np_src: "draft" },
-  /* "Other (free text)" on every list -- EDCD, 17 Sep 2026. The text travels
-     in activityOther; after one or two months the entries say whether the
-     list or the guidance needs work. Not part of the activity taxonomy,
-     which is being reworked on the IASC layers separately. */
-  { code: "OTH",   iasc: null, iasc_conf: null, iasc_rule: "Not coded until the text is reviewed.", name: "Other — specify", group: "Not stated", groupNp: "उल्लेख नगरिएको", np: "अन्य — उल्लेख गर्नुहोस्", np_src: "draft" },
+  { code: "1.1", group: "1", name: "Information on where to get help",       help: "Helpline numbers, services, relief updates",
+    iasc_sub: "1.1", iasc_rule: "Direct." },
+  { code: "1.2", group: "1", name: "Orientation for other relief teams",     help: "Shelter, WASH, health or protection staff: safe and respectful treatment of affected people (not training of your own team)",
+    iasc_sub: "6.1", iasc_rule: "Direct." },
+  { code: "1.9", group: "1", name: "Other (describe)", other: true,           help: "",
+    iasc_of: ["1.3", "2.1", "2.2", "2.3", "6.2"], iasc_rule: "Set at coordination from the description: 2.1 support for emergency relief initiated by the community; 2.2 support for communal spaces or meetings; otherwise 1.3, 2.3 or 6.2 (Other)." },
+  { code: "2.1", group: "2", name: "Recreational activities",                 help: "Play, art, sports, games; child-friendly space",
+    iasc_of: ["3.5", "4.1"], iasc_rule: "4.1 when the activity takes place at a child-friendly space; 3.5 otherwise (4Ws 3.5 excludes activities at child-friendly spaces)." },
+  { code: "2.2", group: "2", name: "Psychoeducation or awareness (group)",    help: "Stress, coping, self-care; IEC materials on these topics",
+    iasc_sub: "1.2", iasc_rule: "Direct. Psychoeducation for one person or family is 3.3." },
+  { code: "2.3", group: "2", name: "Community and family support",            help: "Support groups, parenting sessions, women and girls safe space, traditional or religious support",
+    iasc_of: ["3.1", "3.2", "3.3", "3.4", "3.6", "3.7", "4.2"], iasc_rule: "Set at coordination from the description: 3.1 community-initiated social support; 3.2 parenting or family supports; 3.3 community supports to vulnerable people; 3.4 structured social activities; 3.6 early childhood development; 3.7 traditional, spiritual or religious supports; 4.2 (Other) safe spaces, such as women and girls safe spaces." },
+  { code: "2.9", group: "2", name: "Other (describe)", other: true,           help: "",
+    iasc_of: ["3.8", "5.1", "5.2", "5.3"], iasc_rule: "Set at coordination from the description: 5.1 psychosocial support to teachers or other school personnel; 5.2 to classes or groups of children at school; otherwise 3.8 or 5.3 (Other)." },
+  { code: "3.1", group: "3", name: "Psychological first aid (PFA)",          help: "",
+    iasc_sub: "7.1", iasc_rule: "Direct. Same term as the IASC.", np: "मनोवैज्ञानिक प्राथमिक उपचार", np_src: "draft", np_note: "PFA has an official WHO Nepali translation -- adopt ITS term, do not keep ours" },
+  { code: "3.2", group: "3", name: "Psychosocial counselling",                help: "Individual, family or group",
+    iasc_of: ["8.1", "8.2"], iasc_rule: "8.1 individual; 8.2 group or family. Can be set only if the form records which." },
+  { code: "3.3", group: "3", name: "Emotional support",                       help: "Listening, relaxation, home visits, psychoeducation for one person or family",
+    iasc_of: ["7.3", "8.6"], iasc_rule: "No subcode of its own: 7.3 (Other, person-focused psychosocial work) or 8.6 (Other, psychological intervention), set at coordination with the description." },
+  { code: "3.4", group: "3", name: "Screening and referral",                  help: "Finding people who need more help, linking them to services, follow-up",
+    iasc_of: ["7.2", "9.3"], iasc_rule: "7.2 linking vulnerable individuals or families to resources, with follow-up; 9.3 community workers identifying and referring people with mental disorders." },
+  { code: "3.5", group: "3", name: "Basic mental health care by general health staff", help: "Assessment or medicines by a trained doctor or nurse who is not a mental health specialist",
+    iasc_of: ["9.1", "9.2"], iasc_rule: "9.2 when medicines are given; 9.1 otherwise. Can be set only if the form records whether medicines were given." },
+  { code: "3.9", group: "3", name: "Other (describe)", other: true,           help: "",
+    iasc_of: ["7.3", "8.3", "8.5", "8.6", "9.4"], iasc_rule: "Set at coordination from the description: 8.3 interventions for alcohol or substance use problems; 8.5 psychological debriefing (not offered: the IASC Guidelines 2007, p. 15, advise against one-off, single-session debriefing for the general population); otherwise 7.3, 8.6 or 9.4 (Other)." },
+  { code: "4.1", group: "4", name: "Psychotherapy",                           help: "By a clinical psychologist or other mental health professional",
+    iasc_sub: "8.4", iasc_rule: "Direct. Same term as the IASC. 4Ws Annex 3: psychological intervention is level 4 only if it involves formal psychotherapy; basic counselling is 3.2." },
+  { code: "4.2", group: "4", name: "Psychiatric medication",                  help: "Prescribed or reviewed by a psychiatrist",
+    iasc_sub: "10.2", iasc_rule: "Direct. Medicines from trained general health staff are 3.5." },
+  { code: "4.3", group: "4", name: "Specialist consultation or hospital care", help: "Psychiatrist or clinical psychologist consultation, psychiatric nursing, hospital admission",
+    iasc_of: ["10.1", "10.3"], iasc_rule: "10.3 inpatient mental health care; 10.1 otherwise." },
+  { code: "4.9", group: "4", name: "Other (describe)", other: true,           help: "",
+    iasc_sub: "10.4", iasc_rule: "Direct (Other)." },
+  { code: "9",   group: "9", name: "Other activity (describe)", other: true,  help: "",
+    iasc_of: [], iasc_rule: "No IASC equivalent until the description is reviewed at coordination." },
+];
+
+/* The 4Ws 2012 Table 2 subcode labels as printed (transcribed by the data
+   workstream from the PDF text layer and checked against the page image);
+   only the subcodes an option above can carry. Codes 11.x are not on the
+   field form (coordination, assessment, training, supervision, staff care,
+   research carry no count of affected people). */
+const IASC_4WS_SUBCODES = {
+  "1.1": "Information on the current situation, relief efforts or available services in general",
+  "1.2": "Raising awareness on mental health and psychosocial support (e.g., messages on positive coping or on available mental health services and psychosocial supports)",
+  "1.3": "Other",
+  "2.1": "Support for emergency relief that is initiated by the community",
+  "2.2": "Support for communal spaces/meetings to discuss, problem-solve and plan action by community members to respond to the emergency",
+  "2.3": "Other",
+  "3.1": "Support for social support activities that are initiated by the community",
+  "3.2": "Strengthening parenting/family supports",
+  "3.3": "Facilitation of community supports to vulnerable people",
+  "3.4": "Structured social activities (e.g. group activities)",
+  "3.5": "Structured recreational or creative activities (do not include activities at child-friendly spaces that are covered in 4.1)",
+  "3.6": "Early childhood development (ECD) activities",
+  "3.7": "Facilitation of conditions for indigenous traditional, spiritual or religious supports, including communal healing practices",
+  "3.8": "Other",
+  "4.1": "Child-friendly spaces",
+  "4.2": "Other",
+  "5.1": "Psychosocial support to teachers / other personnel at schools/learning places",
+  "5.2": "Psychosocial support to classes/groups of children at schools/learning places",
+  "5.3": "Other",
+  "6.1": "Orientation of or advocacy with aid workers/agencies on including social/ psychosocial considerations in programming",
+  "6.2": "Other",
+  "7.1": "Psychological first aid (PFA)",
+  "7.2": "Linking vulnerable individuals/families to resources (e.g., health services, livelihoods assistance, community resources etc.) and following up to see if support is provided.",
+  "7.3": "Other",
+  "8.1": "Basic counselling for individuals",
+  "8.2": "Basic counselling for groups or families",
+  "8.3": "Interventions for alcohol/substance use problems",
+  "8.4": "Psychotherapy",
+  "8.5": "Individual or group psychological debriefing",
+  "8.6": "Other",
+  "9.1": "Non-pharmacological management of mental disorder by nonspecialized health care providers",
+  "9.2": "Pharmacological management of mental disorder by nonspecialized health care providers",
+  "9.3": "Action by community workers to identify and refer people with mental disorders and to follow-up on them to make sure adherence to clinical treatment",
+  "9.4": "Other",
+  "10.1": "Non-pharmacological management of mental disorder by specialized mental health care providers",
+  "10.2": "Pharmacological management of mental disorder by specialized health care",
+  "10.3": "Inpatient mental health care",
+  "10.4": "Other",
+};
+
+/* The previous list (codes.js 0.1.0 to 0.3.0 and the reconciliation
+   worksheet), kept so that every record already in the register still
+   resolves to a name. `to` is the crosswalk of claude/activity-categories.md
+   section 7: ONE target and the dashboard reads the record under the new
+   code; several targets and the record stays "not yet placed" until someone
+   reads its description -- nothing is picked by default; none and the code
+   is not an activity of the field form at all. */
+const ACTIVITIES_V03 = [
+  { code: "PFA",   retired: true, to: ["3.1"],                     name: "Psychological first aid",               np: "मनोवैज्ञानिक प्राथमिक उपचार", np_src: "draft" },
+  { code: "CNS-I", retired: true, to: ["3.2"],                     name: "Individual psychosocial counselling",   np: "व्यक्तिगत मनोसामाजिक परामर्श", np_src: "draft" },
+  { code: "CNS-G", retired: true, to: ["3.2"],                     name: "Group psychosocial counselling",        np: "सामूहिक मनोसामाजिक परामर्श", np_src: "draft" },
+  { code: "PSED",  retired: true, to: ["2.2", "3.3"],              name: "Psychoeducation / awareness session",   np: "मनोशिक्षा / जनचेतना सत्र", np_src: "draft" },
+  { code: "RECR",  retired: true, to: ["2.1"],                     name: "Recreational / structured activity",    np: "मनोरञ्जनात्मक / संरचित क्रियाकलाप", np_src: "draft" },
+  { code: "CFS",   retired: true, to: ["2.1"],                     name: "Child-friendly space activity",         np: "बालमैत्री क्षेत्रको क्रियाकलाप", np_src: "draft" },
+  { code: "SPEC",  retired: true, to: ["4.3", "4.1", "3.5"],       name: "Specialised mental health service",     np: "विशेषज्ञ मानसिक स्वास्थ्य सेवा", np_src: "draft" },
+  { code: "MEDS",  retired: true, to: ["4.2", "3.5"],              name: "Psychotropic medication provision",     np: "मनोरोग औषधि उपलब्ध गराइएको", np_src: "draft" },
+  { code: "REF",   retired: true, to: ["3.4"],                     name: "Referral made to another service",      np: "अन्य सेवामा प्रेषण (रेफर)", np_src: "draft" },
+  { code: "HELP",  retired: true, to: [],                          name: "Helpline contact",                      np: "हेल्पलाइन सम्पर्क", np_src: "draft", note: "a setting, not an activity (R13)" },
+  { code: "IEC",   retired: true, to: ["1.1", "2.2"],              name: "IEC material distribution",             np: "सूचना-शिक्षा-सञ्चार सामग्री वितरण", np_src: "draft" },
+  { code: "ASMT",  retired: true, to: ["3.4"],                     name: "Rapid assessment / identification",     np: "द्रुत आकलन / पहिचान", np_src: "draft", note: "3.4 when it counts people screened; a situation assessment is not on the field form (R5)" },
+  { code: "COORD", retired: true, to: [],                          name: "Coordination meeting",                  np: "समन्वय बैठक", np_src: "draft", note: "not on the field form (R1)" },
+  { code: "TRAIN", retired: true, to: [],                          name: "Training / orientation delivered",      np: "तालिम / अभिमुखीकरण सञ्चालन", np_src: "draft", note: "not on the field form (R14), unless orientation of other sectors' staff (1.2)" },
+  { code: "STAFF", retired: true, to: [],                          name: "Support to responders / staff care",    np: "कार्यकर्तालाई सहयोग / स्टाफ केयर", np_src: "draft", note: "not on the field form (4Ws 11.5)" },
+  { code: "OTH",   retired: true, to: ["1.9", "2.9", "3.9", "4.9", "9"], name: "Other — specify",                np: "अन्य — उल्लेख गर्नुहोस्", np_src: "draft" },
+  { code: "CNS",       retired: true, to: ["3.2"], name: "Counselling, individual or group not stated" },
+  { code: "PSS-OTHER", retired: true, to: ["3.3"], name: "Other psychosocial support (emotional support, home visits, relaxation)" },
+  { code: "SUPERV",    retired: true, to: [],      name: "Supervision", note: "not on the field form (4Ws 11.4)" },
+  { code: "GENERIC",   retired: true, to: [],      name: "Generic label only", note: "not codable (R6)" },
+  { code: "NONE",      retired: true, to: [],      name: "No activity written", note: "not codable" },
 ];
 
 /* ---------------------------------------------------------------------
@@ -371,7 +484,36 @@ const CADRE_RANK = ["PSYT", "CPSY", "PSY", "PNUR", "MO", "HW", "PSC", "CPSW", "S
 const siteByCode = Object.fromEntries(SITES.map((s) => [s.code, s]));
 const orgByCode = Object.fromEntries(ORGS.map((o) => [o.code, o]));
 const districtByCode = Object.fromEntries(DISTRICTS.map((d) => [d.code, d]));
-const activityByCode = Object.fromEntries(ACTIVITIES.map((a) => [a.code, a]));
+const activityByCode = Object.fromEntries(ACTIVITIES.concat(ACTIVITIES_V03).map((a) => [a.code, a]));
+const activityGroupByCode = Object.fromEntries(ACTIVITY_GROUPS.map((g) => [g.code, g]));
+
+/* THE TWO READINGS OF ONE ACTIVITY CODE.
+   activityResolve(code) answers, for any code old or new, where a record
+   is read on the dashboard: `placed` is the current code it counts under
+   (itself for a current code; the single crosswalk target for a retired
+   code with one; null when it is not yet placed or not an activity).
+   activityIasc(code) is the backend reading: the IASC layer and the 4Ws
+   subcode(s), as words, for a current code. */
+function activityResolve(code) {
+  var a = activityByCode[code];
+  if (!a) return { code: code || "", name: code || "", legacy: false, placed: null, to: [], note: "unknown code" };
+  if (!a.retired) return { code: a.code, name: a.name, legacy: false, placed: a.code, to: [a.code], group: a.group };
+  var to = a.to || [];
+  var placed = to.length === 1 ? to[0] : null;
+  return { code: a.code, name: a.name, legacy: true, placed: placed, to: to,
+           group: placed ? activityByCode[placed].group : null,
+           note: to.length === 0 ? (a.note || "not an activity of the field form") : to.length === 1 ? "read as " + placed : "not yet placed: " + to.join(" or ") };
+}
+function activityIasc(code) {
+  var a = activityByCode[code];
+  if (!a || a.retired) return "";
+  var g = activityGroupByCode[a.group];
+  var layer = g && g.iasc_layer ? "Layer " + g.iasc_layer + " — " + g.iasc_name : "No IASC layer";
+  var sub = a.iasc_sub ? "4Ws " + a.iasc_sub + " " + (IASC_4WS_SUBCODES[a.iasc_sub] || "")
+          : (a.iasc_of && a.iasc_of.length) ? "4Ws " + a.iasc_of.join(" / ") + " — set at coordination"
+          : "no 4Ws subcode until the description is reviewed";
+  return layer + " · " + sub;
+}
 const palikaByCode = Object.fromEntries(PALIKAS.map((p) => [p.pcode, p]));
 
 /* Roster sites only — the denominator for coverage-gap analysis.
@@ -477,9 +619,10 @@ function palikaName(pcode) {
 }
 
 window.CODES = {
-  META, DISTRICTS, PALIKAS, SITES, ACTIVITIES, ORGS, DONORS, CADRES, CADRE_RANK,
+  META, DISTRICTS, PALIKAS, SITES, ACTIVITIES, ACTIVITY_GROUPS, ACTIVITIES_V03, IASC_4WS_SUBCODES, ORGS, DONORS, CADRES, CADRE_RANK,
   TARGET_GROUPS, MODALITIES, STATUS,
-  siteByCode, orgByCode, districtByCode, activityByCode, palikaByCode,
+  siteByCode, orgByCode, districtByCode, activityByCode, activityGroupByCode, palikaByCode,
   ROSTER_SITES, FORM_SITES,
+  activityResolve, activityIasc,
   label, labelOf, palikaName, ph, npCoverage
 };

@@ -12,7 +12,7 @@
    ===================================================================== */
 
 const KEY = "mhpss-np-4ws-v1";
-const SCHEMA_VERSION = "4ws-np-0.4.0";  /* 0.2.0: four age bands · 0.3.0: donors list, partners, palika, iascSub, 16 Sep 2026 · 0.4.0: five age groups, settings, cadre list, "Other" text fields, funding source off the form — EDCD review 17 Sep 2026 */
+const SCHEMA_VERSION = "5ws-np-0.5.0";  /* 0.2.0: four age bands · 0.3.0: donors list, partners, palika, iascSub, 16 Sep 2026 · 0.4.0: five age groups, settings, cadre list, "Other" text fields, funding source off the form — EDCD review 17 Sep 2026 · 0.5.0 (17 Sep 2026, afternoon): the instrument is the 5Ws; activity list v3 (layer.item codes, IASC terms in the backend only); one report per session with its attendance — countBasis no longer asked, always CONTACTS; sessionTime in the record id */
 
 /* ---------------------------------------------------------------------
    Deterministic record id.
@@ -36,7 +36,11 @@ function recordId(r) {
      "PALIKA") for two palikas on one day are two records, not one. For a
      report at a named site the palika is implied by the site and changes
      nothing. */
-  const parts = [r.org, r.orgOther || "", r.site, r.siteOther || "", r.palika || "", r.dateAD, r.activity, r.modality].join("|");
+  /* `sessionTime` (0.5.0) is in the basis so that two sessions of one
+     activity at one place on one day are two records when the reporter
+     gives their start times; left blank, a second report of the same
+     activity updates the first, and the form says so. */
+  const parts = [r.org, r.orgOther || "", r.site, r.siteOther || "", r.palika || "", r.dateAD, r.activity, r.modality, r.sessionTime || ""].join("|");
   return "R" + fnv1a(parts).toString(36).toUpperCase().padStart(7, "0");
 }
 
@@ -131,7 +135,7 @@ function syncToRegister(rec) {
    cap stays out of reach. Readers already treat a missing key and an
    empty one the same way. */
 function registerBody(rec) {
-  const body = { kind: "activity", schema: "mhpss-np-4ws/" + SCHEMA_VERSION };
+  const body = { kind: "activity", schema: "mhpss-np-5ws/" + SCHEMA_VERSION };
   for (const [k, v] of Object.entries(rec || {})) {
     if (k === "previous" || k === "archived" || k === "archivedAt" || k === "archiveReason") continue;
     if (v === "" || v === null || v === undefined) continue;
@@ -224,7 +228,7 @@ function ageShape(r) {
   const v03only = ["f517", "m517", "o517", "f1859", "m1859", "o1859"];
   if (v04only.some(has)) return "v04";
   if (v03only.some(has)) return "v03";
-  if (PART_IDS.some(has)) return /0\.4\./.test(r.schemaVersion || "") || !(r.schemaVersion) ? "v04" : "v03";
+  if (PART_IDS.some(has)) return /-0\.([4-9]|\d\d)\./.test(r.schemaVersion || "") || !(r.schemaVersion) ? "v04" : "v03";
   return "pair";
 }
 
@@ -283,10 +287,20 @@ function validate(r) {
      name or a description, never a person: digits in bulk or an @ are
      refused so a phone number or email cannot ride in on a text field. */
   const OTHER_TEXT = { cadre: ["cadreOther", "Say which cadre"], modality: ["modalityOther", "Say where the activity took place"],
-                       district: ["districtOther", "Name the district"], activity: ["activityOther", "Say what activity was done"] };
+                       district: ["districtOther", "Name the district"] };
   for (const [k, [tk, msg]] of Object.entries(OTHER_TEXT)) {
     if ((r[k] === "OTH" || r[k] === "OTHER") && !(r[tk] || "").trim()) p.push(msg);
   }
+  /* Activity list v3 (17 Sep 2026): "Other (describe)" is x.9 within a
+     layer or 9 outside every layer; each needs the description. A code the
+     current list does not offer -- a retired one, or a typo -- is refused
+     at entry; retired codes exist only so old records resolve. */
+  if (r.activity) {
+    const a = (window.CODES && window.CODES.activityByCode) ? window.CODES.activityByCode[r.activity] : null;
+    if (!a || a.retired) p.push("Choose an activity from the current list");
+    else if (a.other && !(r.activityOther || "").trim()) p.push("Describe the activity");
+  }
+  if (r.sessionTime && !/^([01]\d|2[0-3]):[0-5]\d$/.test(r.sessionTime)) p.push("Start time must be hh:mm");
   if ((r.targetGroups || []).includes("TG-OTH") && !(r.targetGroupOther || "").trim()) p.push("Say which other group");
   for (const tk of ["cadreOther", "modalityOther", "districtOther", "activityOther", "targetGroupOther", "orgOther", "siteOther"]) {
     if (r[tk] && /\d{7,}|@/.test(r[tk])) p.push("Free-text fields are names of things, not of people — no phone numbers or emails");
@@ -304,16 +318,18 @@ function validate(r) {
   if (!(r.targetGroups || []).length) p.push("Select at least one target group");
 
   const t = num(r.reachedTotal);
-  if (t === null) p.push("Total reached is required (enter 0 if none)");
-  /* The counting basis is required because without it the figure cannot be
-     used: the cleaned backlog is in service contacts, the form once said
-     "people", and a series that mixes the two is not a series. R-U1
-     (NDRRMA / EDCD) rules on what goes into the 5W; this field only records
-     what the reporter actually counted. */
-  if (!r.countBasis) p.push("Say what the total counts — people who attended, or service contacts");
+  if (t === null) p.push("Attendance is required (enter 0 if nobody came)");
+  /* Since 17 Sep 2026 (afternoon) the form does not ask what the figure
+     counts: a report is one session, and its figure is the attendance --
+     everyone who took part, once for that session. Across sessions that is
+     a count of attendances, i.e. service contacts, so the record carries
+     countBasis CONTACTS and the dashboard says "attendances". Distinct
+     people come from the optional attendance list, not from this form.
+     Records filed earlier keep the basis they were filed with. */
+  if (!r.countBasis) p.push("Count basis missing (the form sets it)");
   const dp = num(r.distinctPeople);
   if (dp !== null && r.countBasis !== "CONTACTS") p.push("Distinct people applies only when the total is a contact count");
-  if (dp !== null && t !== null && dp > t) p.push(`Distinct people (${dp}) cannot exceed the contact count of ${t}`);
+  if (dp !== null && t !== null && dp > t) p.push(`Distinct people (${dp}) cannot exceed the attendance of ${t}`);
   const sum = disaggTotal(r);
   if (t !== null && sum > t) p.push(`Disaggregated figures add to ${sum}, more than the total of ${t}`);
   if (t !== null && sum > 0 && sum < t) p.push(`Disaggregated figures add to ${sum} of ${t} — ${t - sum} unaccounted. Leave all blank, or account for all.`);
@@ -341,7 +357,11 @@ function num(v) {
 const CSV_COLUMNS = [
   "id", "createdAt", "revision", "dateAD", "dateBS", "district", "palika", "site", "siteOther", "siteSource",
   "org", "orgOther", "donors", "partners", "focalName", "focalPhone", "focalEmail", "cadre", "cadreOther",
-  "activity", "activityOther", "iascSub", "modality", "modalityOther", "status", "targetGroups", "targetGroupOther", "districtOther", "description",
+  "sessionTime",
+  /* the two readings of one activity code (list v3, 17 Sep 2026): the code
+     and the plain label the form showed, then the backend reading -- IASC
+     layer and 4Ws subcode -- computed at export from codes.js, never typed */
+  "activity", "activityLabel", "activityLayer", "iascSub", "iascReading", "activityOther", "modality", "modalityOther", "status", "targetGroups", "targetGroupOther", "districtOther", "description",
   "reachedTotal", "countBasis", "distinctPeople",
   /* the five groups as collected (0.4.0) and the four bands of 0.3.0, so a
      record of either vintage exports in full */
@@ -355,6 +375,25 @@ const CSV_COLUMNS = [
   "schemaVersion",
 ];
 
+/* The backend reading of the activity on a record, computed from codes.js
+   at export and at read: the plain label the form showed, the IASC layer,
+   and the 4Ws subcode -- the one on the record (set at entry for a direct
+   match, or at coordination) or the candidates when it is not set yet. A
+   retired code is read through its crosswalk. Nothing here is typed. */
+function activityReadings(r) {
+  const C = window.CODES;
+  if (!C || !C.activityResolve) return {};
+  const res = C.activityResolve(r.activity);
+  const code = res.placed || r.activity;
+  const a = C.activityByCode[code];
+  const g = a && !a.retired ? C.activityGroupByCode[a.group] : null;
+  return {
+    activityLabel: res.legacy ? res.name + " (previous list" + (res.placed ? ", read as " + res.placed : ", not yet placed") + ")" : (a ? a.name : r.activity || ""),
+    activityLayer: g ? g.code + " " + g.name : (res.legacy && !res.placed ? "not yet placed" : ""),
+    iascReading: res.placed ? C.activityIasc(res.placed) : "",
+  };
+}
+
 function toCSV(rows) {
   const esc = (v) => {
     const s = Array.isArray(v) ? v.join(";") : v === null || v === undefined ? "" : String(v);
@@ -365,7 +404,7 @@ function toCSV(rows) {
      one figure in two places is one figure that can disagree with itself. */
   const body = rows.map((r) => {
     const d = fold(r);
-    const row = { ...r, ...d, foldBoundary: d.boundary, donors: donorsOf(r) };
+    const row = { ...r, ...d, foldBoundary: d.boundary, donors: donorsOf(r), ...activityReadings(r) };
     return CSV_COLUMNS.map((c) => esc(row[c])).join(",");
   }).join("\n");
   return "﻿" + head + "\n" + body + "\n"; // BOM so Excel reads UTF-8
@@ -407,7 +446,7 @@ function donorsOf(r) {
 
 /* Global for the same reason as codes.js — see the note there. */
 window.STORE = {
-  SCHEMA_VERSION, CSV_COLUMNS, BANDS, BANDS_V03, PART_IDS, PART_IDS_V03, FOLD_BOUNDARY, OF_WHOM, OF_WHOM_LABEL, fold, ageShape, disaggTotal, donorsOf, todayLocal, registerBody,
+  SCHEMA_VERSION, CSV_COLUMNS, BANDS, BANDS_V03, PART_IDS, PART_IDS_V03, FOLD_BOUNDARY, OF_WHOM, OF_WHOM_LABEL, fold, ageShape, disaggTotal, donorsOf, todayLocal, registerBody, activityReadings,
   recordId, all, active, save, archive,
   validate, toCSV, download, stamp, clearAll
 };

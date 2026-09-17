@@ -54,7 +54,7 @@
   <nav>
     <span class="rgrp">Dashboard</span>
     <a href="./">Coordination view</a>
-    <a href="coverage.html">Coverage &amp; 4Ws</a>
+    <a href="coverage.html">Coverage &amp; 5Ws</a>
     <a class="on" aria-current="page" href="inbox.html">Field inbox</a>
     <a href="access.html">Access</a>
     <span class="rgrp">Elsewhere</span>
@@ -63,7 +63,7 @@
     <a href="../method.html">Method</a>
   </nav>
   <span data-i18n-toggle class="railtoggle"></span>
-  <p class="rfoot">Draft. Synthetic data only.</p>
+  <p class="rfoot">Draft. Figures are provisional.</p>
 </aside>
 <!--/NAV-->
 
@@ -129,7 +129,7 @@
       <button class="btn grey" id="clear">Clear this inbox</button>
     </div>
     <p class="xs" style="margin-top:10px">The merged export is what you would hand to the data
-      workstream, or load into the 4Ws template. It carries no names — the forms never collected any.</p>
+      workstream, or load into the 5W template. It carries no names — the forms never collected any.</p>
   </div>
 
   <!-- Filled by assets/brand.js. Emblems are off until the official
@@ -151,7 +151,7 @@
 
   var KINDS = {
     service_contact: "Service contact",
-    activity:        "Activity report (4Ws)",
+    activity:        "Activity report (5Ws)",
     referral:        "Referral",
     phq9:            "PHQ-9",
     self_report:     "Self-report"
@@ -200,7 +200,7 @@
     if (rec.schema && /referral/.test(rec.schema)) return "referral";
     if (rec.schema && /phq9/.test(rec.schema)) return "phq9";
     if (rec.schema && /selfreport/.test(rec.schema)) return "self_report";
-    /* the 4Ws form predates the kind field: recognise it by its columns */
+    /* the activity form predates the kind field: recognise it by its columns */
     if (rec.activity !== undefined || rec.activityCode !== undefined ||
         rec.reached_total !== undefined || rec.total !== undefined && rec.site !== undefined) {
       return "activity";
@@ -364,7 +364,7 @@
       return (r._kind === "service_contact" || r._kind === "referral") && !r.sex;
     }).length;
     if (nosex) probs.push(['wn', nosex + " record(s) with no sex recorded",
-      "Sex and age disaggregation is the minimum the 4Ws expects; without it the report cannot be submitted as complete."]);
+      "Sex and age disaggregation is the minimum the 5Ws expects; without it the report cannot be submitted as complete."]);
 
     var noage = ROWS.filter(function (r) {
       return (r._kind === "service_contact" || r._kind === "referral") &&

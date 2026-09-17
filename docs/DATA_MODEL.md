@@ -1,8 +1,9 @@
 # Data model
 
 Draft, 15 September 2026; corrected 16 September 2026 against the IASC manual
-itself and the data workstream's code lists. Not agreed with EDCD or the MHPSS
-Technical Working Group.
+itself and the data workstream's code lists; revised 17 September 2026 after the
+EDCD review (record schema `5ws-np-0.5.0`, see *Since 17 September 2026* at the
+end). Not agreed with EDCD or the MHPSS Technical Working Group.
 
 ## The rule the model exists to enforce
 
@@ -35,11 +36,11 @@ observed in the current reporting workbook rather than from the manual.
 | G · Region / district | `district` | Coded. |
 | H · Town / neighbourhood | `site`, `siteOther` | Coded against the site list. A report that names only a palika and no site is coded at palika level (see *Site list*). |
 | I · Geographical code | `site` → palika P-code | Every site carries the OCHA COD-AB P-code of its palika. No GPS is collected — see granularity below. |
-| J · Activity code | `activity` | Coded. |
-| K · Activity subcode | via `codes.js` | The 2012 code list (Table 2: 11 codes, 45 subcodes) is now in hand. Where the match is direct the subcode sits on the activity in `codes.js`; where it depends on the cadre or the content (specialised care, medication, referral, IEC, assessment) a rule is recorded and no subcode is written yet. |
+| J · Activity code | `activity` | Coded, from the activity list of 17 September 2026: `layer.item` as text, first digit the IASC intervention-pyramid layer (1 to 4), `x.9` other within the layer, `9` outside every layer. The form shows a plain label and a help line only. |
+| K · Activity subcode | `iascSub`, via `codes.js` | One activity code, two readings. The 4Ws 2012 subcode (Table 2: 11 codes, 45 subcodes) is written on the record at entry where the match is direct (`iasc_sub` in `codes.js`); where it depends on the content (`iasc_of`) it is set at coordination from the description and the record carries none until then. The reporter never sees an IASC term; the dashboard and the exports never show only the plain label. |
 | L · One-sentence description | `description` | Capped at 220 characters. No names, no clinical detail. |
 | M · Target groups | `targetGroups` | Category codes, multiple. Never a description of a person. |
-| N · Number of people in the target group directly supported in the previous 30 days | `reachedTotal`, `countBasis`, `distinctPeople` | The manual's N is a 30-day count of *people*. The current workbook counts contacts per activity-day, so this model records the total together with what it counts — service contacts, distinct people, or not sure — and a distinct-people figure where the reporter has one. How a 30-day people count is derived from daily contact counts is an open ruling. |
+| N · Number of people in the target group directly supported in the previous 30 days | `reachedTotal`, `countBasis`, `distinctPeople` | The manual's N is a 30-day count of *people*. Since 17 September 2026 a report is one session and `reachedTotal` is its attendance — everyone who took part, once; summed across sessions that is a count of attendances (service contacts), so the form writes `countBasis` = `CONTACTS` and no longer asks. Records filed earlier keep the basis they were filed with. Distinct people are not derived from this form; they belong to the optional attendance list, still to be designed. How a 30-day people count is derived is an open ruling. |
 | — | twelve band fields, see *Disaggregation* | **Addition.** Sex and age disaggregation in four age bands. |
 | O · Implementation status | `status` | The manual's three states are: currently being implemented; funded but not yet implemented; unfunded and not yet implemented. The form's Ongoing / Completed / Planned is a working rendering and does not carry the funded–unfunded distinction. |
 | P · Start date | `dateAD` | This model reports per activity-day, so start and end collapse into the report date. |
@@ -139,11 +140,14 @@ is not a site and never enters the roster denominator.
 
 Two different things, often confused:
 
-**Record identity.** The record id is a hash of organisation, site, date,
-activity and modality. Submitting the same report twice — a double tap, a page
+**Record identity.** The record id is a hash of organisation, site, palika,
+date, activity, setting and — since 17 September 2026 — the session's start
+time when one is given. Submitting the same report twice — a double tap, a page
 reload, a re-sync after signal returns — produces the same id and therefore
 one record with a revision history, not two records. This is what makes the
-form safe to use on a bad connection.
+form safe to use on a bad connection. Two sessions of one activity at one place
+on one day are two records only when their start times are given; the form
+says so.
 
 **Analytical de-duplication.** A separate question: did two *different*
 organisations report the same site on the same day, and if so did they reach
@@ -168,3 +172,27 @@ the data inventory shared with the WHO Nepal mental health team, the Ministry of
 Health and Food Safety and EDCD. They are deliberately not reproduced in this
 public repository: they are unpublished operational figures attributed to named
 partners, and they are not ours to publish.*
+
+## Since 17 September 2026 — the 5Ws, one report per session
+
+The instrument is called the **5Ws** — who did what, where, when and for whom,
+the name the national response uses — and the field form is arranged in those
+five steps. Three things changed in the record, schema `5ws-np-0.5.0`:
+
+- **One report per session.** `sessionTime` (hh:mm, optional) identifies a
+  session and is part of the record id. `reachedTotal` is the attendance of that
+  session; `countBasis` is written by the form as `CONTACTS` and is no longer a
+  question.
+- **The activity list on the IASC layers.** `activity` carries a `layer.item`
+  code from the list agreed on 17 September 2026 (`codes.js` 0.4.0-draft,
+  `ACTIVITIES` and `ACTIVITY_GROUPS`). The previous codes are kept as
+  `ACTIVITIES_V03` with a crosswalk: a record filed under a previous code is
+  read under the new code when the crosswalk has one target, and stays *not yet
+  placed* when it has several — nothing is picked by default. The register is
+  not rewritten.
+- **Two readings of one code.** The form shows the plain label and help text
+  (`name`, `help`); the dashboard, the CSV export (`activityLabel`,
+  `activityLayer`, `iascSub`, `iascReading`) and the published documents read the
+  IASC layer and the 4Ws 2012 subcode from the same code. The glossary that maps
+  each label to its IASC term lives in `codes.js` (`IASC_4WS_SUBCODES`,
+  `iasc_rule`) and in the activity-categories note held by the coordination team.
