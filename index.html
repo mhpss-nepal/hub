@@ -112,6 +112,7 @@
   .howcount > summary::before{content:"\25B8\00a0"}
   .howcount[open] > summary::before{content:"\25BE\00a0"}
   .howcount p{font-size:12.5px;line-height:1.6;margin:9px 0 0;color:var(--slate)}
+  .nodate{color:var(--warn);font-weight:600}
   .sechead{margin:0 0 4px}
   .secsay{margin:0 0 14px;font-size:14px;color:var(--slate)}
 </style>
@@ -284,6 +285,8 @@
         <div><label for="fAct">Activity</label><select id="fAct" data-dim="activity"></select></div>
         <div><label for="fMod">Service setting</label><select id="fMod" data-dim="modality"></select></div>
         <div><label for="fSta">Status</label><select id="fSta" data-dim="status"></select></div>
+        <div><label for="fPeriod">Period</label><select id="fPeriod"></select></div>
+        <div><label for="fBasis">Date the period reads</label><select id="fBasis"></select></div>
         <div><label for="fFrom">From</label><input type="date" id="fFrom"></div>
         <div><label for="fTo">To</label><input type="date" id="fTo"></div>
       </div>
@@ -358,6 +361,7 @@
       <p class="xs" style="margin-top:10px" id="disNote"></p>
 
       <h2>Reports per day</h2>
+      <p class="secsay">Follows the period and the date basis chosen above.</p>
       <div id="dayWrap"></div>
     </div>
 
@@ -520,6 +524,14 @@
   }
   function actIasc(c) { var r = actRes(c); return r.placed ? C.activityIasc(r.placed) : (r.legacy ? r.note : ""); }
   function distName(c) { var d = C.districtByCode[c]; return d ? d.name : (c || "—"); }
+  var DIST_BY_NAME = {};
+  (C.DISTRICTS || []).forEach(function (d) { DIST_BY_NAME[d.name] = d.code; });
+  function distCode(raw) {
+    raw = (raw || "").trim();
+    if (!raw) return "";
+    if (C.districtByCode[raw]) return raw;
+    return DIST_BY_NAME[raw] || raw;
+  }
 
   /* ---------- CSV parsing (quoted fields, embedded newlines) ---------- */
   function parseCSV(text) {
@@ -669,10 +681,72 @@
      unlisted sites) or its site's. The options of each list are computed from
      the records that pass every OTHER filter, so the lists cascade in every
      direction and never offer a choice that would empty the page. */
+  /* ---------- the period ------------------------------------------------
+     "This week" has to mean one thing, and it has to be visible. The week
+     runs Sunday to Saturday, which is the Nepali working week (Saturday is
+     the weekly holiday), and every option says its own boundary so nobody
+     has to guess which convention is in force.
+     Two bases, because the register holds two kinds of date and one of them
+     is missing from most of it:
+       date of activity -- what the report is about. The 5Ws form records it
+         in the Gregorian calendar; the backlog was imported with Bikram
+         Sambat only, so those records fall outside EVERY period and the
+         filter summary says how many.
+       date received    -- when the register took the record. Present on
+         every record without exception, so "what came in this week" is
+         answerable for the whole register.
+     Neither is converted into the other and no Bikram Sambat date is read as
+     a Gregorian one: there is no agreed conversion in this build. */
+  var PERIODS = [
+    ["",          "All dates"],
+    ["today",     "Today"],
+    ["yesterday", "Yesterday"],
+    ["week",      "This week (Sunday to Saturday)"],
+    ["lastweek",  "Last week (Sunday to Saturday)"],
+    ["7d",        "Last 7 days, including today"],
+    ["month",     "This month"],
+    ["lastmonth", "Last month"],
+    ["30d",       "Last 30 days, including today"],
+    ["custom",    "Custom — the two dates below"]
+  ];
+  var BASES = [["activity", "Date of activity"], ["received", "Date received"]];
+  function pad2(x) { return (x < 10 ? "0" : "") + x; }
+  function ymd(d) { return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()); }
+  var DAY = 86400000;
+  function periodRange(p) {
+    var now = new Date(), t = new Date(now.getFullYear(), now.getMonth(), now.getDate()), f, u;
+    if (p === "today") { f = t; u = t; }
+    else if (p === "yesterday") { f = new Date(t.getTime() - DAY); u = f; }
+    else if (p === "week") { f = new Date(t.getTime() - t.getDay() * DAY); u = new Date(f.getTime() + 6 * DAY); }
+    else if (p === "lastweek") { f = new Date(t.getTime() - (t.getDay() + 7) * DAY); u = new Date(f.getTime() + 6 * DAY); }
+    else if (p === "7d") { f = new Date(t.getTime() - 6 * DAY); u = t; }
+    else if (p === "month") { f = new Date(t.getFullYear(), t.getMonth(), 1); u = new Date(t.getFullYear(), t.getMonth() + 1, 0); }
+    else if (p === "lastmonth") { f = new Date(t.getFullYear(), t.getMonth() - 1, 1); u = new Date(t.getFullYear(), t.getMonth(), 0); }
+    else if (p === "30d") { f = new Date(t.getTime() - 29 * DAY); u = t; }
+    else return null;
+    return { from: ymd(f), to: ymd(u) };
+  }
+  function periodLabel(p) {
+    for (var i = 0; i < PERIODS.length; i++) { if (PERIODS[i][0] === p) return PERIODS[i][1]; }
+    return p;
+  }
+  function basisLabel(b) { return b === "received" ? "date received" : "date of activity"; }
+  /* the date a record is placed by, on the basis in force -- "" means it
+     cannot be placed at all, which is a state the page reports rather than
+     hides */
+  function basisDate(r) {
+    if (FILT.basis === "received") {
+      var t = receivedAt(r); if (!t) return "";
+      var d = new Date(t); return isNaN(d) ? "" : ymd(d);
+    }
+    return r.dateAD || "";
+  }
+
   var DIMS = ["province", "district", "palika", "org", "donor", "group", "activity", "modality", "status"];
   var FSEL = {};
   DIMS.forEach(function (d) { FSEL[d] = document.querySelector('#filters select[data-dim="' + d + '"]'); });
-  var FILT = { province: "", district: "", palika: "", org: "", donor: "", group: "", activity: "", modality: "", status: "", from: "", to: "" };
+  var FILT = { province: "", district: "", palika: "", org: "", donor: "", group: "", activity: "", modality: "", status: "",
+               from: "", to: "", period: "", basis: "activity" };
 
   function palikaOf(r) {
     if (r.palika) return r.palika;
@@ -681,8 +755,13 @@
   }
   /* each dimension: the record's value(s) as codes, and a label for a code */
   var DIM = {
-    province: { of: function (r) { var p = C.palikaByCode[palikaOf(r)]; if (p) return [p.province]; var d = C.districtByCode[r.district]; return [d && d.province ? d.province : ""]; }, label: function (v) { return v || "not stated"; } },
-    district: { of: function (r) { return [r.district || ""]; }, label: function (v) { return v ? distName(v) : "not stated"; } },
+    province: { of: function (r) { var p = C.palikaByCode[palikaOf(r)]; if (p) return [p.province]; var d = C.districtByCode[distCode(r.district)]; return [d && d.province ? d.province : ""]; }, label: function (v) { return v || "not stated"; } },
+    /* The backlog states a district NAME ("Nuwakot") where the form states a
+       CODE ("NUW"), so the filter offered the same district twice. The name
+       is read as its code ONLY on an exact match in the code list -- a name
+       that is not in the list stays exactly as the record states it, because
+       mapping it would assert a district the record does not name. */
+    district: { of: function (r) { return [distCode(r.district)]; }, label: function (v) { return v ? distName(v) : "not stated"; } },
     palika:   { of: function (r) { return [palikaOf(r)]; }, label: function (v) { return v ? (C.palikaName(v) || v) : "not established"; } },
     org:      { of: function (r) { return [orgName(r)]; }, label: function (v) { return v; } },
     donor:    { of: function (r) { var d = S.donorsOf(r); return d.length ? d : [""]; }, label: function (v) { return v || "not specified"; } },
@@ -697,8 +776,15 @@
       if (!want || d === skip) continue;
       if (DIM[d].of(r).indexOf(want === "\u2205" ? "" : want) < 0) return false;
     }
-    if (FILT.from && (r.dateAD || "") < FILT.from) return false;
-    if (FILT.to && (r.dateAD || "") > FILT.to) return false;
+    if (FILT.from || FILT.to) {
+      var d = basisDate(r);
+      /* a record with no date on this basis is outside every period: it is
+         dropped from the selection and COUNTED in the summary, never quietly
+         folded in at one end of the range */
+      if (!d) return false;
+      if (FILT.from && d < FILT.from) return false;
+      if (FILT.to && d > FILT.to) return false;
+    }
     return true;
   }
   function fillFilter(d) {
@@ -723,20 +809,61 @@
     DIMS.forEach(fillFilter);
     DATA = ALL.filter(function (r) { return passes(r, null); });
     var active = DIMS.filter(function (d) { return FILT[d]; }).length + (FILT.from ? 1 : 0) + (FILT.to ? 1 : 0);
-    $("fSum").innerHTML = active
+    var say = active
       ? "Showing <b>" + DATA.length.toLocaleString() + "</b> of " + ALL.length.toLocaleString() + " reports · <b>" + active + "</b> filter" + (active === 1 ? "" : "s") + " active"
       : "Showing <b>all " + ALL.length.toLocaleString() + "</b> reports";
+    if (FILT.from || FILT.to) {
+      say += " · " + (FILT.period && FILT.period !== "custom" ? esc(periodLabel(FILT.period).replace(/ \(.*\)$/, "")) : "dates") +
+        " <b>" + esc(FILT.from || "any") + "</b> to <b>" + esc(FILT.to || "any") + "</b>, read on the " + basisLabel(FILT.basis);
+      var undated = ALL.filter(function (r) { return !basisDate(r); }).length;
+      if (undated) {
+        say += ' · <span class="nodate"><b>' + undated.toLocaleString() + "</b> report" + (undated === 1 ? "" : "s") +
+          " carr" + (undated === 1 ? "ies" : "y") + " no " + basisLabel(FILT.basis) +
+          " and sit" + (undated === 1 ? "s" : "") + " outside every period" +
+          (FILT.basis === "activity" ? " — the imported backlog has Bikram Sambat dates only; switch the basis to the date received to place them" : "") +
+          "</span>";
+      }
+    }
+    $("fSum").innerHTML = say;
     $("fClear").hidden = !active;
     render();
   }
   DIMS.forEach(function (d) {
     FSEL[d].addEventListener("change", function () { FILT[d] = this.value; applyFilters(); });
   });
-  $("fFrom").addEventListener("change", function () { FILT.from = this.value; applyFilters(); });
-  $("fTo").addEventListener("change", function () { FILT.to = this.value; applyFilters(); });
+  /* The two selects and the two date boxes are one control: choosing a
+     period writes the dates, and editing a date makes the period custom. */
+  (function fillPeriodControls() {
+    $("fPeriod").innerHTML = PERIODS.map(function (p) {
+      return '<option value="' + p[0] + '">' + p[1] + "</option>"; }).join("");
+    $("fBasis").innerHTML = BASES.map(function (b) {
+      return '<option value="' + b[0] + '">' + b[1] + "</option>"; }).join("");
+    $("fBasis").value = FILT.basis;
+  })();
+  $("fPeriod").addEventListener("change", function () {
+    FILT.period = this.value;
+    if (!FILT.period) { FILT.from = ""; FILT.to = ""; }
+    else if (FILT.period !== "custom") {
+      var rg = periodRange(FILT.period);
+      FILT.from = rg.from; FILT.to = rg.to;
+    }
+    $("fFrom").value = FILT.from; $("fTo").value = FILT.to;
+    applyFilters();
+  });
+  $("fBasis").addEventListener("change", function () { FILT.basis = this.value; applyFilters(); });
+  $("fFrom").addEventListener("change", function () {
+    FILT.from = this.value; FILT.period = (FILT.from || FILT.to) ? "custom" : "";
+    $("fPeriod").value = FILT.period; applyFilters();
+  });
+  $("fTo").addEventListener("change", function () {
+    FILT.to = this.value; FILT.period = (FILT.from || FILT.to) ? "custom" : "";
+    $("fPeriod").value = FILT.period; applyFilters();
+  });
   $("fClear").addEventListener("click", function () {
     Object.keys(FILT).forEach(function (k) { FILT[k] = ""; });
+    FILT.basis = "activity";
     $("fFrom").value = ""; $("fTo").value = "";
+    $("fPeriod").value = ""; $("fBasis").value = "activity";
     applyFilters();
   });
 
@@ -1352,20 +1479,23 @@
        and a guessed date is worse than an absent one. */
     var byDay = {}, noAD = 0, noADreach = 0;
     DATA.forEach(function (r) {
-      if (!r.dateAD) { noAD++; noADreach += n(r.reachedTotal); return; }
-      var b = byDay[r.dateAD] = byDay[r.dateAD] || { reports: 0, reach: 0, orgs: new Set() };
+      var day = basisDate(r);
+      if (!day) { noAD++; noADreach += n(r.reachedTotal); return; }
+      var b = byDay[day] = byDay[day] || { reports: 0, reach: 0, orgs: new Set() };
       b.reports++; b.reach += n(r.reachedTotal); b.orgs.add(orgName(r));
     });
     var days = Object.keys(byDay).sort();
     var dayMax = Math.max(1, ...days.map(function (d) { return byDay[d].reach; }));
     var dayNote = noAD
       ? '<p class="xs" style="margin-top:10px">' + noAD.toLocaleString() + " report" + (noAD === 1 ? "" : "s") +
-        " carr" + (noAD === 1 ? "ies" : "y") + " a Bikram Sambat date only and " + (noAD === 1 ? "is" : "are") +
-        " not on this table — that is how the backlog was imported. Their " + noADreach.toLocaleString() +
+        " carr" + (noAD === 1 ? "ies" : "y") + " no " + basisLabel(FILT.basis) + " and " + (noAD === 1 ? "is" : "are") +
+        " not on this table" + (FILT.basis === "activity" ? " — the imported backlog has Bikram Sambat dates only, and nothing here converts them" : "") +
+        ". Their " + noADreach.toLocaleString() +
         " attendances are in every other figure on this screen; only the day is unplaced.</p>"
       : "";
     $("dayWrap").innerHTML = (days.length
-      ? '<div class="tbl-wrap"><table class="data"><thead><tr><th>Date of activity</th>' +
+      ? '<div class="tbl-wrap"><table class="data"><thead><tr><th>' +
+        (FILT.basis === "received" ? "Date received" : "Date of activity") + '</th>' +
         '<th class="n">Reports</th><th class="n">Attendances</th><th class="n">Organisations</th><th>Share of the attendances placed on a day</th></tr></thead><tbody>' +
         days.map(function (d) {
           var b = byDay[d], w = Math.max(3, Math.round(b.reach / dayMax * 100));
@@ -1374,9 +1504,9 @@
             '<td class="n">' + b.orgs.size + '</td>' +
             '<td class="n">' + w + '%<div class="bar"><i style="width:' + w + '%"></i></div></td></tr>';
         }).join("") + "</tbody></table></div>"
-      : '<div class="banner warn" style="margin:0"><b>No report in this selection carries a date in the Gregorian calendar.</b> ' +
-        'Nothing can be placed on a day until reports arrive with an AD date, or until a conversion of the ' +
-        'Bikram Sambat dates is agreed.</div>') + dayNote;
+      : '<div class="banner warn" style="margin:0"><b>No report in this selection can be placed on a day.</b> ' +
+        'On the date of activity that means no report here carries a Gregorian date — the imported backlog has ' +
+        'Bikram Sambat only. Switch the basis above to the date received to see when the register took them.</div>') + dayNote;
 
     /* --- reports received --- */
     renderRaw();
@@ -1444,6 +1574,7 @@
     DIMS.forEach(function (d) { if (FILT[d]) parts.push(d + " = " + DIM[d].label(FILT[d] === "\u2205" ? "" : FILT[d])); });
     if (FILT.from) parts.push("from " + FILT.from);
     if (FILT.to) parts.push("to " + FILT.to);
+    if (FILT.from || FILT.to) parts.push("dates read on the " + basisLabel(FILT.basis));
     return parts.length ? parts.join("; ") : "no filters";
   }
   function pubDefaultBasis() {
