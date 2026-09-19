@@ -13,6 +13,7 @@
 
 const KEY = "mhpss-np-4ws-v1";
 const SCHEMA_VERSION = "5ws-np-0.5.0";  /* 0.2.0: four age bands · 0.3.0: donors list, partners, palika, iascSub, 16 Sep 2026 · 0.4.0: five age groups, settings, cadre list, "Other" text fields, funding source off the form — EDCD review 17 Sep 2026 · 0.5.0 (17 Sep 2026, afternoon): the instrument is the 5Ws; activity list v3 (layer.item codes, IASC terms in the backend only); one report per session with its attendance — countBasis no longer asked, always CONTACTS; sessionTime in the record id */
+let memoryCurrent = false;
 
 /* ---------------------------------------------------------------------
    Deterministic record id.
@@ -50,9 +51,10 @@ function recordId(r) {
    storage is unavailable is a form that loses a day of field reporting.
    ------------------------------------------------------------------- */
 function read() {
+  if (memoryCurrent) return window.__mem || [];
   try {
     const raw = localStorage.getItem(KEY);
-    return raw ? JSON.parse(raw) : [];
+    return raw ? JSON.parse(raw) : (window.__mem || []);
   } catch (e) {
     console.warn("store: read failed, continuing in memory", e);
     return window.__mem || [];
@@ -62,8 +64,10 @@ function write(list) {
   window.__mem = list;
   try {
     localStorage.setItem(KEY, JSON.stringify(list));
+    memoryCurrent = false;
     return true;
   } catch (e) {
+    memoryCurrent = true;
     console.warn("store: write failed, held in memory for this page only", e);
     return false;
   }
@@ -89,6 +93,29 @@ function save(rec) {
   const idx = list.findIndex((x) => x.id === id);
   const out = { ...rec, id, schemaVersion: SCHEMA_VERSION };
 
+  /* A revision is the same local report and therefore the same remote event.
+     A new report gets its immutable event id before either local or queued
+     copy is written. Existing ids, including legacy deterministic ids, win. */
+  if (idx >= 0 && list[idx]._rid) out._rid = list[idx]._rid;
+  if (idx >= 0 && !out._rid && window.FB) {
+    if (typeof window.FB.queue === "function") {
+      const queued = window.FB.queue();
+      const match = queued.find((item) => item && item.kind === "activity" &&
+        item._rid && (item.id === id || recordId(item) === id));
+      if (match) out._rid = match._rid;
+    }
+    /* Before immutable event ids, FB.rid() was the remote document id. A
+       legacy local record with no queue must revise that document rather
+       than create a second random-id document for the same report. */
+    if (!out._rid && typeof window.FB.rid === "function") {
+      out._rid = window.FB.rid(registerBody(out));
+    }
+  }
+  if (window.FB && typeof window.FB.ensureEventId === "function") {
+    const identity = { kind: "activity", _rid: out._rid };
+    out._rid = window.FB.ensureEventId(identity);
+  }
+
   if (idx >= 0) {
     // Same report again: keep the original creation time, record the revision.
     out.createdAt = list[idx].createdAt;
@@ -97,25 +124,35 @@ function save(rec) {
     out.previous = list[idx].previous ? [...list[idx].previous, stripHistory(list[idx])] : [stripHistory(list[idx])];
     list[idx] = out;
     const persistedRev = write(list);
-    syncToRegister(out);   /* a corrected report must reach the register too */
+    reportPersistence(persistedRev);
+    if (persistedRev) syncToRegister(out);   /* a corrected report must reach the register too */
     return { record: out, duplicateOf: id, persisted: persistedRev };
   }
   out.createdAt = now;
   out.revision = 0;
   list.push(out);
   const persisted = write(list);
+  reportPersistence(persisted);
 
-  /* The device copy is written FIRST and unconditionally -- that is the
-     record. Only then is a push attempted, and a failed push leaves the
-     record queued rather than losing it.
+  /* The persisted device copy is written first. Only then is a push
+     attempted, and a failed push leaves the record queued rather than
+     losing it.
 
      This was missing until 16 Sep 2026: the activity report is the only
      form that saves through this file rather than l1.js, so wiring the
      bridge into l1.js alone left the 4Ws report -- the form that feeds
      the 5W -- saving locally and never reaching the register. Found by
      submitting the real form and checking the queue. */
-  syncToRegister(out);
+  if (persisted) syncToRegister(out);
   return { record: out, duplicateOf: null, persisted: persisted };
+}
+
+function reportPersistence(persisted) {
+  if (persisted) return;
+  const message = "This report is only in memory because browser storage failed. Export it before closing this page.";
+  if (window.FB && typeof window.FB.reportPersistenceFailure === "function") {
+    window.FB.reportPersistenceFailure(message);
+  }
 }
 
 /* Shape an activity report for the register and hand it to the bridge.
@@ -429,8 +466,44 @@ function stamp() {
 }
 
 function clearAll() {
-  try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ }
+  const list = read();
+  if (!window.FB || typeof window.FB.clearQueue !== "function") {
+    const unavailableMessage = "Cannot verify that the activity report send queue was cleared.";
+    if (typeof window.alert === "function") window.alert(unavailableMessage);
+    const unavailable = new Error(unavailableMessage);
+    unavailable.code = "PERSISTENCE_FAILED";
+    throw unavailable;
+  }
+  let queueResult;
+  try {
+    queueResult = window.FB.clearQueue({
+      kinds: ["activity"],
+      rids: list.map((r) => r && r._rid).filter(Boolean),
+    });
+  } catch (e) {
+    const queueMessage = e && e.message ? e.message : "Could not clear the activity report send queue.";
+    if (typeof window.FB.reportPersistenceFailure === "function") {
+      window.FB.reportPersistenceFailure(queueMessage);
+    } else if (typeof window.alert === "function") {
+      window.alert(queueMessage);
+    }
+    throw e;
+  }
+  try { localStorage.removeItem(KEY); }
+  catch (e) {
+    const message = "Could not clear the saved activity reports from this device.";
+    if (typeof window.FB.reportPersistenceFailure === "function") {
+      window.FB.reportPersistenceFailure(message);
+    } else if (typeof window.alert === "function") {
+      window.alert(message);
+    }
+    const error = new Error(message);
+    error.code = "PERSISTENCE_FAILED";
+    throw error;
+  }
   window.__mem = [];
+  memoryCurrent = true;
+  return { cleared: true, queueCleared: queueResult.queueCleared };
 }
 
 /* The funding tags of a record, whatever its vintage. 0.3.0 records carry

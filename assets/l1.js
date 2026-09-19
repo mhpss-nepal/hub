@@ -47,9 +47,23 @@
 
   /* ---------- storage ----------------------------------------------- */
   var mem = {};
-  function key(kind) { return "mhpss-np-l1-" + kind + "-v1"; }
+  var KIND_ALIAS = {
+    contact: { storage: "contact", queue: ["contact", "service_contact"] },
+    service_contact: { storage: "contact", queue: ["contact", "service_contact"] },
+    selfreport: { storage: "selfreport", queue: ["selfreport", "self_report"] },
+    self_report: { storage: "selfreport", queue: ["selfreport", "self_report"] }
+  };
+  function storageKind(kind) {
+    return KIND_ALIAS[kind] ? KIND_ALIAS[kind].storage : kind;
+  }
+  function queueKinds(kind) {
+    return KIND_ALIAS[kind] ? KIND_ALIAS[kind].queue.slice() : [kind];
+  }
+  function key(kind) { return "mhpss-np-l1-" + storageKind(kind) + "-v1"; }
 
   function all(kind) {
+    kind = storageKind(kind);
+    if (Object.prototype.hasOwnProperty.call(mem, kind)) return mem[kind];
     try {
       var raw = localStorage.getItem(key(kind));
       return raw ? JSON.parse(raw) : [];
@@ -58,8 +72,10 @@
     }
   }
   function writeAll(kind, list) {
+    kind = storageKind(kind);
     try {
       localStorage.setItem(key(kind), JSON.stringify(list));
+      delete mem[kind];
       return true;
     } catch (e) {
       mem[kind] = list;
@@ -67,15 +83,25 @@
     }
   }
   function save(kind, obj) {
+    kind = storageKind(kind);
+    if (window.FB && typeof window.FB.ensureEventId === "function") {
+      window.FB.ensureEventId(obj);
+    }
     var list = all(kind);
     obj._saved = new Date().toISOString();
     list.push(obj);
     var persisted = writeAll(kind, list);
 
-    /* The device copy is written FIRST and unconditionally — that is the
-       record. Only then is a push attempted, and a failed push leaves the
-       record queued rather than losing it. One call site so no form can
-       forget to sync, and so adding a form cannot accidentally skip it. */
+    if (!persisted) {
+      var message = "This record is only in memory because browser storage failed. Export it before closing this page.";
+      if (window.FB && typeof window.FB.reportPersistenceFailure === "function") {
+        window.FB.reportPersistenceFailure(message);
+      }
+      return { count: list.length, persisted: false, synced: null };
+    }
+
+    /* The persisted device copy is written first. Only then is a push
+       attempted, and a failed push leaves the record queued. */
     var synced = null;
     if (window.FB && typeof window.FB.submit === "function") {
       synced = window.FB.submit(obj);
@@ -83,8 +109,44 @@
     return { count: list.length, persisted: persisted, synced: synced };
   }
   function clear(kind) {
-    try { localStorage.removeItem(key(kind)); } catch (e) { /* ignore */ }
-    mem[kind] = [];
+    var sourceKind = storageKind(kind);
+    var list = all(kind);
+    if (!window.FB || typeof window.FB.clearQueue !== "function") {
+      var unavailableMessage = "Cannot verify that this form's unsent queue was cleared.";
+      if (typeof window.alert === "function") window.alert(unavailableMessage);
+      var unavailable = new Error(unavailableMessage);
+      unavailable.code = "PERSISTENCE_FAILED";
+      throw unavailable;
+    }
+    var queueResult;
+    try {
+      queueResult = window.FB.clearQueue({
+        kinds: queueKinds(kind),
+        rids: list.map(function (r) { return r && r._rid; }).filter(Boolean)
+      });
+    } catch (e) {
+      var queueMessage = e && e.message ? e.message : "Could not clear this form's unsent queue.";
+      if (typeof window.FB.reportPersistenceFailure === "function") {
+        window.FB.reportPersistenceFailure(queueMessage);
+      } else if (typeof window.alert === "function") {
+        window.alert(queueMessage);
+      }
+      throw e;
+    }
+    try { localStorage.removeItem(key(kind)); }
+    catch (e) {
+      var message = "Could not clear the saved records from this device.";
+      if (typeof window.FB.reportPersistenceFailure === "function") {
+        window.FB.reportPersistenceFailure(message);
+      } else if (typeof window.alert === "function") {
+        window.alert(message);
+      }
+      var error = new Error(message);
+      error.code = "PERSISTENCE_FAILED";
+      throw error;
+    }
+    mem[sourceKind] = [];
+    return { cleared: true, queueCleared: queueResult.queueCleared };
   }
   function storageWorks() {
     try {

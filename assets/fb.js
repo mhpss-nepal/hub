@@ -11,13 +11,11 @@
       Malang and wrong in a holding centre above Dhunche. A record must
       never depend on the network to survive.
 
-   2. DETERMINISTIC DOCUMENT IDs, via setDoc rather than addDoc. A queued
-      record may be retried many times — on reconnect, on reload, on a
-      second device that has the same export. addDoc would create a new
-      document every time and silently inflate the count. setDoc with an
-      id derived from the record's own content writes the same document
-      again instead, so retrying is safe and de-duplication happens for
-      free at the database.
+   2. IMMUTABLE EVENT IDs, via setDoc rather than addDoc. A new record gets
+      a random id once, before either local copy is written, and carries
+      that id through every retry. Legacy queued and imported records keep
+      their existing `_rid`. Retrying is therefore idempotent without
+      collapsing two distinct events that happen to have the same content.
 
    Nothing here logs record content to the console. Never add that: a
    phone screen in a shelter is not a private place.
@@ -44,6 +42,9 @@
     configured: !!(cfg.projectId && cfg.apiKey),
     ready: false,
     error: "",
+    queueError: "",
+    queueReadFailed: false,
+    storageError: "",
     user: null
   };
   var db = null, auth = null, api = {};
@@ -57,6 +58,7 @@
       configured: state.configured,
       ready: state.ready,
       error: state.error,
+      persistenceError: state.storageError || state.queueError,
       online: navigator.onLine,
       user: state.user ? { email: state.user.email, uid: state.user.uid } : null,
       pending: queue().length
@@ -67,17 +69,40 @@
      The queue is the record of truth until the server confirms. An entry
      leaves the queue only once Firestore has acknowledged the write. */
   function queue() {
-    try { return JSON.parse(localStorage.getItem(QKEY) || "[]"); } catch (e) { return []; }
+    try {
+      var raw = localStorage.getItem(QKEY);
+      /* When a write failed, the page copy is newer than localStorage. Do not
+         hide it from status, export, retry, or a later successful write. */
+      if (state.queueError && !state.queueReadFailed && window.__fbq) return window.__fbq;
+      state.queueReadFailed = false;
+      var parsed = JSON.parse(raw || "[]");
+      if (!Array.isArray(parsed)) throw new Error("queue is not a list");
+      return parsed;
+    } catch (e) {
+      state.queueReadFailed = true;
+      state.queueError = "The existing send queue could not be read from this device.";
+      return window.__fbq || [];
+    }
   }
   function setQueue(q) {
-    try { localStorage.setItem(QKEY, JSON.stringify(q)); return true; }
-    catch (e) { window.__fbq = q; return false; }
+    try {
+      localStorage.setItem(QKEY, JSON.stringify(q));
+      state.queueError = "";
+      state.queueReadFailed = false;
+      return true;
+    } catch (e) {
+      /* Keep the page copy available for an immediate retry, but never call
+         it persisted: it disappears when this page closes. */
+      window.__fbq = q;
+      state.queueError = "The send queue could not be stored on this device.";
+      return false;
+    }
   }
 
-  /* ---------- deterministic id ----------------------------------------
-     FNV-1a over the fields that make a record what it is. Two exports of
-     the same record produce the same id; two genuinely different records
-     do not. Timestamps added by the device are excluded on purpose. */
+  /* ---------- legacy deterministic id ---------------------------------
+     Kept as a public compatibility helper for old exports and readers.
+     New submissions do NOT use this content hash: two real events can have
+     identical answers and must still be two remote documents. */
   function rid(rec) {
     /* The 4Ws activity report names its fields dateAD / activity / modality
        (camelCase, from store.js), not date_ad / service like the l1.js
@@ -106,6 +131,47 @@
     }
     function p(n) { var s = n.toString(36).toUpperCase(); while (s.length < 7) s = "0" + s; return s; }
     return (rec.kind || "rec") + "_" + p(h1) + p(h2);
+  }
+
+  var fallbackEventCounter = 0;
+  function eventId(rec) {
+    var bytes = new Uint8Array(16), hex = "", i;
+    if (window.crypto && typeof window.crypto.getRandomValues === "function") {
+      window.crypto.getRandomValues(bytes);
+    } else {
+      /* getRandomValues is available in the trial's supported browsers. This
+         fallback still mixes time, randomness and a page counter so an older
+         browser does not fall back to content-derived identity. */
+      fallbackEventCounter++;
+      var seed = Date.now().toString(16) + Math.random().toString(16).slice(2) +
+        fallbackEventCounter.toString(16);
+      for (i = 0; i < bytes.length; i++) {
+        bytes[i] = (parseInt(seed.slice(i * 2, i * 2 + 2), 16) || 0) ^
+          Math.floor(Math.random() * 256);
+      }
+    }
+    for (i = 0; i < bytes.length; i++) hex += bytes[i].toString(16).padStart(2, "0");
+    var kind = String(rec && rec.kind || "rec").replace(/[^A-Za-z0-9_-]/g, "_");
+    return kind + "_evt_" + hex;
+  }
+
+  function ensureEventId(rec) {
+    if (!rec || typeof rec !== "object") throw new TypeError("a record is required");
+    /* Existing ids are immutable compatibility data. In particular, never
+       replace the deterministic ids already sitting in a legacy queue. */
+    if (!rec._rid) rec._rid = eventId(rec);
+    return rec._rid;
+  }
+
+  function persistenceFailure(message) {
+    state.storageError = message || "A record could not be stored on this device.";
+    announce();
+  }
+
+  function persistenceError(message) {
+    var e = new Error(message);
+    e.code = "PERSISTENCE_FAILED";
+    return e;
   }
 
   /* ---------- init ---------------------------------------------------- */
@@ -179,23 +245,44 @@
   }
 
   /* ---------- submit --------------------------------------------------
-     Returns immediately once the record is safe on this device. The
-     network attempt continues in the background; the caller is told the
-     truth either way, never "sent" when it was not. */
+     The caller gets explicit local persistence and remote acknowledgement
+     states. A failed queue write is never described as safe local storage. */
   function submit(rec) {
+    ensureEventId(rec);
     var r = JSON.parse(JSON.stringify(rec || {}));
-    r._rid = rid(r);
     r._device_ts = new Date().toISOString();
     var q = queue();
+    if (state.queueReadFailed) {
+      /* Never replace an unreadable queue with a new one. Keep this submission
+         in memory and require export/recovery instead of risking older rows. */
+      window.__fbq = (window.__fbq || []).concat([r]);
+      var unreadable = {
+        local: false,
+        persisted: false,
+        rid: r._rid,
+        remote: false,
+        error: "Not safely stored: the existing send queue could not be read."
+      };
+      announce();
+      return Promise.resolve(unreadable);
+    }
     /* already queued and unsent? replace rather than add a second copy */
     var at = -1;
     for (var i = 0; i < q.length; i++) { if (q[i]._rid === r._rid) { at = i; break; } }
     if (at >= 0) q[at] = r; else q.push(r);
     var persisted = setQueue(q);
 
-    var out = { local: true, persisted: persisted, rid: r._rid, remote: false, error: "" };
+    var out = {
+      local: persisted,
+      persisted: persisted,
+      rid: r._rid,
+      remote: false,
+      error: persisted ? "" : "Not safely stored: the send queue is only in memory for this page."
+    };
     if (!state.ready) {
-      out.error = state.configured ? (state.error || "not connected yet") : "not configured";
+      if (persisted) {
+        out.error = state.configured ? (state.error || "not connected yet") : "not configured";
+      }
       announce();
       return Promise.resolve(out);
     }
@@ -226,12 +313,18 @@
      point, this list and the rules change together -- deliberately, not
      by an edit to one form. */
   var NEVER_SENT = ["focalName", "focalPhone", "focalEmail",
-                    "focal_name", "focal_phone", "focal_email"];
+                    "focal_name", "focal_phone", "focal_email",
+                    "referrerPhone", "referrer_phone"];
 
-  function push(r) {
+  function bodyForFirestore(r) {
     var body = JSON.parse(JSON.stringify(r));
     delete body._device_ts;
     for (var i = 0; i < NEVER_SENT.length; i++) delete body[NEVER_SENT[i]];
+    return body;
+  }
+
+  function push(r) {
+    var body = bodyForFirestore(r);
     body.server_ts = api.serverTimestamp();
     body.device_ts = r._device_ts;
     return api.setDoc(api.doc(db, COLL, r._rid), body);
@@ -239,6 +332,39 @@
 
   function drop(id) {
     setQueue(queue().filter(function (x) { return x._rid !== id; }));
+  }
+
+  /* With no argument this retains the old clear-all API. A kind string or
+     { kinds, rids } removes only queue entries related to a source store.
+     Failure throws so a source clear cannot continue and claim success. */
+  function clearQueue(match) {
+    var q = queue(), ids = {}, kinds = {}, clearAll = match === undefined;
+    if (state.queueReadFailed) {
+      announce();
+      throw persistenceError("Could not read the existing send queue; nothing was cleared.");
+    }
+    if (typeof match === "string") kinds[match] = true;
+    else if (match && typeof match === "object") {
+      if (match.kind) kinds[match.kind] = true;
+      (match.kinds || []).forEach(function (kind) { if (kind) kinds[kind] = true; });
+      (match.rids || []).forEach(function (id) { if (id) ids[id] = true; });
+    }
+    var keep = q.filter(function (r) {
+      /* An id match is only a fallback for a legacy queue entry with no kind.
+         Never let an accidental/corrupt cross-kind id clear another form. */
+      var related = clearAll || (r.kind && kinds[r.kind]) ||
+        (!r.kind && r._rid && ids[r._rid]);
+      return !related;
+    });
+    var removed = q.length - keep.length;
+    if (removed && !setQueue(keep)) {
+      /* The clear did not persist, so keep the pre-clear page copy too. */
+      window.__fbq = q;
+      announce();
+      throw persistenceError("Could not clear the related send queue from this device.");
+    }
+    announce();
+    return { cleared: true, queueCleared: removed, left: keep.length };
   }
 
   /* ---------- flush ---------------------------------------------------
@@ -337,15 +463,20 @@
 
     function paint(st) {
       var cls = "", msg;
-      if (!st.configured) {
+      if (st.persistenceError) {
+        cls = "warn";
+        msg = "<b>Storage failed.</b> " + st.persistenceError +
+              " Do not close this page; export the record before leaving.";
+      } else if (!st.configured) {
         cls = "off";
         msg = "<b>Saving to this device only.</b> No database is connected yet, so records stay here " +
-              "until you export them. Nothing is lost.";
+              "until you export them.";
       } else if (!st.ready) {
         cls = "warn";
         msg = "<b>Not connected to the database.</b> " +
               (st.online ? "Retrying. " : "No signal. ") +
-              "Records are safe on this phone" + (st.pending ? " — " + st.pending + " waiting to send." : ".");
+              "Persisted records remain on this phone" +
+              (st.pending ? " — " + st.pending + " waiting to send." : ".");
       } else if (st.pending) {
         cls = "warn";
         msg = "<b>" + st.pending + " record(s) still to send.</b> " +
@@ -456,7 +587,9 @@
     onStatus: function (f) { stateCbs.push(f); f(status()); },
     onUser: function (f) { userCbs.push(f); f(state.user); },
     submit: submit, flush: flush, queue: queue, rid: rid,
+    bodyForFirestore: bodyForFirestore,
+    ensureEventId: ensureEventId, reportPersistenceFailure: persistenceFailure,
     watch: watch, watchKind: watchKind, signIn: signIn, signOut: signOutNow,
-    clearQueue: function () { setQueue([]); announce(); }
+    clearQueue: clearQueue
   };
 })();

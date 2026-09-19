@@ -347,13 +347,16 @@
     } catch (e) { err = "could not be read as JSON or CSV"; }
     if (err) return { name: name, err: err, added: 0, dupe: 0, unknown: 0, kinds: {} };
 
-    var seen = {}; ROWS.forEach(function (r) { seen[r._rid] = 1; });
+    var seen = {}; viewRows().forEach(function (r) { if (r._rid) seen[r._rid] = 1; });
     var added = 0, dupe = 0, unknown = 0, kinds = {};
     recs.forEach(function (rec) {
       if (!rec || typeof rec !== "object") { unknown++; return; }
       var kind = classify(rec);
       if (!kind) { unknown++; return; }
-      var id = rid(rec, kind);
+      /* Current exports carry the immutable Firestore document id. Preserve
+         it exactly so an imported copy deduplicates with the live register.
+         Only legacy exports without one use the old content identity. */
+      var id = rec._rid || rid(rec, kind);
       if (seen[id]) { dupe++; return; }
       seen[id] = 1;
       rec._rid = id; rec._kind = kind; rec._file = name;
