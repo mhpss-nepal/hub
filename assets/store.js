@@ -15,6 +15,7 @@ const KEY = "mhpss-np-4ws-v1";
 const SCHEMA_VERSION = "5ws-np-0.5.0";  /* 0.2.0: four age bands · 0.3.0: donors list, partners, palika, iascSub, 16 Sep 2026 · 0.4.0: five age groups, settings, cadre list, "Other" text fields, funding source off the form — EDCD review 17 Sep 2026 · 0.5.0 (17 Sep 2026, afternoon): the instrument is the 5Ws; activity list v3 (layer.item codes, IASC terms in the backend only); one report per session with its attendance — countBasis no longer asked, always CONTACTS; sessionTime in the record id */
 let memoryCurrent = false;
 let sourceMutationCounter = 0;
+let sourceWriteError = "";
 
 /* ---------------------------------------------------------------------
    Deterministic record id.
@@ -155,10 +156,12 @@ function read() {
 }
 function write(list, expected) {
   window.__mem = list;
+  sourceWriteError = "";
   try {
     mutateSource(() => list, expected);
     return true;
   } catch (e) {
+    sourceWriteError = e && e.message ? e.message : "Browser storage failed.";
     memoryCurrent = true;
     console.warn("store: write failed, held in memory for this page only", e);
     return false;
@@ -257,6 +260,7 @@ function saveResult(record, duplicateOf, sourcePersisted, synced) {
       : "volatile",
     recoveryRequired: !sourcePersisted || !queuePersisted,
     synced,
+    error: sourcePersisted ? "" : sourceWriteError,
   };
 }
 
