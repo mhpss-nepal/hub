@@ -440,6 +440,7 @@ test("STORE concurrent revisions cannot both claim source persistence", () => {
   assert.equal(concurrent.sourcePersisted, true);
   assert.equal(stale.sourcePersisted, false);
   assert.equal(stale.queuePersisted, false);
+  assert.match(stale.error, /changed|concurrent|busy/i);
   assert.equal(second.window.STORE.all()[0].description, "second revision");
   assert.match(first.window.STORE.toCSV(first.window.STORE.all()), /first revision/);
 });
@@ -1355,6 +1356,23 @@ test("legacy CSV ids exactly match historical Firestore FB.rid for every support
     assert.equal(importer.viewRows().length, 1, record.kind);
     assert.equal(importer.viewRows()[0]._rid, liveId, record.kind);
   }
+});
+
+test("release contract keeps the separate repositories blocked and names the atomic pair", () => {
+  const contract = JSON.parse(fs.readFileSync(path.join(ROOT, "release-contract.json"), "utf8"));
+  assert.equal(contract.schema, "mhpss-nepal.atomic-form-hub-release-contract/v1");
+  assert.equal(contract.status, "blocked-pending-monorepo-integration");
+  assert.equal(contract.review_artifacts_only, true);
+  assert.equal(contract.independent_merge_or_deploy_allowed, false);
+  assert.equal(contract.does_not_resolve_rollout, true);
+  assert.match(contract.atomic_pair.hub_commit, /^[0-9a-f]{40}$/);
+  assert.match(contract.atomic_pair.form_commit, /^[0-9a-f]{40}$/);
+  assert.match(contract.atomic_pair.asset_fingerprint.value, /^[0-9a-f]{64}$/);
+  assert.match(contract.atomic_pair.cache_version, /^mhpss-np-field-v\d+$/);
+  assert.deepEqual(contract.required_monorepo_integration.activation, [
+    "one atomic Form+Hub release",
+    "one paired rollback boundary",
+  ]);
 });
 
 test("Firestore submission bodies strip every focal and referrer contact alias", () => {

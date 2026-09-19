@@ -1,0 +1,45 @@
+{
+  "schema": "mhpss-nepal.atomic-form-hub-release-contract/v1",
+  "status": "blocked-pending-monorepo-integration",
+  "review_artifacts_only": true,
+  "independent_merge_or_deploy_allowed": false,
+  "does_not_resolve_rollout": true,
+  "atomic_pair": {
+    "hub_commit": "55e5944c19f9f74655bd5928ce6947ffa5931607",
+    "form_commit": "4f4d297f3bd7fbadf44cb8bcd18a723d48b2d387",
+    "asset_fingerprint": {
+      "algorithm": "sha256",
+      "value": "ac14f28307fefa42014ddae5299f4d498f73008a5a9333e3c698e40ab078096a",
+      "definition": "SHA-256 over each Form sw.js PRECACHE entry name followed by that entry's bytes, in PRECACHE order; ../hub/ entries resolve from the paired Hub commit",
+      "form_record": "tools/precache.sha"
+    },
+    "cache_version": "mhpss-np-field-v41"
+  },
+  "required_monorepo_integration": {
+    "consume_exactly": {
+      "hub_paths": [
+        "assets/fb.js",
+        "assets/l1.js",
+        "assets/store.js",
+        "forms.html",
+        "index.html"
+      ],
+      "form_paths": [
+        "cards.html",
+        "sw.js",
+        "tools/precache.sha"
+      ]
+    },
+    "verify": [
+      "atomic_pair.hub_commit and atomic_pair.form_commit are present in the monorepo integration history",
+      "recomputed asset_fingerprint.value equals this contract",
+      "Form sw.js cache version equals atomic_pair.cache_version",
+      "Hub and Form full suites, static gates, and localhost-only browser smoke tests pass from the integrated tree"
+    ],
+    "activation": [
+      "one atomic Form+Hub release",
+      "one paired rollback boundary"
+    ]
+  },
+  "blocker": "B6 remains unresolved until the exact pair is integrated, verified, activated, and rollback-coupled in the monorepo. This contract is review evidence, not deployment authorization."
+}
