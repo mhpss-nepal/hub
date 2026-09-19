@@ -320,19 +320,18 @@
     return "";
   }
 
-  /* Deterministic id so the same record dropped twice is not counted twice.
-     FNV-1a over the fields that identify a record, not over the whole object —
-     a re-export can differ in _saved without being a different record. */
+  /* Legacy exports have no _rid. Their identity must be byte-for-byte the
+     historical Firestore document id from FB.rid(), never a second importer
+     hash. Supply the classified kind because early activity CSVs omitted it,
+     while the body written to Firestore always carried kind: "activity". */
   function rid(rec, kind) {
-    var basis = [kind, rec.org, rec.date_ad || rec.dateAD || rec.date, rec.site,
-                 rec.contact_code || "", rec.service || rec.activity || "",
-                 rec.total || "", rec.minutes || "", rec.q1 === undefined ? "" : rec.q1,
-                 rec.coping || "", rec.reason || ""].join("|");
-    var h = 0x811c9dc5 >>> 0;
-    for (var i = 0; i < basis.length; i++) {
-      h ^= basis.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0;
+    if (!window.FB || typeof window.FB.rid !== "function") {
+      throw new Error("The historical record-id helper is unavailable; legacy import was stopped.");
     }
-    return kind + "-" + h.toString(36);
+    if (rec.kind === kind) return window.FB.rid(rec);
+    var identity = JSON.parse(JSON.stringify(rec));
+    identity.kind = kind;
+    return window.FB.rid(identity);
   }
 
   function ingest(name, text) {

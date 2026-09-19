@@ -125,8 +125,8 @@ function save(rec) {
     list[idx] = out;
     const persistedRev = write(list);
     reportPersistence(persistedRev);
-    if (persistedRev) syncToRegister(out);   /* a corrected report must reach the register too */
-    return { record: out, duplicateOf: id, persisted: persistedRev };
+    const syncedRev = persistedRev ? syncToRegister(out) : null;   /* a corrected report must reach the register too */
+    return saveResult(out, id, persistedRev, syncedRev);
   }
   out.createdAt = now;
   out.revision = 0;
@@ -143,8 +143,27 @@ function save(rec) {
      bridge into l1.js alone left the 4Ws report -- the form that feeds
      the 5W -- saving locally and never reaching the register. Found by
      submitting the real form and checking the queue. */
-  if (persisted) syncToRegister(out);
-  return { record: out, duplicateOf: null, persisted: persisted };
+  const synced = persisted ? syncToRegister(out) : null;
+  return saveResult(out, null, persisted, synced);
+}
+
+function saveResult(record, duplicateOf, sourcePersisted, synced) {
+  const syncResult = synced && synced.result ? synced.result : synced;
+  const queuePersisted = !!(syncResult && syncResult.queuePersisted);
+  return {
+    record,
+    duplicateOf,
+    persisted: sourcePersisted, /* compatibility alias: source storage only */
+    sourcePersisted,
+    queuePersisted,
+    acknowledged: !!(syncResult && syncResult.acknowledged),
+    ackState: syncResult && syncResult.ackState || "not-acknowledged",
+    deliveryState: sourcePersisted
+      ? (syncResult && syncResult.deliveryState || "not-queued")
+      : "volatile",
+    recoveryRequired: !sourcePersisted || !queuePersisted,
+    synced,
+  };
 }
 
 function reportPersistence(persisted) {
@@ -493,7 +512,7 @@ function clearAll() {
   try { localStorage.removeItem(KEY); }
   catch (e) {
     let rollbackFailed = false;
-    try { window.FB.restoreQueue(queueResult.originalQueue); }
+    try { window.FB.restoreQueue(queueResult); }
     catch (rollbackError) { rollbackFailed = true; }
     const message = rollbackFailed
       ? "HIGH-SEVERITY WARNING: saved activity reports could not be cleared, and the original send queue could not be restored to device storage. Do not close this page; export the reports now and ask coordination to recover the send queue. Nothing was reported as cleared."

@@ -8,6 +8,8 @@ const vm = require("node:vm");
 
 const ROOT = path.resolve(__dirname, "..");
 const QKEY = "mhpss-np-queue-v1";
+const QVERSION = QKEY + "-version";
+const QLOCK = QKEY + "-mutation";
 const L1_PREFIX = "mhpss-np-l1-";
 const STORE_KEY = "mhpss-np-4ws-v1";
 
@@ -17,12 +19,21 @@ function makeStorage(initial) {
   const failRemove = new Set();
   const failSetAfter = new Map();
   const setCounts = new Map();
+  const beforeGet = new Map();
+  const beforeSet = new Map();
   return {
     failSet,
     failSetAfter,
     failRemove,
-    getItem(key) { return data.has(key) ? data.get(key) : null; },
+    beforeGet,
+    beforeSet,
+    forceSet(key, value) { data.set(key, String(value)); },
+    getItem(key) {
+      if (beforeGet.has(key)) beforeGet.get(key)(key);
+      return data.has(key) ? data.get(key) : null;
+    },
     setItem(key, value) {
+      if (beforeSet.has(key)) beforeSet.get(key)(key, value);
       const count = (setCounts.get(key) || 0) + 1;
       setCounts.set(key, count);
       if (failSet.has(key)) throw new Error("storage write blocked");
@@ -110,7 +121,7 @@ function makeContext(storage, overrides) {
     },
     document,
     localStorage: storage,
-    navigator: { geolocation: null, onLine: false },
+    navigator: (overrides && overrides.navigator) || { geolocation: null, onLine: false },
     setTimeout,
     clearTimeout,
     window,
@@ -173,6 +184,13 @@ function activityRecord() {
     activity: "1.1",
     modality: "FAC",
   };
+}
+
+function interleaveAtMutationLock(storage, action) {
+  storage.beforeSet.set(QLOCK, () => {
+    storage.beforeSet.delete(QLOCK);
+    action();
+  });
 }
 
 test("new submissions get unique event ids that remain stable on retry", async () => {
@@ -243,6 +261,168 @@ test("STORE persists the event id in its local activity record before queueing",
   assert.equal(result.persisted, true);
   assert.match(local[0]._rid, /^activity_evt_[0-9a-f]{32}$/);
   assert.equal(local[0]._rid, queued[0]._rid);
+});
+
+test("L1.save distinguishes durable source storage from failed durable queueing", () => {
+  const sourceKey = L1_PREFIX + "referral-v1";
+  const storage = makeStorage();
+  storage.failSet.add(QKEY);
+  const context = makeContext(storage);
+  load(context, "assets/fb.js");
+  load(context, "assets/l1.js");
+
+  const result = context.window.L1.save("referral", { kind: "referral", org: "ORG" });
+
+  assert.equal(result.sourcePersisted, true);
+  assert.equal(result.queuePersisted, false);
+  assert.equal(result.acknowledged, false);
+  assert.equal(result.deliveryState, "not-queued");
+  assert.equal(result.recoveryRequired, true);
+  assert.equal(JSON.parse(storage.getItem(sourceKey)).length, 1);
+  assert.match(context.window.L1.toCSV(context.window.L1.all("referral"), ["org"]), /ORG/);
+});
+
+test("STORE.save distinguishes durable source storage from failed durable queueing", () => {
+  const storage = makeStorage();
+  storage.failSet.add(QKEY);
+  const context = makeContext(storage);
+  load(context, "assets/fb.js");
+  load(context, "assets/store.js");
+
+  const result = context.window.STORE.save(activityRecord());
+
+  assert.equal(result.sourcePersisted, true);
+  assert.equal(result.queuePersisted, false);
+  assert.equal(result.acknowledged, false);
+  assert.equal(result.deliveryState, "not-queued");
+  assert.equal(result.recoveryRequired, true);
+  assert.equal(JSON.parse(storage.getItem(STORE_KEY)).length, 1);
+  assert.match(context.window.STORE.toCSV(context.window.STORE.all()), /ORG/);
+});
+
+test("offline saves report durable queueing without claiming acknowledgement", () => {
+  const storage = makeStorage();
+  const context = makeContext(storage);
+  load(context, "assets/fb.js");
+  load(context, "assets/l1.js");
+
+  const result = context.window.L1.save("referral", { kind: "referral", org: "ORG" });
+
+  assert.equal(result.sourcePersisted, true);
+  assert.equal(result.queuePersisted, true);
+  assert.equal(result.acknowledged, false);
+  assert.equal(result.deliveryState, "queued");
+  assert.equal(result.recoveryRequired, false);
+});
+
+test("submit fails closed instead of overwriting a concurrent tab submission", () => {
+  const storage = makeStorage();
+  const first = makeContext(storage);
+  const second = makeContext(storage);
+  load(first, "assets/fb.js");
+  load(second, "assets/fb.js");
+  interleaveAtMutationLock(storage, () => {
+    const concurrent = second.window.FB.submit({ _rid: "second", kind: "phq9" });
+    assert.equal(concurrent.queuePersisted, true);
+  });
+
+  const result = first.window.FB.submit({ _rid: "first", kind: "referral" });
+
+  assert.equal(result.queuePersisted, false);
+  assert.equal(result.deliveryState, "not-queued");
+  assert.match(result.error, /changed|concurrent|busy/i);
+  assert.deepEqual(JSON.parse(storage.getItem(QKEY)).map((r) => r._rid), ["second"]);
+});
+
+test("clear fails closed instead of overwriting a concurrent queue update", () => {
+  const storage = makeStorage({
+    [QKEY]: JSON.stringify([{ _rid: "old", kind: "referral" }]),
+  });
+  const first = makeContext(storage);
+  const second = makeContext(storage);
+  load(first, "assets/fb.js");
+  load(second, "assets/fb.js");
+  interleaveAtMutationLock(storage, () => {
+    second.window.FB.submit({ _rid: "second", kind: "phq9" });
+  });
+
+  assert.throws(
+    () => first.window.FB.clearQueue({ kinds: ["referral"] }),
+    (error) => error && error.code === "QUEUE_CONFLICT",
+  );
+  assert.deepEqual(JSON.parse(storage.getItem(QKEY)).map((r) => r._rid), ["old", "second"]);
+});
+
+test("acknowledged drop fails closed instead of overwriting a concurrent queue update", () => {
+  const storage = makeStorage({
+    [QKEY]: JSON.stringify([{ _rid: "acked", kind: "referral" }]),
+  });
+  const first = makeContext(storage);
+  const second = makeContext(storage);
+  load(first, "assets/fb.js");
+  load(second, "assets/fb.js");
+  interleaveAtMutationLock(storage, () => {
+    second.window.FB.submit({ _rid: "second", kind: "phq9" });
+  });
+
+  assert.throws(
+    () => first.window.FB.dropAcknowledged("acked"),
+    (error) => error && error.code === "QUEUE_CONFLICT",
+  );
+  assert.deepEqual(JSON.parse(storage.getItem(QKEY)).map((r) => r._rid), ["acked", "second"]);
+});
+
+test("rollback fails closed instead of overwriting a post-clear queue update", () => {
+  const storage = makeStorage({
+    [QKEY]: JSON.stringify([{ _rid: "old", kind: "referral" }]),
+  });
+  const first = makeContext(storage);
+  const second = makeContext(storage);
+  load(first, "assets/fb.js");
+  load(second, "assets/fb.js");
+  const cleared = first.window.FB.clearQueue({ kinds: ["referral"] });
+  interleaveAtMutationLock(storage, () => {
+    second.window.FB.submit({ _rid: "second", kind: "phq9" });
+  });
+
+  assert.throws(
+    () => first.window.FB.restoreQueue(cleared),
+    (error) => error && error.code === "QUEUE_CONFLICT",
+  );
+  assert.deepEqual(JSON.parse(storage.getItem(QKEY)).map((r) => r._rid), ["second"]);
+});
+
+test("rollback refuses a versionless legacy snapshot rather than overwriting newer data", () => {
+  const storage = makeStorage({
+    [QKEY]: JSON.stringify([{ _rid: "newer", kind: "phq9" }]),
+  });
+  const context = makeContext(storage);
+  load(context, "assets/fb.js");
+
+  assert.throws(
+    () => context.window.FB.restoreQueue([{ _rid: "older", kind: "referral" }]),
+    (error) => error && error.code === "QUEUE_CONFLICT",
+  );
+  assert.deepEqual(JSON.parse(storage.getItem(QKEY)).map((r) => r._rid), ["newer"]);
+});
+
+test("flush keeps an acknowledged row when a concurrent update races its drop", async () => {
+  const storage = makeStorage({
+    [QKEY]: JSON.stringify([{ _rid: "acked", kind: "referral" }]),
+  });
+  const first = makeContext(storage, { navigator: { geolocation: null, onLine: true } });
+  const second = makeContext(storage);
+  load(first, "assets/fb.js");
+  load(second, "assets/fb.js");
+  interleaveAtMutationLock(storage, () => {
+    second.window.FB.submit({ _rid: "second", kind: "phq9" });
+  });
+
+  const result = await first.window.FB.flush(() => Promise.resolve());
+
+  assert.equal(result.sent, 1);
+  assert.equal(result.conflicts, 1);
+  assert.deepEqual(JSON.parse(storage.getItem(QKEY)).map((r) => r._rid), ["acked", "second"]);
 });
 
 test("L1.clear maps the contact storage kind to service_contact queue entries only", () => {
@@ -376,7 +556,7 @@ test("clear fails closed when the related queue cannot be persisted", () => {
     (error) => error && error.code === "PERSISTENCE_FAILED",
   );
   assert.notEqual(storage.getItem(sourceKey), null);
-  assert.equal(context.window.FB.queue()[0]._rid, "referral-1");
+  assert.equal(JSON.parse(storage.getItem(QKEY))[0]._rid, "referral-1");
 });
 
 test("L1.clear restores the exact queue when source removal fails", () => {
@@ -810,6 +990,7 @@ test("coordination still imports and re-exports old CSVs without event ids", () 
       },
     },
   });
+  load(context, "assets/fb.js");
   const importer = loadCoordinationImporter(context);
 
   const result = importer.ingest(
@@ -818,7 +999,9 @@ test("coordination still imports and re-exports old CSVs without event ids", () 
   );
 
   assert.equal(result.added, 1);
-  assert.match(importer.viewRows()[0]._rid, /^referral-/);
+  assert.equal(importer.viewRows()[0]._rid, context.window.FB.rid({
+    kind: "referral", org: "ORG", date_ad: "2026-09-19", reason: "MH",
+  }));
   assert.match(importer.exportCSV("referral"), new RegExp(importer.viewRows()[0]._rid));
 });
 
@@ -848,6 +1031,7 @@ test("coordination imports still dedupe legacy records without event ids", () =>
     CODES: { orgByCode: {}, siteByCode: {}, palikaName() { return ""; } },
     L1: { today() { return "2026-09-19"; } },
   });
+  load(context, "assets/fb.js");
   const importer = loadCoordinationImporter(context);
   const legacy = JSON.stringify([{ kind: "phq9", org: "ORG", date_ad: "2026-09-19", total: 8 }]);
 
@@ -857,6 +1041,38 @@ test("coordination imports still dedupe legacy records without event ids", () =>
   assert.equal(first.added, 1);
   assert.equal(second.dupe, 1);
   assert.equal(importer.viewRows().length, 1);
+});
+
+test("legacy CSV ids exactly match historical Firestore FB.rid for every supported kind", () => {
+  const records = [
+    { kind: "service_contact", org: "ORG", date_ad: "2026-09-18", site: "SITE", contact_code: "NP-AAAAA-BBBBB", service: "PFA", minutes: "30" },
+    { kind: "activity", id: "R0000001", org: "ORG", dateAD: "2026-09-18", site: "SITE", palika: "NP0000001", activity: "1.1", modality: "FAC" },
+    { kind: "referral", org: "ORG", date_ad: "2026-09-18", site: "SITE", contact_code: "NP-AAAAA-BBBBB", reason: "MH", direction: "OUT" },
+    { kind: "phq9", org: "ORG", date_ad: "2026-09-18", contact_code: "NP-AAAAA-BBBBB", instrument: "PHQ-9", administration: "BASE", q1: "2", total: "11" },
+    { kind: "self_report", site: "SITE", coping: "SOME", total: "" },
+  ];
+
+  for (const record of records) {
+    const storage = makeStorage();
+    const context = makeContext(storage, {
+      elements: {},
+      CODES: { orgByCode: {}, siteByCode: {}, palikaName() { return ""; } },
+      L1: { today() { return "2026-09-19"; } },
+    });
+    load(context, "assets/fb.js");
+    const importer = loadCoordinationImporter(context);
+    const liveId = context.window.FB.rid(record);
+    importer.mergeLive([{ ...record, _id: liveId }]);
+    const columns = Object.keys(record);
+    const csv = columns.join(",") + "\r\n" + columns.map((column) => record[column]).join(",") + "\r\n";
+
+    const result = importer.ingest(`legacy-${record.kind}.csv`, csv);
+
+    assert.equal(result.added, 0, record.kind);
+    assert.equal(result.dupe, 1, record.kind);
+    assert.equal(importer.viewRows().length, 1, record.kind);
+    assert.equal(importer.viewRows()[0]._rid, liveId, record.kind);
+  }
 });
 
 test("Firestore submission bodies strip every focal and referrer contact alias", () => {

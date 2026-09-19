@@ -97,7 +97,17 @@
       if (window.FB && typeof window.FB.reportPersistenceFailure === "function") {
         window.FB.reportPersistenceFailure(message);
       }
-      return { count: list.length, persisted: false, synced: null };
+      return {
+        count: list.length,
+        persisted: false,
+        sourcePersisted: false,
+        queuePersisted: false,
+        acknowledged: false,
+        ackState: "not-acknowledged",
+        deliveryState: "volatile",
+        recoveryRequired: true,
+        synced: null
+      };
     }
 
     /* The persisted device copy is written first. Only then is a push
@@ -106,7 +116,19 @@
     if (window.FB && typeof window.FB.submit === "function") {
       synced = window.FB.submit(obj);
     }
-    return { count: list.length, persisted: persisted, synced: synced };
+    var syncResult = synced && synced.result ? synced.result : synced;
+    var queuePersisted = !!(syncResult && syncResult.queuePersisted);
+    return {
+      count: list.length,
+      persisted: persisted, /* compatibility alias: source storage only */
+      sourcePersisted: persisted,
+      queuePersisted: queuePersisted,
+      acknowledged: !!(syncResult && syncResult.acknowledged),
+      ackState: syncResult && syncResult.ackState || "not-acknowledged",
+      deliveryState: syncResult && syncResult.deliveryState || "not-queued",
+      recoveryRequired: !queuePersisted,
+      synced: synced
+    };
   }
   function clear(kind) {
     var sourceKind = storageKind(kind);
@@ -137,7 +159,7 @@
     try { localStorage.removeItem(key(kind)); }
     catch (e) {
       var rollbackFailed = false;
-      try { window.FB.restoreQueue(queueResult.originalQueue); }
+      try { window.FB.restoreQueue(queueResult); }
       catch (rollbackError) { rollbackFailed = true; }
       var message = rollbackFailed
         ? "HIGH-SEVERITY WARNING: saved records could not be cleared, and the original send queue could not be restored to device storage. Do not close this page; export the records now and ask coordination to recover the send queue. Nothing was reported as cleared."

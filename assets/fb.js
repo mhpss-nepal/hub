@@ -27,6 +27,8 @@
   var cfg = window.FB_CONFIG || {};
   var COLL = window.FB_COLLECTION || "submissions";
   var QKEY = "mhpss-np-queue-v1";
+  var QVERSION = QKEY + "-version";
+  var QLOCK = QKEY + "-mutation";
   var LKEY = "mhpss-np-linkmail";
   /* Kept in step with isOwner() in the security rules. The rules are what
      enforce it; this copy only lets a page explain itself without a read. */
@@ -66,36 +68,155 @@
   }
 
   /* ---------- local queue ---------------------------------------------
-     The queue is the record of truth until the server confirms. An entry
-     leaves the queue only once Firestore has acknowledged the write. */
+     The queue is the record of truth until the server confirms. Every
+     mutation uses a localStorage lease plus a monotonic version check. Web
+     Locks may serialize a caller in newer browsers, but correctness here does
+     not depend on them: a tab that observed version N may write only while it
+     still owns the token and storage still says N. */
+  var mutationCounter = 0;
+
+  function queueConflict(message) {
+    var e = persistenceError(message || "The send queue changed in another tab; this change was not applied.");
+    e.code = "QUEUE_CONFLICT";
+    return e;
+  }
+
+  function queueFingerprint(raw) {
+    raw = raw === null ? "" : String(raw);
+    var h = 0x811c9dc5 >>> 0;
+    for (var i = 0; i < raw.length; i++) {
+      h ^= raw.charCodeAt(i);
+      h = Math.imul(h, 0x01000193) >>> 0;
+    }
+    return h.toString(36);
+  }
+
+  function queueVersion(rawQueue) {
+    var raw = localStorage.getItem(QVERSION);
+    if (raw === null || raw === "") return { version: 0, fingerprint: "" };
+    var stamp = JSON.parse(raw);
+    if (!stamp || !Number.isSafeInteger(stamp.version) || stamp.version < 0 ||
+        typeof stamp.fingerprint !== "string") throw new Error("queue version is invalid");
+    if (stamp.fingerprint !== queueFingerprint(rawQueue)) {
+      throw queueConflict("The send queue and its version do not match; this change was not applied.");
+    }
+    return stamp;
+  }
+
+  function readQueueState() {
+    var rawBefore = localStorage.getItem(QKEY);
+    var stampBefore = queueVersion(rawBefore);
+    var versionRawBefore = localStorage.getItem(QVERSION);
+    var rawAfter = localStorage.getItem(QKEY);
+    var stampAfter = queueVersion(rawAfter);
+    var versionRawAfter = localStorage.getItem(QVERSION);
+    if (rawBefore !== rawAfter || versionRawBefore !== versionRawAfter ||
+        stampBefore.version !== stampAfter.version) {
+      throw queueConflict("The send queue changed while it was being read; retry without closing this page.");
+    }
+    var parsed = JSON.parse(rawAfter || "[]");
+    if (!Array.isArray(parsed)) throw new Error("queue is not a list");
+    return { queue: parsed, raw: rawAfter, version: stampAfter.version, versionRaw: versionRawAfter };
+  }
+
   function queue() {
     try {
-      var raw = localStorage.getItem(QKEY);
       /* When a write failed, the page copy is newer than localStorage. Do not
-         hide it from status, export, retry, or a later successful write. */
+         hide it from status, export, retry, or immediate recovery export. */
       if (state.queueError && !state.queueReadFailed && window.__fbq) return window.__fbq;
+      var snapshot = readQueueState();
       state.queueReadFailed = false;
-      var parsed = JSON.parse(raw || "[]");
-      if (!Array.isArray(parsed)) throw new Error("queue is not a list");
-      return parsed;
+      return snapshot.queue;
     } catch (e) {
       state.queueReadFailed = true;
-      state.queueError = "The existing send queue could not be read from this device.";
+      state.queueError = e && e.code === "QUEUE_CONFLICT"
+        ? e.message
+        : "The existing send queue could not be read from this device.";
       return window.__fbq || [];
     }
   }
-  function setQueue(q) {
+
+  function lockToken() {
+    mutationCounter++;
+    return Date.now().toString(36) + "-" + mutationCounter.toString(36) + "-" + Math.random().toString(36).slice(2);
+  }
+
+  function mutateQueue(change, expectedVersion) {
+    var snapshot;
     try {
-      localStorage.setItem(QKEY, JSON.stringify(q));
+      snapshot = readQueueState();
+    } catch (e) {
+      var readError = e && e.code ? e : persistenceError("The existing send queue could not be read from this device.");
+      state.queueReadFailed = true;
+      state.queueError = readError.message;
+      throw readError;
+    }
+    if (expectedVersion !== undefined && snapshot.version !== expectedVersion) {
+      throw queueConflict("The send queue changed after the earlier operation; rollback was not applied.");
+    }
+    var token = lockToken();
+    var lease = JSON.stringify({ token: token, expires: Date.now() + 5000 });
+    var held = false;
+    var next = null;
+    try {
+      var existingRaw = localStorage.getItem(QLOCK);
+      if (existingRaw) {
+        var existing;
+        try { existing = JSON.parse(existingRaw); } catch (e) { existing = null; }
+        if (!existing || !existing.expires || existing.expires > Date.now()) {
+          throw queueConflict("The send queue is busy in another tab; this change was not applied.");
+        }
+      }
+      localStorage.setItem(QLOCK, lease);
+      held = localStorage.getItem(QLOCK) === lease;
+      if (!held) throw queueConflict("Another tab took the send queue mutation token; this change was not applied.");
+
+      /* Required compare-and-swap recheck immediately before either durable
+         write. This catches a tab that changed the queue after our read but
+         before our token became visible. */
+      if (localStorage.getItem(QVERSION) !== snapshot.versionRaw ||
+          localStorage.getItem(QKEY) !== snapshot.raw) {
+        throw queueConflict();
+      }
+      next = change(snapshot.queue.slice());
+      if (!Array.isArray(next)) throw new TypeError("queue mutation must return a list");
+      var nextRaw = JSON.stringify(next);
+      var nextVersion = snapshot.version + 1;
+      var nextStamp = JSON.stringify({ version: nextVersion, fingerprint: queueFingerprint(nextRaw) });
+
+      if (localStorage.getItem(QLOCK) !== lease ||
+          localStorage.getItem(QVERSION) !== snapshot.versionRaw) throw queueConflict();
+      /* Stamp the intended next content first. A crash between these writes
+         leaves a fingerprint mismatch, so a later tab fails closed instead of
+         treating a partial mutation as valid. */
+      localStorage.setItem(QVERSION, nextStamp);
+      if (localStorage.getItem(QLOCK) !== lease ||
+          localStorage.getItem(QVERSION) !== nextStamp ||
+          localStorage.getItem(QKEY) !== snapshot.raw) throw queueConflict();
+      localStorage.setItem(QKEY, nextRaw);
+      if (localStorage.getItem(QKEY) !== nextRaw ||
+          localStorage.getItem(QVERSION) !== nextStamp ||
+          queueVersion(nextRaw).version !== nextVersion) {
+        throw persistenceError("The send queue write could not be verified on this device.");
+      }
+      window.__fbq = next;
       state.queueError = "";
       state.queueReadFailed = false;
-      return true;
+      return { before: snapshot.queue, queue: next, version: nextVersion };
     } catch (e) {
-      /* Keep the page copy available for an immediate retry, but never call
-         it persisted: it disappears when this page closes. */
-      window.__fbq = q;
-      state.queueError = "The send queue could not be stored on this device.";
-      return false;
+      var mutationError = e && e.code ? e : persistenceError(
+        e && e.message ? e.message : "The send queue could not be stored on this device."
+      );
+      state.queueError = mutationError.message;
+      /* A failed mutation is never the page's recovery truth. Retain the
+         pre-mutation rows; submit() explicitly appends its new record after
+         this so export recovery has both old and new data. */
+      window.__fbq = snapshot.queue;
+      throw mutationError;
+    } finally {
+      try {
+        if (held && localStorage.getItem(QLOCK) === lease) localStorage.removeItem(QLOCK);
+      } catch (e) { /* an expired token is safer than an unverified overwrite */ }
     }
   }
 
@@ -247,51 +368,78 @@
   /* ---------- submit --------------------------------------------------
      The caller gets explicit local persistence and remote acknowledgement
      states. A failed queue write is never described as safe local storage. */
+  function submissionOperation(out, completion) {
+    var op = completion.then(function (result) {
+      Object.keys(result).forEach(function (key) { op[key] = result[key]; });
+      return result;
+    });
+    Object.keys(out).forEach(function (key) { op[key] = out[key]; });
+    op.result = out;
+    return op;
+  }
+
   function submit(rec) {
     ensureEventId(rec);
     var r = JSON.parse(JSON.stringify(rec || {}));
     r._device_ts = new Date().toISOString();
-    var q = queue();
-    if (state.queueReadFailed) {
-      /* Never replace an unreadable queue with a new one. Keep this submission
-         in memory and require export/recovery instead of risking older rows. */
-      window.__fbq = (window.__fbq || []).concat([r]);
-      var unreadable = {
-        local: false,
-        persisted: false,
-        rid: r._rid,
-        remote: false,
-        error: "Not safely stored: the existing send queue could not be read."
-      };
-      announce();
-      return Promise.resolve(unreadable);
+    var persisted = false, mutationError = "";
+    try {
+      mutateQueue(function (q) {
+        /* already queued and unsent? replace rather than add a second copy */
+        var at = -1;
+        for (var i = 0; i < q.length; i++) { if (q[i]._rid === r._rid) { at = i; break; } }
+        if (at >= 0) q[at] = r; else q.push(r);
+        return q;
+      });
+      persisted = true;
+    } catch (e) {
+      mutationError = e && e.message ? e.message : "The send queue could not be stored on this device.";
+      /* Immediate recovery remains available even when durable queueing was
+         refused. Do not write this page copy over the concurrent durable data. */
+      var recovery = window.__fbq || [];
+      if (!recovery.some(function (x) { return x && x._rid === r._rid; })) recovery = recovery.concat([r]);
+      window.__fbq = recovery;
     }
-    /* already queued and unsent? replace rather than add a second copy */
-    var at = -1;
-    for (var i = 0; i < q.length; i++) { if (q[i]._rid === r._rid) { at = i; break; } }
-    if (at >= 0) q[at] = r; else q.push(r);
-    var persisted = setQueue(q);
 
     var out = {
       local: persisted,
       persisted: persisted,
+      queuePersisted: persisted,
+      acknowledged: false,
+      ackState: persisted ? "pending" : "not-acknowledged",
+      deliveryState: persisted ? "queued" : "not-queued",
       rid: r._rid,
       remote: false,
-      error: persisted ? "" : "Not safely stored: the send queue is only in memory for this page."
+      error: persisted ? "" : "Not safely stored: " + mutationError
     };
     if (!state.ready) {
       if (persisted) {
         out.error = state.configured ? (state.error || "not connected yet") : "not configured";
       }
       announce();
-      return Promise.resolve(out);
+      return submissionOperation(out, Promise.resolve(out));
     }
-    return push(r).then(function () {
-      out.remote = true; drop(r._rid); announce(); return out;
+    var completion = push(r).then(function () {
+      out.remote = true;
+      out.acknowledged = true;
+      out.ackState = "acknowledged";
+      out.deliveryState = "acknowledged";
+      drop(r._rid); announce(); return out;
     }).catch(function (e) {
-      out.error = e && e.message ? e.message : String(e);
+      if (out.acknowledged) {
+        /* Firestore acknowledged the event, but a concurrent queue mutation
+           prevented its local removal. Keep it for an idempotent retry while
+           reporting the acknowledgement and cleanup failure separately. */
+        out.ackState = "acknowledged";
+        out.deliveryState = "acknowledged-queued";
+        out.error = "Delivery was acknowledged, but the local queue changed before cleanup; the record remains queued for a safe retry.";
+      } else {
+        out.ackState = "failed";
+        out.error = e && e.message ? e.message : String(e);
+      }
       announce(); return out;
     });
+    return submissionOperation(out, completion);
   }
 
   /* ---------- what never crosses the network -------------------------
@@ -331,76 +479,89 @@
   }
 
   function drop(id) {
-    setQueue(queue().filter(function (x) { return x._rid !== id; }));
+    return mutateQueue(function (q) {
+      return q.filter(function (x) { return x._rid !== id; });
+    });
   }
 
   /* With no argument this retains the old clear-all API. A kind string or
      { kinds, rids } removes only queue entries related to a source store.
      Failure throws so a source clear cannot continue and claim success. */
   function clearQueue(match) {
-    var q = queue(), ids = {}, kinds = {}, clearAll = match === undefined;
-    if (state.queueReadFailed) {
-      announce();
-      throw persistenceError("Could not read the existing send queue; nothing was cleared.");
-    }
+    var ids = {}, kinds = {}, clearAll = match === undefined, removed = 0;
     if (typeof match === "string") kinds[match] = true;
     else if (match && typeof match === "object") {
       if (match.kind) kinds[match.kind] = true;
       (match.kinds || []).forEach(function (kind) { if (kind) kinds[kind] = true; });
       (match.rids || []).forEach(function (id) { if (id) ids[id] = true; });
     }
-    var keep = q.filter(function (r) {
-      /* An id match is only a fallback for a legacy queue entry with no kind.
-         Never let an accidental/corrupt cross-kind id clear another form. */
-      var related = clearAll || (r.kind && kinds[r.kind]) ||
-        (!r.kind && r._rid && ids[r._rid]);
-      return !related;
+    var result = mutateQueue(function (q) {
+      var keep = q.filter(function (r) {
+        /* An id match is only a fallback for a legacy queue entry with no kind.
+           Never let an accidental/corrupt cross-kind id clear another form. */
+        var related = clearAll || (r.kind && kinds[r.kind]) ||
+          (!r.kind && r._rid && ids[r._rid]);
+        return !related;
+      });
+      removed = q.length - keep.length;
+      return keep;
     });
-    var removed = q.length - keep.length;
-    if (removed && !setQueue(keep)) {
-      /* The clear did not persist, so keep the pre-clear page copy too. */
-      window.__fbq = q;
-      announce();
-      throw persistenceError("Could not clear the related send queue from this device.");
-    }
     announce();
-    /* Return the exact snapshot this mutation was based on. A caller that
-       cannot complete its source deletion must restore this snapshot, not a
-       separate pre-read that another tab could have made stale. */
-    return { cleared: true, queueCleared: removed, left: keep.length, originalQueue: q };
+    /* Rollback is valid only while the queue remains at this mutation's
+       version. A later tab update makes restoreQueue fail closed. */
+    return {
+      cleared: true,
+      queueCleared: removed,
+      left: result.queue.length,
+      originalQueue: result.before,
+      queueVersion: result.version
+    };
   }
 
-  /* Put back a caller's pre-mutation snapshot. Source stores use this to make
-     a queue clear and source clear one recoverable operation: if deleting the
-     source fails after the queue changed, every queued row (including order and
-     unrelated kinds) is written back. Failure throws and must be treated as a
-     high-severity recovery condition by the caller. */
+  /* Put back a caller's pre-mutation snapshot only if no tab has changed the
+     queue since clearQueue. A versionless array cannot prove that condition
+     and is rejected instead of overwriting potentially newer data. */
   function restoreQueue(snapshot) {
-    if (!Array.isArray(snapshot)) {
+    if (Array.isArray(snapshot)) {
+      throw queueConflict("HIGH-SEVERITY WARNING: a versionless queue snapshot cannot be restored safely.");
+    }
+    var original = snapshot && snapshot.originalQueue;
+    var expectedVersion = snapshot && snapshot.queueVersion;
+    if (!Array.isArray(original) || !Number.isSafeInteger(expectedVersion)) {
       throw persistenceError("HIGH-SEVERITY WARNING: the original send queue snapshot is invalid and could not be restored.");
     }
-    if (!setQueue(snapshot)) {
-      announce();
-      throw persistenceError("HIGH-SEVERITY WARNING: the original send queue could not be restored on this device.");
+    var result;
+    try {
+      result = mutateQueue(function () { return original.slice(); }, expectedVersion);
+    } catch (e) {
+      /* Durable rollback failed, but keep the exact original snapshot available
+         in this page for immediate export/recovery. Never call it restored. */
+      window.__fbq = original.slice();
+      throw e;
     }
     announce();
-    return { restored: true, count: snapshot.length };
+    return { restored: true, count: result.queue.length, queueVersion: result.version };
   }
 
   /* ---------- flush ---------------------------------------------------
      Sequential, not parallel: a phone on one bar of signal handles one
-     write at a time far better than twenty at once. */
-  function flush() {
-    if (!state.ready || !navigator.onLine) return Promise.resolve({ sent: 0, left: queue().length });
-    var q = queue().slice(), sent = 0;
+     write at a time far better than twenty at once. A completed remote write
+     is counted even when its local drop detects a race; the row stays queued
+     for an idempotent retry rather than overwriting another tab. */
+  function flush(pushOverride) {
+    if ((!state.ready && !pushOverride) || !navigator.onLine) return Promise.resolve({ sent: 0, left: queue().length, conflicts: 0 });
+    var q = queue().slice(), sent = 0, conflicts = 0, send = pushOverride || push;
     return q.reduce(function (chain, r) {
       return chain.then(function () {
-        return push(r).then(function () { sent++; drop(r._rid); })
-                      .catch(function () { /* stays queued */ });
+        return send(r).then(function () {
+          sent++;
+          try { drop(r._rid); }
+          catch (e) { if (e && e.code === "QUEUE_CONFLICT") conflicts++; }
+        }).catch(function () { /* remote failure stays queued */ });
       });
     }, Promise.resolve()).then(function () {
       announce();
-      return { sent: sent, left: queue().length };
+      return { sent: sent, left: queue().length, conflicts: conflicts };
     });
   }
 
@@ -500,9 +661,9 @@
       } else if (st.pending) {
         cls = "warn";
         msg = "<b>" + st.pending + " record(s) still to send.</b> " +
-              (st.online ? "Sending now." : "They go as soon as you have signal.");
+              (st.online ? "A delivery attempt can run now; wait for this count to clear as acknowledgement." : "Reconnect, use Send now, and wait for this count to clear as acknowledgement.");
       } else {
-        msg = "<b>Connected.</b> Records reach coordination as you save them." +
+        msg = "<b>Connected; no queued records.</b> Check Records received for end-to-end delivery confirmation." +
               (st.user ? " Signed in as " + st.user.email + "." : "");
       }
       bar.className = cls;
@@ -610,6 +771,6 @@
     bodyForFirestore: bodyForFirestore,
     ensureEventId: ensureEventId, reportPersistenceFailure: persistenceFailure,
     watch: watch, watchKind: watchKind, signIn: signIn, signOut: signOutNow,
-    clearQueue: clearQueue, restoreQueue: restoreQueue
+    clearQueue: clearQueue, restoreQueue: restoreQueue, dropAcknowledged: drop
   };
 })();
