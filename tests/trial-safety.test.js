@@ -1,6 +1,7 @@
 "use strict";
 
 const assert = require("node:assert/strict");
+const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
 const test = require("node:test");
@@ -1360,6 +1361,7 @@ test("legacy CSV ids exactly match historical Firestore FB.rid for every support
 
 test("release contract keeps the separate repositories blocked and names the atomic pair", () => {
   const contract = JSON.parse(fs.readFileSync(path.join(ROOT, "release-contract.json"), "utf8"));
+  const pairRoot = process.env.MHPSS_RELEASE_PAIR_ROOT;
   assert.equal(contract.schema, "mhpss-nepal.atomic-form-hub-release-contract/v1");
   assert.equal(contract.status, "blocked-pending-monorepo-integration");
   assert.equal(contract.review_artifacts_only, true);
@@ -1373,6 +1375,34 @@ test("release contract keeps the separate repositories blocked and names the ato
     "one atomic Form+Hub release",
     "one paired rollback boundary",
   ]);
+  if (!pairRoot) return;
+
+  const hubRoot = path.join(pairRoot, "hub");
+  const formRoot = path.join(pairRoot, "form");
+  const entries = Array.from(
+    fs.readFileSync(path.join(formRoot, "sw.js"), "utf8")
+      .match(/const\s+PRECACHE\s*=\s*\[([\s\S]*?)\]\s*;/)[1]
+      .matchAll(/"([^"]+)"/g),
+    (match) => match[1],
+  );
+  const hash = crypto.createHash("sha256");
+  for (const entry of entries) {
+    const file = entry === "./" ? "index.html" : entry;
+    const full = file.startsWith("../hub/")
+      ? path.join(hubRoot, file.slice("../hub/".length))
+      : path.join(formRoot, file);
+    hash.update(entry);
+    hash.update(fs.readFileSync(full));
+  }
+  assert.equal(hash.digest("hex"), contract.atomic_pair.asset_fingerprint.value);
+  assert.equal(
+    fs.readFileSync(path.join(formRoot, "tools", "precache.sha"), "utf8").trim(),
+    contract.atomic_pair.asset_fingerprint.value,
+  );
+  assert.match(
+    fs.readFileSync(path.join(formRoot, "sw.js"), "utf8"),
+    new RegExp(`const CACHE = "${contract.atomic_pair.cache_version}";`),
+  );
 });
 
 test("Firestore submission bodies strip every focal and referrer contact alias", () => {
