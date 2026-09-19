@@ -392,7 +392,7 @@ function num(v) {
    the reach twice. Totals belong in the analysis, never in the dataset.
    ------------------------------------------------------------------- */
 const CSV_COLUMNS = [
-  "id", "createdAt", "revision", "dateAD", "dateBS", "district", "palika", "site", "siteOther", "siteSource",
+  "id", "_rid", "createdAt", "revision", "dateAD", "dateBS", "district", "palika", "site", "siteOther", "siteSource",
   "org", "orgOther", "donors", "partners", "focalName", "focalPhone", "focalEmail", "cadre", "cadreOther",
   "sessionTime",
   /* the two readings of one activity code (list v3, 17 Sep 2026): the code
@@ -467,7 +467,8 @@ function stamp() {
 
 function clearAll() {
   const list = read();
-  if (!window.FB || typeof window.FB.clearQueue !== "function") {
+  if (!window.FB || typeof window.FB.clearQueue !== "function" ||
+      typeof window.FB.restoreQueue !== "function") {
     const unavailableMessage = "Cannot verify that the activity report send queue was cleared.";
     if (typeof window.alert === "function") window.alert(unavailableMessage);
     const unavailable = new Error(unavailableMessage);
@@ -491,7 +492,12 @@ function clearAll() {
   }
   try { localStorage.removeItem(KEY); }
   catch (e) {
-    const message = "Could not clear the saved activity reports from this device.";
+    let rollbackFailed = false;
+    try { window.FB.restoreQueue(queueResult.originalQueue); }
+    catch (rollbackError) { rollbackFailed = true; }
+    const message = rollbackFailed
+      ? "HIGH-SEVERITY WARNING: saved activity reports could not be cleared, and the original send queue could not be restored to device storage. Do not close this page; export the reports now and ask coordination to recover the send queue. Nothing was reported as cleared."
+      : "Could not clear the saved activity reports from this device. The original send queue was restored; nothing was cleared.";
     if (typeof window.FB.reportPersistenceFailure === "function") {
       window.FB.reportPersistenceFailure(message);
     } else if (typeof window.alert === "function") {
@@ -499,6 +505,8 @@ function clearAll() {
     }
     const error = new Error(message);
     error.code = "PERSISTENCE_FAILED";
+    error.severity = rollbackFailed ? "high" : "error";
+    error.rollbackFailed = rollbackFailed;
     throw error;
   }
   window.__mem = [];

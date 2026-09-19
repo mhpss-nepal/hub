@@ -364,7 +364,27 @@
       throw persistenceError("Could not clear the related send queue from this device.");
     }
     announce();
-    return { cleared: true, queueCleared: removed, left: keep.length };
+    /* Return the exact snapshot this mutation was based on. A caller that
+       cannot complete its source deletion must restore this snapshot, not a
+       separate pre-read that another tab could have made stale. */
+    return { cleared: true, queueCleared: removed, left: keep.length, originalQueue: q };
+  }
+
+  /* Put back a caller's pre-mutation snapshot. Source stores use this to make
+     a queue clear and source clear one recoverable operation: if deleting the
+     source fails after the queue changed, every queued row (including order and
+     unrelated kinds) is written back. Failure throws and must be treated as a
+     high-severity recovery condition by the caller. */
+  function restoreQueue(snapshot) {
+    if (!Array.isArray(snapshot)) {
+      throw persistenceError("HIGH-SEVERITY WARNING: the original send queue snapshot is invalid and could not be restored.");
+    }
+    if (!setQueue(snapshot)) {
+      announce();
+      throw persistenceError("HIGH-SEVERITY WARNING: the original send queue could not be restored on this device.");
+    }
+    announce();
+    return { restored: true, count: snapshot.length };
   }
 
   /* ---------- flush ---------------------------------------------------
@@ -590,6 +610,6 @@
     bodyForFirestore: bodyForFirestore,
     ensureEventId: ensureEventId, reportPersistenceFailure: persistenceFailure,
     watch: watch, watchKind: watchKind, signIn: signIn, signOut: signOutNow,
-    clearQueue: clearQueue
+    clearQueue: clearQueue, restoreQueue: restoreQueue
   };
 })();

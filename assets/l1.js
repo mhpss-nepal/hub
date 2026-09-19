@@ -111,7 +111,8 @@
   function clear(kind) {
     var sourceKind = storageKind(kind);
     var list = all(kind);
-    if (!window.FB || typeof window.FB.clearQueue !== "function") {
+    if (!window.FB || typeof window.FB.clearQueue !== "function" ||
+        typeof window.FB.restoreQueue !== "function") {
       var unavailableMessage = "Cannot verify that this form's unsent queue was cleared.";
       if (typeof window.alert === "function") window.alert(unavailableMessage);
       var unavailable = new Error(unavailableMessage);
@@ -135,7 +136,12 @@
     }
     try { localStorage.removeItem(key(kind)); }
     catch (e) {
-      var message = "Could not clear the saved records from this device.";
+      var rollbackFailed = false;
+      try { window.FB.restoreQueue(queueResult.originalQueue); }
+      catch (rollbackError) { rollbackFailed = true; }
+      var message = rollbackFailed
+        ? "HIGH-SEVERITY WARNING: saved records could not be cleared, and the original send queue could not be restored to device storage. Do not close this page; export the records now and ask coordination to recover the send queue. Nothing was reported as cleared."
+        : "Could not clear the saved records from this device. The original send queue was restored; nothing was cleared.";
       if (typeof window.FB.reportPersistenceFailure === "function") {
         window.FB.reportPersistenceFailure(message);
       } else if (typeof window.alert === "function") {
@@ -143,6 +149,8 @@
       }
       var error = new Error(message);
       error.code = "PERSISTENCE_FAILED";
+      error.severity = rollbackFailed ? "high" : "error";
+      error.rollbackFailed = rollbackFailed;
       throw error;
     }
     mem[sourceKind] = [];
