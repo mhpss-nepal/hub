@@ -281,7 +281,9 @@
 
   /* ---------- parsing ---------- */
   function csvRows(text) {
-    /* small RFC4180 reader — quoted fields, doubled quotes, CRLF */
+    /* small RFC4180 reader — quoted fields, doubled quotes, CRLF. Normalise
+       UTF-8 BOM before headers can participate in historical identity. */
+    text = String(text || "").replace(/^\uFEFF/, "");
     var rows = [], row = [], cur = "", q = false, i, ch;
     for (i = 0; i < text.length; i++) {
       ch = text[i];
@@ -302,7 +304,10 @@
     var head = rows[0];
     return rows.slice(1).map(function (r) {
       var o = {};
-      head.forEach(function (h, i) { o[h] = r[i] === undefined ? "" : r[i]; });
+      head.forEach(function (h, i) {
+        h = String(h || "").replace(/^\uFEFF/, "").trim();
+        o[h] = r[i] === undefined ? "" : String(r[i]).replace(i === 0 ? /^\uFEFF/ : /$^/, "");
+      });
       return o;
     });
   }

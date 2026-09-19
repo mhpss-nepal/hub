@@ -46,7 +46,7 @@
   }
 
   /* ---------- storage ----------------------------------------------- */
-  var mem = {};
+  var mem = {}, sourceMutationCounter = 0;
   var KIND_ALIAS = {
     contact: { storage: "contact", queue: ["contact", "service_contact"] },
     service_contact: { storage: "contact", queue: ["contact", "service_contact"] },
@@ -60,40 +60,123 @@
     return KIND_ALIAS[kind] ? KIND_ALIAS[kind].queue.slice() : [kind];
   }
   function key(kind) { return "mhpss-np-l1-" + storageKind(kind) + "-v1"; }
+  function sourceConflict(message) {
+    var error = new Error(message || "Saved records changed in another tab; this change was not applied.");
+    error.code = "SOURCE_CONFLICT";
+    return error;
+  }
+  function sourceFingerprint(raw) {
+    var h = 0x811c9dc5 >>> 0;
+    raw = String(raw || "");
+    for (var i = 0; i < raw.length; i++) {
+      h ^= raw.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0;
+    }
+    return h.toString(36);
+  }
+  function sourceKeys() {
+    var out = [];
+    for (var i = 0; i < localStorage.length; i++) {
+      var item = localStorage.key(i);
+      if (item !== null) out.push(item);
+    }
+    return out;
+  }
+  function readSourceState(kind) {
+    kind = storageKind(kind);
+    var base = key(kind), prefix = base + "-commit-", latest = null;
+    sourceKeys().filter(function (item) { return item.indexOf(prefix) === 0; }).sort()
+      .forEach(function (item) {
+        var commit = JSON.parse(localStorage.getItem(item) || "null");
+        if (!commit || !Number.isSafeInteger(commit.fence) || commit.fence < 1 ||
+            !Number.isSafeInteger(commit.version) || commit.version < 1 ||
+            !Array.isArray(commit.records) ||
+            commit.fingerprint !== sourceFingerprint(JSON.stringify(commit.records))) {
+          throw sourceConflict("Saved record commit metadata is invalid; this change was not applied.");
+        }
+        if (!latest || commit.fence > latest.fence ||
+            (commit.fence === latest.fence && item > latest.commitKey)) {
+          latest = { records: commit.records, fence: commit.fence, version: commit.version,
+            fingerprint: commit.fingerprint, commitKey: item };
+        }
+      });
+    if (latest) return latest;
+    var rawBefore = localStorage.getItem(base);
+    var rawAfter = localStorage.getItem(base);
+    if (rawBefore !== rawAfter) throw sourceConflict("Saved records changed while being read.");
+    var records = rawAfter ? JSON.parse(rawAfter) : [];
+    if (!Array.isArray(records)) throw new Error("saved records are not a list");
+    return { records: records, fence: 0, version: 0, commitKey: "",
+      fingerprint: sourceFingerprint(JSON.stringify(records)) };
+  }
+  function sameSourceState(left, right) {
+    return left.commitKey === right.commitKey && left.fence === right.fence &&
+      left.version === right.version && left.fingerprint === right.fingerprint;
+  }
+  function mutateSource(kind, change, expected) {
+    kind = storageKind(kind);
+    var base = key(kind), lockKey = base + "-mutation", snapshot = readSourceState(kind);
+    if (expected && !sameSourceState(snapshot, expected)) throw sourceConflict();
+    sourceMutationCounter++;
+    var token = Date.now().toString(36) + "-" + sourceMutationCounter.toString(36) + "-" + Math.random().toString(36).slice(2);
+    var lease = "", held = false;
+    try {
+      var existingRaw = localStorage.getItem(lockKey), existing = null;
+      if (existingRaw) {
+        try { existing = JSON.parse(existingRaw); } catch (e) { existing = null; }
+        if (!existing || !existing.expires || !Number.isSafeInteger(existing.fence) || existing.expires > Date.now()) {
+          throw sourceConflict("Saved records are busy in another tab; this change was not applied.");
+        }
+      }
+      var fence = Math.max(snapshot.fence, existing && existing.fence || 0) + 1;
+      lease = JSON.stringify({ token: token, fence: fence, expires: Date.now() + 5000 });
+      localStorage.setItem(lockKey, lease);
+      held = localStorage.getItem(lockKey) === lease;
+      if (!held || !sameSourceState(readSourceState(kind), snapshot)) throw sourceConflict();
+      var next = change(snapshot.records.slice());
+      if (!Array.isArray(next)) throw new TypeError("source mutation must return a list");
+      var raw = JSON.stringify(next);
+      var commitKey = base + "-commit-" + String(fence).padStart(16, "0") + "-" + token;
+      var commitRaw = JSON.stringify({ fence: fence, version: snapshot.version + 1,
+        parent: snapshot.commitKey, fingerprint: sourceFingerprint(raw), records: next });
+      if (localStorage.getItem(lockKey) !== lease || !sameSourceState(readSourceState(kind), snapshot)) {
+        throw sourceConflict();
+      }
+      localStorage.setItem(commitKey, commitRaw);
+      var committed = readSourceState(kind);
+      if (localStorage.getItem(commitKey) !== commitRaw || committed.commitKey !== commitKey) {
+        throw sourceConflict("A newer tab committed first; this saved-record change was not applied.");
+      }
+      delete mem[kind];
+      return { before: snapshot.records, records: next, version: snapshot.version + 1 };
+    } finally {
+      try { if (held && localStorage.getItem(lockKey) === lease) localStorage.removeItem(lockKey); }
+      catch (e) { /* fail closed */ }
+    }
+  }
 
   function all(kind) {
     kind = storageKind(kind);
     if (Object.prototype.hasOwnProperty.call(mem, kind)) return mem[kind];
-    try {
-      var raw = localStorage.getItem(key(kind));
-      return raw ? JSON.parse(raw) : [];
-    } catch (e) {
-      return mem[kind] || [];
-    }
-  }
-  function writeAll(kind, list) {
-    kind = storageKind(kind);
-    try {
-      localStorage.setItem(key(kind), JSON.stringify(list));
-      delete mem[kind];
-      return true;
-    } catch (e) {
-      mem[kind] = list;
-      return false;
-    }
+    try { return readSourceState(kind).records; }
+    catch (e) { return mem[kind] || []; }
   }
   function save(kind, obj) {
     kind = storageKind(kind);
     if (window.FB && typeof window.FB.ensureEventId === "function") {
       window.FB.ensureEventId(obj);
     }
-    var list = all(kind);
+    var sourceSnapshot;
+    try { sourceSnapshot = readSourceState(kind); }
+    catch (e) { sourceSnapshot = null; }
+    var list = (sourceSnapshot ? sourceSnapshot.records : all(kind)).slice();
     obj._saved = new Date().toISOString();
     list.push(obj);
-    var persisted = writeAll(kind, list);
+    var persisted = false, sourceError = "";
+    try { mutateSource(kind, function () { return list; }, sourceSnapshot); persisted = true; }
+    catch (e) { mem[kind] = list; sourceError = e && e.message ? e.message : "Browser storage failed."; }
 
     if (!persisted) {
-      var message = "This record is only in memory because browser storage failed. Export it before closing this page.";
+      var message = "This record is only in memory in this open page because saved records changed concurrently or browser storage failed. Export it before closing this page. " + sourceError;
       if (window.FB && typeof window.FB.reportPersistenceFailure === "function") {
         window.FB.reportPersistenceFailure(message);
       }
@@ -106,7 +189,8 @@
         ackState: "not-acknowledged",
         deliveryState: "volatile",
         recoveryRequired: true,
-        synced: null
+        synced: null,
+        error: sourceError
       };
     }
 
@@ -132,7 +216,8 @@
   }
   function clear(kind) {
     var sourceKind = storageKind(kind);
-    var list = all(kind);
+    var sourceSnapshot = readSourceState(sourceKind);
+    var list = sourceSnapshot.records;
     if (!window.FB || typeof window.FB.clearQueue !== "function" ||
         typeof window.FB.restoreQueue !== "function") {
       var unavailableMessage = "Cannot verify that this form's unsent queue was cleared.";
@@ -156,8 +241,11 @@
       }
       throw e;
     }
-    try { localStorage.removeItem(key(kind)); }
+    try { mutateSource(sourceKind, function () { return []; }, sourceSnapshot); }
     catch (e) {
+      /* Keep the exact records visible for immediate export. A failed source
+         fence must not be disguised as a successful clear. */
+      mem[sourceKind] = list.slice();
       var rollbackFailed = false;
       try { window.FB.restoreQueue(queueResult); }
       catch (rollbackError) { rollbackFailed = true; }
@@ -168,6 +256,11 @@
         window.FB.reportPersistenceFailure(message);
       } else if (typeof window.alert === "function") {
         window.alert(message);
+      }
+      if (e && e.code === "SOURCE_CONFLICT") {
+        e.severity = rollbackFailed ? "high" : "error";
+        e.rollbackFailed = rollbackFailed;
+        throw e;
       }
       var error = new Error(message);
       error.code = "PERSISTENCE_FAILED";

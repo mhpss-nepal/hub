@@ -555,11 +555,12 @@
     }
     if (cur !== "" || row.length) { row.push(cur); rows.push(row); }
     if (!rows.length) return [];
-    var head = rows.shift();
+    var head = rows.shift().map(function (h) { return String(h || "").replace(/^\uFEFF/, "").trim(); });
     return rows.filter(function (r) { return r.some(function (c) { return c !== ""; }); })
       .map(function (r) {
         var o = {};
-        head.forEach(function (h, i) { o[h.trim()] = r[i] === undefined ? "" : r[i]; });
+        if (r.length) r[0] = String(r[0] || "").replace(/^\uFEFF/, "");
+        head.forEach(function (h, i) { o[h] = r[i] === undefined ? "" : r[i]; });
         if (typeof o.targetGroups === "string") o.targetGroups = o.targetGroups ? o.targetGroups.split(";") : [];
         return o;
       });

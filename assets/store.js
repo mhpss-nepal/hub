@@ -14,6 +14,7 @@
 const KEY = "mhpss-np-4ws-v1";
 const SCHEMA_VERSION = "5ws-np-0.5.0";  /* 0.2.0: four age bands · 0.3.0: donors list, partners, palika, iascSub, 16 Sep 2026 · 0.4.0: five age groups, settings, cadre list, "Other" text fields, funding source off the form — EDCD review 17 Sep 2026 · 0.5.0 (17 Sep 2026, afternoon): the instrument is the 5Ws; activity list v3 (layer.item codes, IASC terms in the backend only); one report per session with its attendance — countBasis no longer asked, always CONTACTS; sessionTime in the record id */
 let memoryCurrent = false;
+let sourceMutationCounter = 0;
 
 /* ---------------------------------------------------------------------
    Deterministic record id.
@@ -46,25 +47,116 @@ function recordId(r) {
 }
 
 /* ---------------------------------------------------------------------
-   Storage. Wrapped because localStorage throws in private windows and
-   returns empty when site data is cleared. A form that breaks when
-   storage is unavailable is a form that loses a day of field reporting.
+   Storage. Mutations use immutable, single-key commit envelopes selected by
+   monotonically increasing fencing tokens. An expired writer can append only
+   an older envelope and cannot overwrite a newer tab's payload or metadata.
    ------------------------------------------------------------------- */
+function sourceConflict(message) {
+  const error = new Error(message || "Saved activity reports changed in another tab; this change was not applied.");
+  error.code = "SOURCE_CONFLICT";
+  return error;
+}
+function sourceFingerprint(raw) {
+  let h = 0x811c9dc5 >>> 0;
+  raw = String(raw || "");
+  for (let i = 0; i < raw.length; i++) {
+    h ^= raw.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h.toString(36);
+}
+function sourceKeys() {
+  const out = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const item = localStorage.key(i);
+    if (item !== null) out.push(item);
+  }
+  return out;
+}
+function readSourceState() {
+  const prefix = KEY + "-commit-";
+  let latest = null;
+  sourceKeys().filter((item) => item.startsWith(prefix)).sort().forEach((item) => {
+    const commit = JSON.parse(localStorage.getItem(item) || "null");
+    if (!commit || !Number.isSafeInteger(commit.fence) || commit.fence < 1 ||
+        !Number.isSafeInteger(commit.version) || commit.version < 1 ||
+        !Array.isArray(commit.records) ||
+        commit.fingerprint !== sourceFingerprint(JSON.stringify(commit.records))) {
+      throw sourceConflict("Saved activity commit metadata is invalid; this change was not applied.");
+    }
+    if (!latest || commit.fence > latest.fence ||
+        (commit.fence === latest.fence && item > latest.commitKey)) {
+      latest = { records: commit.records, fence: commit.fence, version: commit.version,
+        fingerprint: commit.fingerprint, commitKey: item };
+    }
+  });
+  if (latest) return latest;
+  const rawBefore = localStorage.getItem(KEY);
+  const rawAfter = localStorage.getItem(KEY);
+  if (rawBefore !== rawAfter) throw sourceConflict("Saved activity reports changed while being read.");
+  const records = rawAfter ? JSON.parse(rawAfter) : [];
+  if (!Array.isArray(records)) throw new Error("saved activity reports are not a list");
+  return { records, fence: 0, version: 0, commitKey: "",
+    fingerprint: sourceFingerprint(JSON.stringify(records)) };
+}
+function sameSourceState(left, right) {
+  return left.commitKey === right.commitKey && left.fence === right.fence &&
+    left.version === right.version && left.fingerprint === right.fingerprint;
+}
+function mutateSource(change, expected) {
+  const snapshot = readSourceState();
+  if (expected && !sameSourceState(snapshot, expected)) throw sourceConflict();
+  const lockKey = KEY + "-mutation";
+  sourceMutationCounter += 1;
+  const token = Date.now().toString(36) + "-" + sourceMutationCounter.toString(36) + "-" + Math.random().toString(36).slice(2);
+  let lease = "", held = false;
+  try {
+    const existingRaw = localStorage.getItem(lockKey);
+    let existing = null;
+    if (existingRaw) {
+      try { existing = JSON.parse(existingRaw); } catch (e) { existing = null; }
+      if (!existing || !existing.expires || !Number.isSafeInteger(existing.fence) || existing.expires > Date.now()) {
+        throw sourceConflict("Saved activity reports are busy in another tab; this change was not applied.");
+      }
+    }
+    const fence = Math.max(snapshot.fence, existing && existing.fence || 0) + 1;
+    lease = JSON.stringify({ token, fence, expires: Date.now() + 5000 });
+    localStorage.setItem(lockKey, lease);
+    held = localStorage.getItem(lockKey) === lease;
+    if (!held || !sameSourceState(readSourceState(), snapshot)) throw sourceConflict();
+    const next = change(snapshot.records.slice());
+    if (!Array.isArray(next)) throw new TypeError("source mutation must return a list");
+    const raw = JSON.stringify(next);
+    const commitKey = KEY + "-commit-" + String(fence).padStart(16, "0") + "-" + token;
+    const commitRaw = JSON.stringify({ fence, version: snapshot.version + 1,
+      parent: snapshot.commitKey, fingerprint: sourceFingerprint(raw), records: next });
+    if (localStorage.getItem(lockKey) !== lease || !sameSourceState(readSourceState(), snapshot)) {
+      throw sourceConflict();
+    }
+    localStorage.setItem(commitKey, commitRaw);
+    const committed = readSourceState();
+    if (localStorage.getItem(commitKey) !== commitRaw || committed.commitKey !== commitKey) {
+      throw sourceConflict("A newer tab committed first; this activity-report change was not applied.");
+    }
+    memoryCurrent = false;
+    window.__mem = next;
+    return { before: snapshot.records, records: next, version: snapshot.version + 1 };
+  } finally {
+    try { if (held && localStorage.getItem(lockKey) === lease) localStorage.removeItem(lockKey); }
+    catch (e) { /* fail closed */ }
+  }
+}
 function read() {
   if (memoryCurrent) return window.__mem || [];
-  try {
-    const raw = localStorage.getItem(KEY);
-    return raw ? JSON.parse(raw) : (window.__mem || []);
-  } catch (e) {
+  try { return readSourceState().records; }
+  catch (e) {
     console.warn("store: read failed, continuing in memory", e);
     return window.__mem || [];
   }
 }
-function write(list) {
+function write(list, expected) {
   window.__mem = list;
   try {
-    localStorage.setItem(KEY, JSON.stringify(list));
-    memoryCurrent = false;
+    mutateSource(() => list, expected);
     return true;
   } catch (e) {
     memoryCurrent = true;
@@ -87,7 +179,9 @@ function todayLocal() {
 }
 
 function save(rec) {
-  const list = read();
+  let sourceSnapshot = null;
+  try { sourceSnapshot = readSourceState(); } catch (e) { /* write fails closed below */ }
+  const list = (sourceSnapshot ? sourceSnapshot.records : read()).slice();
   const id = recordId(rec);
   const now = new Date().toISOString();
   const idx = list.findIndex((x) => x.id === id);
@@ -123,7 +217,7 @@ function save(rec) {
     out.revision = (list[idx].revision || 0) + 1;
     out.previous = list[idx].previous ? [...list[idx].previous, stripHistory(list[idx])] : [stripHistory(list[idx])];
     list[idx] = out;
-    const persistedRev = write(list);
+    const persistedRev = write(list, sourceSnapshot);
     reportPersistence(persistedRev);
     const syncedRev = persistedRev ? syncToRegister(out) : null;   /* a corrected report must reach the register too */
     return saveResult(out, id, persistedRev, syncedRev);
@@ -131,7 +225,7 @@ function save(rec) {
   out.createdAt = now;
   out.revision = 0;
   list.push(out);
-  const persisted = write(list);
+  const persisted = write(list, sourceSnapshot);
   reportPersistence(persisted);
 
   /* The persisted device copy is written first. Only then is a push
@@ -485,7 +579,8 @@ function stamp() {
 }
 
 function clearAll() {
-  const list = read();
+  const sourceSnapshot = readSourceState();
+  const list = sourceSnapshot.records;
   if (!window.FB || typeof window.FB.clearQueue !== "function" ||
       typeof window.FB.restoreQueue !== "function") {
     const unavailableMessage = "Cannot verify that the activity report send queue was cleared.";
@@ -509,8 +604,10 @@ function clearAll() {
     }
     throw e;
   }
-  try { localStorage.removeItem(KEY); }
+  try { mutateSource(() => [], sourceSnapshot); }
   catch (e) {
+    window.__mem = list.slice();
+    memoryCurrent = true;
     let rollbackFailed = false;
     try { window.FB.restoreQueue(queueResult); }
     catch (rollbackError) { rollbackFailed = true; }
@@ -522,6 +619,11 @@ function clearAll() {
     } else if (typeof window.alert === "function") {
       window.alert(message);
     }
+    if (e && e.code === "SOURCE_CONFLICT") {
+      e.severity = rollbackFailed ? "high" : "error";
+      e.rollbackFailed = rollbackFailed;
+      throw e;
+    }
     const error = new Error(message);
     error.code = "PERSISTENCE_FAILED";
     error.severity = rollbackFailed ? "high" : "error";
@@ -529,7 +631,7 @@ function clearAll() {
     throw error;
   }
   window.__mem = [];
-  memoryCurrent = true;
+  memoryCurrent = false;
   return { cleared: true, queueCleared: queueResult.queueCleared };
 }
 

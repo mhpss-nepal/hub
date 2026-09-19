@@ -27,8 +27,9 @@
   var cfg = window.FB_CONFIG || {};
   var COLL = window.FB_COLLECTION || "submissions";
   var QKEY = "mhpss-np-queue-v1";
-  var QVERSION = QKEY + "-version";
+  var QVERSION = QKEY + "-version"; /* read-only legacy metadata */
   var QLOCK = QKEY + "-mutation";
+  var QCOMMIT = QKEY + "-commit-";
   var LKEY = "mhpss-np-linkmail";
   /* Kept in step with isOwner() in the security rules. The rules are what
      enforce it; this copy only lets a page explain itself without a read. */
@@ -98,25 +99,62 @@
     if (!stamp || !Number.isSafeInteger(stamp.version) || stamp.version < 0 ||
         typeof stamp.fingerprint !== "string") throw new Error("queue version is invalid");
     if (stamp.fingerprint !== queueFingerprint(rawQueue)) {
-      throw queueConflict("The send queue and its version do not match; this change was not applied.");
+      throw queueConflict("The legacy send queue and its version do not match; this change was not applied.");
     }
     return stamp;
   }
 
+  function storageKeys() {
+    var keys = [];
+    for (var i = 0; i < localStorage.length; i++) {
+      var key = localStorage.key(i);
+      if (key !== null) keys.push(key);
+    }
+    return keys;
+  }
+
+  function readCommit(key) {
+    var raw = localStorage.getItem(key);
+    var commit = JSON.parse(raw || "null");
+    if (!commit || !Number.isSafeInteger(commit.fence) || commit.fence < 1 ||
+        !Number.isSafeInteger(commit.version) || commit.version < 1 ||
+        !Array.isArray(commit.queue) || typeof commit.fingerprint !== "string") {
+      throw queueConflict("Stored send queue commit metadata is invalid; this change was not applied.");
+    }
+    var queueRaw = JSON.stringify(commit.queue);
+    if (commit.fingerprint !== queueFingerprint(queueRaw)) {
+      throw queueConflict("Stored send queue commit payload and metadata do not match; this change was not applied.");
+    }
+    return { key: key, raw: raw, queue: commit.queue, fence: commit.fence, version: commit.version,
+      fingerprint: commit.fingerprint };
+  }
+
+  /* Queue commits are immutable, single-key envelopes. Readers select the
+     greatest fencing token, so a writer that wakes after its lease expired can
+     only append an older commit; it can never overwrite the newer payload or
+     QVERSION metadata. QKEY/QVERSION remain a read-only migration source. */
   function readQueueState() {
+    var candidates = storageKeys().filter(function (key) { return key.indexOf(QCOMMIT) === 0; }).sort();
+    var latest = null;
+    candidates.forEach(function (key) {
+      var commit = readCommit(key);
+      if (!latest || commit.fence > latest.fence ||
+          (commit.fence === latest.fence && commit.key > latest.key)) latest = commit;
+    });
+    if (latest) return latest;
+
     var rawBefore = localStorage.getItem(QKEY);
-    var stampBefore = queueVersion(rawBefore);
     var versionRawBefore = localStorage.getItem(QVERSION);
+    var stamp = queueVersion(rawBefore);
     var rawAfter = localStorage.getItem(QKEY);
-    var stampAfter = queueVersion(rawAfter);
     var versionRawAfter = localStorage.getItem(QVERSION);
-    if (rawBefore !== rawAfter || versionRawBefore !== versionRawAfter ||
-        stampBefore.version !== stampAfter.version) {
-      throw queueConflict("The send queue changed while it was being read; retry without closing this page.");
+    if (rawBefore !== rawAfter || versionRawBefore !== versionRawAfter) {
+      throw queueConflict("The legacy send queue changed while it was being read; retry without closing this page.");
     }
     var parsed = JSON.parse(rawAfter || "[]");
     if (!Array.isArray(parsed)) throw new Error("queue is not a list");
-    return { queue: parsed, raw: rawAfter, version: stampAfter.version, versionRaw: versionRawAfter };
+    return { key: "", raw: rawAfter, versionRaw: versionRawAfter, queue: parsed,
+      fence: 0, version: stamp.version, fingerprint: queueFingerprint(JSON.stringify(parsed)) };
   }
 
   function queue() {
@@ -141,6 +179,11 @@
     return Date.now().toString(36) + "-" + mutationCounter.toString(36) + "-" + Math.random().toString(36).slice(2);
   }
 
+  function sameQueueState(left, right) {
+    return left.key === right.key && left.fence === right.fence &&
+      left.version === right.version && left.fingerprint === right.fingerprint;
+  }
+
   function mutateQueue(change, expectedVersion) {
     var snapshot;
     try {
@@ -155,49 +198,47 @@
       throw queueConflict("The send queue changed after the earlier operation; rollback was not applied.");
     }
     var token = lockToken();
-    var lease = JSON.stringify({ token: token, expires: Date.now() + 5000 });
-    var held = false;
-    var next = null;
+    var held = false, lease = "", next = null;
     try {
-      var existingRaw = localStorage.getItem(QLOCK);
+      var existingRaw = localStorage.getItem(QLOCK), existing = null;
       if (existingRaw) {
-        var existing;
         try { existing = JSON.parse(existingRaw); } catch (e) { existing = null; }
-        if (!existing || !existing.expires || existing.expires > Date.now()) {
+        if (!existing || !existing.expires || !Number.isSafeInteger(existing.fence) ||
+            existing.expires > Date.now()) {
           throw queueConflict("The send queue is busy in another tab; this change was not applied.");
         }
       }
+      var fence = Math.max(snapshot.fence, existing && existing.fence || 0) + 1;
+      lease = JSON.stringify({ token: token, fence: fence, expires: Date.now() + 5000 });
       localStorage.setItem(QLOCK, lease);
       held = localStorage.getItem(QLOCK) === lease;
       if (!held) throw queueConflict("Another tab took the send queue mutation token; this change was not applied.");
 
-      /* Required compare-and-swap recheck immediately before either durable
-         write. This catches a tab that changed the queue after our read but
-         before our token became visible. */
-      if (localStorage.getItem(QVERSION) !== snapshot.versionRaw ||
-          localStorage.getItem(QKEY) !== snapshot.raw) {
-        throw queueConflict();
-      }
+      var current = readQueueState();
+      if (!sameQueueState(current, snapshot)) throw queueConflict();
       next = change(snapshot.queue.slice());
       if (!Array.isArray(next)) throw new TypeError("queue mutation must return a list");
       var nextRaw = JSON.stringify(next);
       var nextVersion = snapshot.version + 1;
-      var nextStamp = JSON.stringify({ version: nextVersion, fingerprint: queueFingerprint(nextRaw) });
+      var commitKey = QCOMMIT + String(fence).padStart(16, "0") + "-" + token;
+      var commitRaw = JSON.stringify({
+        fence: fence,
+        version: nextVersion,
+        parent: snapshot.key,
+        fingerprint: queueFingerprint(nextRaw),
+        queue: next
+      });
 
-      if (localStorage.getItem(QLOCK) !== lease ||
-          localStorage.getItem(QVERSION) !== snapshot.versionRaw) throw queueConflict();
-      /* Stamp the intended next content first. A crash between these writes
-         leaves a fingerprint mismatch, so a later tab fails closed instead of
-         treating a partial mutation as valid. */
-      localStorage.setItem(QVERSION, nextStamp);
-      if (localStorage.getItem(QLOCK) !== lease ||
-          localStorage.getItem(QVERSION) !== nextStamp ||
-          localStorage.getItem(QKEY) !== snapshot.raw) throw queueConflict();
-      localStorage.setItem(QKEY, nextRaw);
-      if (localStorage.getItem(QKEY) !== nextRaw ||
-          localStorage.getItem(QVERSION) !== nextStamp ||
-          queueVersion(nextRaw).version !== nextVersion) {
-        throw persistenceError("The send queue write could not be verified on this device.");
+      if (localStorage.getItem(QLOCK) !== lease || !sameQueueState(readQueueState(), snapshot)) {
+        throw queueConflict();
+      }
+      /* One atomic localStorage write contains both payload and metadata. An
+         expired writer can append only its lower-fenced immutable envelope. */
+      localStorage.setItem(commitKey, commitRaw);
+      var committed = readQueueState();
+      if (localStorage.getItem(commitKey) !== commitRaw || committed.key !== commitKey ||
+          committed.version !== nextVersion || committed.fingerprint !== queueFingerprint(nextRaw)) {
+        throw queueConflict("A newer tab committed first; this send queue change was not applied.");
       }
       window.__fbq = next;
       state.queueError = "";
@@ -424,7 +465,7 @@
       out.acknowledged = true;
       out.ackState = "acknowledged";
       out.deliveryState = "acknowledged";
-      drop(r._rid); announce(); return out;
+      drop(r); announce(); return out;
     }).catch(function (e) {
       if (out.acknowledged) {
         /* Firestore acknowledged the event, but a concurrent queue mutation
@@ -478,9 +519,29 @@
     return api.setDoc(api.doc(db, COLL, r._rid), body);
   }
 
-  function drop(id) {
+  function sameQueuedEvent(queued, sent) {
+    return !!queued && !!sent && queued._rid === sent._rid &&
+      JSON.stringify(queued) === JSON.stringify(sent);
+  }
+
+  function drop(sent) {
+    if (!sent || typeof sent !== "object" || !sent._rid) {
+      throw queueConflict("An acknowledgement without the exact sent event body cannot remove a queued record.");
+    }
+    var found = false;
     return mutateQueue(function (q) {
-      return q.filter(function (x) { return x._rid !== id; });
+      var keep = q.filter(function (queued) {
+        if (queued && queued._rid === sent._rid) {
+          if (!sameQueuedEvent(queued, sent)) {
+            throw queueConflict("The acknowledged event has a newer queued revision; it remains queued.");
+          }
+          found = true;
+          return false;
+        }
+        return true;
+      });
+      if (!found) throw queueConflict("The exact acknowledged event is no longer queued; no record was removed.");
+      return keep;
     });
   }
 
@@ -555,7 +616,7 @@
       return chain.then(function () {
         return send(r).then(function () {
           sent++;
-          try { drop(r._rid); }
+          try { drop(r); }
           catch (e) { if (e && e.code === "QUEUE_CONFLICT") conflicts++; }
         }).catch(function () { /* remote failure stays queued */ });
       });
