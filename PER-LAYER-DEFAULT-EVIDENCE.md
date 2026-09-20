@@ -156,7 +156,7 @@ gives English; after pressing ENG the preference survives navigation back to the
 
 ## 6. Base / head / production refs
 
-* Hub base `8273e9013b163549640d04b2ec86fa42c840a91b` → head `a11466832c6dc743adef4ab942d79dccf5bc0f82` (branch `task/t_2449fe51-i18n-per-layer-default`)
+* Hub base `8273e9013b163549640d04b2ec86fa42c840a91b` → head `670763a662b0c04e3ad4b681a0353c7ea36e1919` (branch `task/t_2449fe51-i18n-per-layer-default`)
 * Form base `9c3a41eeccc768fcef5d8f241430ba831e8ad9a8` → head `79e761c` (branch `task/t_2449fe51-form-default`)
 * Production refs **unchanged**: public `68bf197`, form `9032bb7`, hub `ff2d4e2`
 * No push, PR, merge or deploy. Both worktrees clean (`git status --porcelain -uall` empty).
