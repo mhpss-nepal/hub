@@ -49,11 +49,17 @@ git -C /root/mhpss-nepal-work/perlayer/form show HEAD:5ws-report.html | sed -n 2
 ```
 
 or, as a machine check over every worktree, from any directory one level above them:
-`search_files(pattern="data-i18n-default", path="/root/mhpss-nepal-work")` returns exactly three
-hits — `perlayer/form/5ws-report.html:2`, `perlayer/form/5ws-report-b2.html:2` (its derived preview)
-and a non-worktree scratch copy. The other six worktrees correctly return **zero**: only the 5Ws
-page is meant to declare a default. The worktree is clean (`git status --porcelain -uall` empty),
-which `scripts/land.py` requires.
+
+```
+grep -rl 'data-i18n-default' /root/mhpss-nepal-work --include='*.html'
+#   /root/mhpss-nepal-work/perlayer/form/5ws-report.html
+#   /root/mhpss-nepal-work/perlayer/form/5ws-report-b2.html   (its derived preview)
+#   /root/mhpss-nepal-work/verify-perlayer/form/5ws-report.html   (orphan scratch copy, not a worktree)
+```
+
+Exactly three hits, and the two real ones are on the 5Ws page and its generated preview. The other
+six worktrees correctly return **zero**: only the 5Ws page is meant to declare a default. The
+worktree is clean (`git status --porcelain -uall` empty), which `scripts/land.py` requires.
 
 ## 2. The mechanism, and why it is per-layer
 
@@ -164,10 +170,11 @@ unapproved.
 
 Verified trees: **Hub `/root/mhpss-nepal-work/hub-real`**, branch
 `task/t_2449fe51-i18n-per-layer-default`; **form `/root/mhpss-nepal-work/perlayer/form`**, branch
-`task/t_2449fe51-form-default` (worktree of `design/form-frontend`, whose tip `9c3a41e` contains
-the trial build). The two are checked out side by side — `perlayer/form` with a `hub` symlink to
-`hub-real` — so the form pages resolve `../hub/assets/*` to the durable repo, which is how the app
-is served.
+`task/t_2449fe51-form-default` — a worktree of the **form repository**
+(`/root/mhpss-nepal-audit-20260918/form`) branched from `design/form-frontend`'s tip `9c3a41e`,
+which is where the trial build lives (see §1 and §6 for the exact base/head). The two are checked
+out side by side — `perlayer/form` with a `hub` symlink to `hub-real` — so the form pages resolve
+`../hub/assets/*` to the durable repo, which is how the app is served.
 
 | Command (cwd) | Result |
 |---|---|
