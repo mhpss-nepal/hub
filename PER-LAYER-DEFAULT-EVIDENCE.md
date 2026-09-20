@@ -82,8 +82,12 @@ remembered for the session (`?i18n=clean` turns it off), exactly like `?i18n=mar
 
 A report names the surface (`"surface": "placeholder"`), so a translator knows whether the complaint
 is about the sentence or the field's placeholder. A key is only reportable on the surface it
-actually renders on that page (a placeholder-only key cannot be filed as text, and vice versa) —
-four checks in the proof cover this.
+actually renders on that page (an aria-label-only key cannot be filed as text, and a text-only key
+cannot be filed as a placeholder). The surface is part of a report's identity, so the same key
+complained about on two different surfaces is **two** reports, while the same surface reported twice
+is still one — otherwise a placeholder complaint would silently swallow a separate sentence
+complaint. Six checks in the proof cover this (the fixture deliberately keys one string both as
+visible text and as a placeholder).
 
 **Where the reports land:** on the device, in **durable** storage —
 `localStorage["mhpss-np-i18n-reports"]` — downloadable as `i18n-reports.json` from the ⚑ chip. This
@@ -105,7 +109,7 @@ edge, because the left clamp ignored the picker's own width). Now:
   the first reason button, and Escape dismisses it and returns focus to the element. A field worker
   who is **not** in report mode gets no tab stops added.
 
-**Privacy properties (33 checks in `tools/i18n-feedback-record-proof.py`):**
+**Privacy properties (35 checks in `tools/i18n-feedback-record-proof.py`):**
 
 * the record is **structured, not typed** — `{kind, schema, key, surface, lang, revision, reason, page, src}`;
   there is **no free-text field**, so there is nowhere for a beneficiary's name to go;
@@ -135,7 +139,7 @@ is served.
 | `python3 -m unittest -v test_i18n_per_layer_default` (hub) | **8 passed** |
 | `python3 tools/per-layer-default-red-green.py` (hub) | base **5 of 8 FAIL** → delivered **8/8 OK**; `red/green demonstration: PASS` |
 | `python3 tools/i18n-protection-and-marks-proof.py` (hub) | **15 checks, 0 failures** — safety properties unchanged |
-| `python3 tools/i18n-feedback-record-proof.py` (hub) | **33 checks, 0 failures** — durability, viewport, keyboard, surface |
+| `python3 tools/i18n-feedback-record-proof.py` (hub) | **35 checks, 0 failures** — durability, viewport, keyboard, surface and surface-identity |
 | `python3 tools/i18n-feedback-red-green.py` (hub) | base `44bba2c` engine: **20 of 40** pickers overflow at 320 px and a report is **lost** on reopen → delivered engine: **0 overflow, 1 report kept**; `PASS` |
 | `python3 tools/i18n-check.py` (hub) | exit 0 — Gate open |
 | `python3 tools/rail.py` / `text-setting-check.py` / `contrast-check.py` (hub) | exit 0 / 0 / 0 |

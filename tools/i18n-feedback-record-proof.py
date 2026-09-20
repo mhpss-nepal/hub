@@ -39,6 +39,7 @@ PAGE = """<!DOCTYPE html>
 <p data-i18n="fx.plain">p</p>
 <input id="field" data-i18n-ph="fx.ph" placeholder="old">
 <a id="navlink" href="#x" data-i18n-aria="fx.aria">link</a>
+<span id="phText" data-i18n="fx.ph">Your name</span>
 <script src="assets/i18n-strings.js"></script>
 <script src="assets/i18n.js"></script>
 </body></html>
@@ -72,9 +73,9 @@ PROBE = """() => {
   // the record says which surface the complaint is about.
   out.cases.attr_placeholder = I.reportWording('fx.ph', 'wrong', 'placeholder');
   out.cases.attr_aria        = I.reportWording('fx.aria', 'unclear', 'aria-label');
-  // a key that only exists as a placeholder cannot be reported as text, and
-  // vice versa
-  out.cases.attr_key_as_text = I.reportWording('fx.ph', 'wrong', 'text');
+  // a key that only exists as an aria-label cannot be reported as text, and a
+  // text-only key cannot be reported as a placeholder
+  out.cases.attr_key_as_text = I.reportWording('fx.aria', 'wrong', 'text');
   out.cases.text_key_as_ph   = I.reportWording('fx.title', 'wrong', 'placeholder');
   out.cases.bad_surface      = I.reportWording('fx.ph', 'wrong', 'nowhere');
   out.keyed_focusable        = document.querySelector('[data-i18n="fx.title"]').tabIndex;
@@ -119,6 +120,31 @@ ATTR_TAP = """() => {
   if (!pick) return {picker: false};
   pick.querySelector('button[data-reason="wrong"]').click();
   return {picker: true, recorded: window.I18N.reports()};
+}"""
+
+# One key, two surfaces, the same reason: two genuine complaints. The surface
+# must be part of a report's identity, or the second is dropped as a duplicate.
+# `fx.ph` is deliberately BOTH the visible text of #phText and the placeholder
+# of #field, which is exactly the ambiguous case.
+SURFACE_IDENTITY = """() => {
+  const I = window.I18N;
+  I.clearReports();
+  const pick = (el) => {
+    el.click();
+    const p = document.getElementById('i18npick');
+    if (!p) return false;
+    p.querySelector('button[data-reason="wrong"]').click();
+    return true;
+  };
+  const openedText = pick(document.getElementById('phText'));
+  const openedPh = pick(document.getElementById('field'));
+  const now = I.reports();
+  // Re-reporting the placeholder is the same complaint, not a third one.
+  const openedAgain = pick(document.getElementById('field'));
+  return {openedText: openedText, openedPh: openedPh, openedAgain: openedAgain,
+          stored: now.length,
+          surfaces: now.map((r) => r.surface).sort(),
+          stored_after_repeat: I.reports().length};
 }"""
 
 # A page with many keyed targets spread across the width and down the page --
@@ -277,6 +303,7 @@ def main():
                 attr_page.wait_for_timeout(400)
                 attr_page.evaluate("() => window.I18N.clearReports()")
                 attr_tap = attr_page.evaluate(ATTR_TAP)
+                surface_identity = attr_page.evaluate(SURFACE_IDENTITY)
 
                 # A narrow-viewport scan over MANY targets: every picker must
                 # fit on screen. This is the check an independent 320x640 scan
@@ -339,6 +366,7 @@ def main():
     print("quiet reader      :", json.dumps(quiet_state))
     print("reviewer tap      :", json.dumps(tap, ensure_ascii=False))
     print("attribute tap     :", json.dumps(attr_tap, ensure_ascii=False))
+    print("surface identity  :", json.dumps(surface_identity, ensure_ascii=False))
     print("surfaces          :", json.dumps(res["surfaces"]))
     print("narrow scan       :", json.dumps(scans))
     checks.append(("quiet_reader_sees_no_reviewer_chrome",
@@ -408,6 +436,13 @@ def main():
                    and (attr_tap["recorded"][0].get("key") == "fx.ph")
                    and (attr_tap["recorded"][0].get("surface") == "placeholder"),
                    json.dumps(attr_tap, ensure_ascii=False)))
+    checks.append(("one_key_on_two_surfaces_is_two_reports",
+                   surface_identity.get("stored") == 2
+                   and surface_identity.get("surfaces") == ["placeholder", "text"],
+                   json.dumps(surface_identity, ensure_ascii=False)))
+    checks.append(("the_same_surface_reported_twice_is_one_report",
+                   surface_identity.get("stored_after_repeat") == 2,
+                   json.dumps(surface_identity, ensure_ascii=False)))
     checks.append(("report_mode_makes_keyed_text_keyboard_reachable",
                    isinstance(tap.get("keyed_focusable"), int)
                    and tap["keyed_focusable"] >= 0,

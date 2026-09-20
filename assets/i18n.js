@@ -202,10 +202,13 @@
   function recordReport(rec) {
     if (!rec) return null;
     var all = reports();
-    /* One report per key per reason: a reviewer tapping twice is not two
-       problems, and the count should mean something. */
+    /* One report per key, per SURFACE, per reason: a reviewer tapping twice is
+       not two problems, and the count should mean something. The surface is
+       part of the identity, or a complaint about a field's placeholder would
+       swallow a separate complaint about the same key's visible sentence. */
     for (var i = 0; i < all.length; i++) {
-      if (all[i].key === rec.key && all[i].reason === rec.reason) return all[i];
+      if (all[i].key === rec.key && all[i].reason === rec.reason
+          && all[i].surface === rec.surface) return all[i];
     }
     rec.at = new Date().toISOString();
     all.push(rec);
