@@ -419,7 +419,14 @@ window.I18N_STRINGS = {
       "svc.p089",
       "svc.p090",
       "svc.p091",
-      "svc.p092",], human: [] }
+      "svc.p092",
+      "phq9.p009",
+      "phq9.p023",
+      "ref.p050",
+      "svc.p007",
+      "svc.p031",
+      "svc.p070",
+      "svc.p093",], human: [] }
   },
 
   en: {
@@ -1798,5 +1805,21 @@ window.I18N_STRINGS = {
     "svc.p090": "स्थानको नाम, वडा, पालिका",
     "svc.p091": "जस्तै: RB",
     "svc.p092": "जस्तै: Uttargaya",
+    /* ---- referral, PHQ-9 and service contact forms: 7 more keys
+       20 Sep 2026, settled by comparing the two machine lanes against the
+       project's OWN published vocabulary (assets/codes.js `np` fields, the
+       terminology lock, the dictionary's placeholders) -- never by a vote.
+       Each settled key differed on exactly one term the project has already
+       fixed, e.g. अनुगमन over फलोअप, स्थान over स्थल. Where the difference was
+       not fixed by that material it was LEFT IN ENGLISH and reported; see
+       tools/i18n-ne-authority-held.json in the form repo. Machine drafts,
+       NOT checked by a Nepali speaker. -- */
+    "phq9.p009": "को, र कुन भ्रमण",
+    "phq9.p023": "अंग्रेजी, सिधै",
+    "ref.p050": "संरक्षण सेवा",
+    "svc.p007": "एक व्यक्तिसँग एक सम्पर्क",
+    "svc.p031": "स्थान पिन <span class=\"opt\">— ऐच्छिक</span>",
+    "svc.p070": "अवधि मिनेटमा <span class=\"opt\">— ऐच्छिक</span>",
+    "svc.p093": "सेवा वा स्थानबारे — व्यक्तिबारे होइन",
   }
 };
