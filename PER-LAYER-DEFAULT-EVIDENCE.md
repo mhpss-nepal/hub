@@ -148,6 +148,9 @@ is served.
 | `python3 tools/5ws-still-works.py http://127.0.0.1:8899` (form) | exit 0 — `lang: ne`, switch mounted, 24-name contract match, 8 pickers |
 | `python3 tools/trial-scope-render-check.py http://127.0.0.1:8899` (form) | exit 0 — 390/1280 px |
 | `python3 tools/hub-trial-scope-render-check.py http://127.0.0.1:8899` (hub) | exit 0 — 390/1280 px, `offenders=[]` |
+| `python3 -m unittest discover -s design-preview -p 'test_*.py'` (form) | **48 passed** — includes the deterministic rebuild of the derived B2 page |
+| `python3 tools/4ws-offline-redirect-check.py http://127.0.0.1:8899` (form) | exit 0 — distributed 4Ws address still reaches the 5Ws form offline, query/hash intact |
+| `python3 tools/text-setting-check.py` (form) | **pre-existing red** at base `9c3a41e` as well — `design-preview/translation-review-index.html` bundles `th, td` on `text-align:left`; untouched by this task |
 
 Rendered evidence for the decision itself (served site): the 5Ws form opens in **Nepali**
 (`data-lang=ne`) with the bilingual notice and the ENG/NEP switch; `/hub/`, `/hub/forms.html`,
@@ -218,3 +221,14 @@ The engine change to support this is in `assets/i18n.js`; the form side of the s
 6. **The form repo's own report of this change is limited to `sw.js`/`tools/precache.sha`.** The
    durable engine lives in the hub repository (`hub-real`), which is what the form pages load at
    `../hub/assets/i18n.js`; no dictionary text was edited in either repository.
+7. **A round-1 regression, found while re-verifying for round 2: the derived B2 preview page.**
+   `5ws-report-b2.html` is *generated* from `5ws-report.html` by `design-preview/build_b2.py`, and
+   the builder copies the source `<head>` verbatim. Round 1 declared the language default on the
+   source page and did not regenerate the derived page, so
+   `test_build_script_reproduces_the_committed_page` passed at base `9c3a41e` and **failed** at the
+   round-1 head. It went unnoticed because round 1 ran the form's `test_trial_scope` and the hub
+   suites but not `design-preview`. Fixed by **running the builder** (hand-editing is exactly what
+   the builder exists to prevent): one line changes — the `<html>` tag gains the same
+   `data-i18n-default="ne"` the source declares — so the B2 preview of the 5Ws form matches the form
+   it previews. `design-preview`: 48 passed. The form-side changed-file list is therefore
+   `5ws-report-b2.html`, `sw.js`, `tools/precache.sha`.
