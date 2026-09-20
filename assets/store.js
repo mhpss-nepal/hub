@@ -355,7 +355,7 @@ function num(v) {
    the reach twice. Totals belong in the analysis, never in the dataset.
    ------------------------------------------------------------------- */
 const CSV_COLUMNS = [
-  "id", "createdAt", "revision", "dateAD", "dateBS", "district", "palika", "site", "siteOther", "siteSource",
+  "id", "createdAt", "revision", "dateAD", "dateBS", "district", "palika", "ward", "site", "siteOther", "siteSource",
   "org", "orgOther", "donors", "partners", "focalName", "focalPhone", "focalEmail", "cadre", "cadreOther",
   "sessionTime",
   /* the two readings of one activity code (list v3, 17 Sep 2026): the code

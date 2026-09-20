@@ -32,7 +32,11 @@ window.I18N_STRINGS = {
       { code: "ne", label: "NEP", name: "नेपाली",   html: "ne" }
     ],
     // Bumped whenever the English changes, so a stale translation is visible.
-    revision: "2026-09-16",
+    // 2026-09-20: the optional `ward` field's three strings were added (EN +
+    // Nepali) after the field landed on the 5Ws form; the rest of the form's
+    // machine Nepali was deliberately NOT imported (see i18n gate + the
+    // Layer 1→2 handoff).
+    revision: "2026-09-20",
 
     /* ---- strings that NO machine may translate --------------------------
        Matched as prefixes, so a PHQ-9 item added next month is protected
@@ -230,6 +234,9 @@ window.I18N_STRINGS = {
       "f4.timeHelp",
       "f4.timeLab",
       "f4.wipe",
+      "f4.wardHelp",
+      "f4.wardLab",
+      "f4.optional",
       "banner.demo",
       "foot.cards",
       "foot.contact",
@@ -497,6 +504,16 @@ window.I18N_STRINGS = {
     "f4.partnersHelp": "Organisations that did this activity with you. Item C of the IASC 4Ws.",
     "f4.palikaLab":    "Palika (local level)",
     "f4.palikaHelp":   "Named after the official list of local levels. A palika-level report is counted at palika level and never as a site, so it cannot close a gap on the roster.",
+    /* ---- ward (added 20 Sep 2026) ------------------------------------
+       The 5Ws form records an OPTIONAL ward. `f4.optional` is the
+       "— optional" suffix the form shows inside the label; it is given a
+       plain value because the form's ward label inserts the string with
+       textContent, not innerHTML, so a value carrying <span> markup would
+       render as visible source text on the page. Kept as its own key so a
+       page that splits the suffix can still use it. */
+    "f4.wardLab":      "Ward — optional",
+    "f4.wardHelp":     "Optional. NDRRMA reports impact by ward, so recording it lets this report be compared with the official affected-area list. Leave it blank if the activity covered the whole palika or you are not sure.",
+    "f4.optional":     "— optional",
 
     "sr.age.choose": "— choose —",
     "sr.age.u18": "Under 18",
@@ -1215,6 +1232,11 @@ window.I18N_STRINGS = {
     "f4.partnersHelp": "तपाईंसँग मिलेर यो गतिविधि गर्ने संस्थाहरू। IASC 4Ws को बुँदा C।",
     "f4.palikaLab": "पालिका (स्थानीय तह)",
     "f4.palikaHelp": "स्थानीय तहको आधिकारिक सूची अनुसारका नाम। पालिका-स्तरको प्रतिवेदन पालिका स्तरमै गनिन्छ, स्थानका रूपमा होइन, त्यसैले यसले सूचीको कुनै रिक्तता पूरा गर्न सक्दैन।",
+    /* ward (20 Sep 2026): the label is one plain string, because the form
+       inserts it with textContent -- markup would show as source text. */
+    "f4.wardLab": "वडा — ऐच्छिक",
+    "f4.wardHelp": "ऐच्छिक। NDRRMA ले वडा अनुसार प्रभाव सार्वजनिक गर्छ, त्यसैले यो राख्दा प्रतिवेदनलाई आधिकारिक प्रभावित क्षेत्र सूचीसँग तुलना गर्न सकिन्छ। गतिविधि सम्पूर्ण पालिकामा भएको भए वा थाहा नभए खाली छोड्नुहोस्।",
+    "f4.optional": "— ऐच्छिक",
     "f4.h4": "कसका लागि",
     "f4.h4hint": "संख्या मात्र, कहिल्यै सूची होइन",
     "f4.reachLab": "उपस्थिति",
