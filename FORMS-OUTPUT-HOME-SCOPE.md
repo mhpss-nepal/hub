@@ -73,7 +73,7 @@ allowlists are the one place that has to change with it.
 ## Verification
 
 ```
-python3 -m unittest -v test_trial_scope.py          # 6 tests, 0 failures
+python3 -m unittest -v test_trial_scope.py          # 7 tests, 0 failures
 python3 tools/rail.py                               # rail matches the generator
 python3 tools/text-setting-check.py                 # 0
 python3 tools/i18n-check.py                         # 0 (gate open)
@@ -82,14 +82,46 @@ python3 tools/contrast-check.py                     # 0
 # rendered DOM, over the served workspace (both repos under one root):
 python3 -m http.server 8791 --bind 127.0.0.1        # from a root with hub/ and form/
 python3 tools/hub-trial-scope-render-check.py http://127.0.0.1:8791   # exit 0
+
+# adversarial: plants an unapproved rendered link and proves the checker
+# exits non-zero against it (exit 0 here means the checker caught it):
+python3 tools/render-check-adversarial-probe.py                        # exit 0
+
+# red/green of the round-1 fix: the classifier test is red against the
+# pre-fix checker (15d35b3) and green now; the probe is blind against the
+# pre-fix checker and catches the planted link now:
+python3 tools/round1-red-green-demo.py                                 # exit 0
 ```
 
 The rendered check walks `/hub/`, `/hub/forms.html`, `/hub/access.html`,
 `/hub/inbox.html` and `/hub/coverage.html` at 390 px and 1280 px and asserts the
-rail group's hrefs are exactly `["./#reports", "forms.html", "../form/"]` and
-that no rendered link resolves under `/form/` outside the approved two.
+rail group's hrefs are exactly `["./#reports", "forms.html", "../form/"]`, and
+that no rendered link, once resolved to a URL and normalized, lands under
+`/form/` outside the two approved form paths (`/form` and
+`/form/5ws-report.html`). The rail group has three links: the 5Ws output, the
+neutral Hub `forms.html` entries page, and the form landing page. Comparison is
+exact equality on the normalized path, never a substring test, so
+`../form//contact.html`, `../form/./phq9.html`, `../form/sub/../referral.html`,
+`%2f`-encoded and backslash spellings, protocol-relative URLs and a `/FORM/`
+case variant are all rejected (see the classifier table in
+`test_rendered_link_check_uses_exact_normalized_form_paths`).
 
-Failing-first: at base `ff2d4e2` the suite fails 3 of 6 (page link, rail group,
-QR asset); at head it passes 6 of 6. Five adversarial probes (planted page link,
-planted rail item, planted section hash, hand-edited rail block, restored
-unapproved QR) each make the suite exit 1.
+Failing-first: at base `ff2d4e2` the suite fails 4 of 7 (page link, rail group,
+QR asset, and the pre-fix rendered classifier); at head it passes 7 of 7. Five
+static adversarial probes (planted page link, planted rail item, planted
+section hash, hand-edited rail block, restored unapproved QR) each make the
+suite exit 1, and the served-DOM probe
+`tools/render-check-adversarial-probe.py` plants `../form/contact.html` into the
+rendered `forms.html` and proves the checker exits non-zero -- against the
+pre-fix checker the same probe is accepted and prints "checker is blind", so
+the fix is red-then-green, not green-only.
+
+## Worktree and the two unrelated files
+
+The required clean worktree is met. Two untracked files that appeared during
+the first attempt, `tools/i18n_apply.py` and `tools/terminology_lock.py`,
+belong to the concurrent i18n lane and have been **relocated** -- not deleted,
+not committed -- to `/root/mhpss-nepal-work/recovered/t_46e4cb25-collision/`
+with their mtimes and SHA-256 preserved. They are recoverable in one move, and
+the sibling `hub-translation` worktree keeps its own live copies. Nothing in
+this change ever referenced them.

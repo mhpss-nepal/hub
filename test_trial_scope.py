@@ -118,7 +118,45 @@ def rail_module():
     return module
 
 
+def render_check_module():
+    spec = importlib.util.spec_from_file_location(
+        "hub_trial_scope_render_check",
+        ROOT / "tools" / "hub-trial-scope-render-check.py",
+    )
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 class HubTrialScopeTest(unittest.TestCase):
+    def test_rendered_link_check_uses_exact_normalized_form_paths(self):
+        check = render_check_module()
+        page_url = "http://127.0.0.1:8791/hub/forms.html"
+        cases = {
+            "../form/": False,
+            "../form": False,
+            "../form/5ws-report.html?source=hub#top": False,
+            "https://mhpss-nepal.github.io/FORM/5ws-report.html": False,
+            "../form/contact.html": True,
+            "/form/phq9.html": True,
+            "https://mhpss-nepal.github.io/form/referral.html": True,
+            "../form/selfreport.html?source=hub": True,
+            "forms.html#contact": False,
+            # adversarial spellings that a substring match would wave through
+            "../form//contact.html": True,
+            "../form/./contact.html": True,
+            "../form/sub/../phq9.html": True,
+            "../form%2fcontact.html": True,
+            "../form/contact.html".replace("/", "\\"): True,
+            "//mhpss-nepal.github.io/form/referral.html": True,
+            "/FORM/Phq9.html": True,
+        }
+        self.assertEqual(
+            cases,
+            {href: check.is_unapproved_form_href(href, page_url) for href in cases},
+        )
+
     def test_no_hub_page_links_to_an_unapproved_form_page(self):
         offenders = {}
         for page in pages():

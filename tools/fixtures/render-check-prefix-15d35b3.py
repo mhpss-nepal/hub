@@ -11,8 +11,6 @@ Serves the workspace root so the Hub's ../form/ and ../ links resolve, the
 same way the sibling form repository's render check does.
 """
 import sys
-import posixpath
-from urllib.parse import unquote, urljoin, urlparse
 
 from playwright.sync_api import sync_playwright
 
@@ -21,35 +19,8 @@ PAGES = ["/hub/", "/hub/forms.html", "/hub/access.html", "/hub/inbox.html", "/hu
 UNAPPROVED = ("contact", "phq9", "referral", "selfreport")
 VIEWPORTS = [(390, 844, "mobile"), (1280, 900, "desktop")]
 
-# The two addresses a Hub page may resolve to under /form/. Anything else that
-# lands under /form/ fails. Compared after resolution and normalization, so a
-# substring match cannot wave an unapproved instrument through.
-APPROVED_FORM_PATHS = ("/form", "/form/5ws-report.html")
-# The sibling form app's directory segment, normalized and case-folded.
-FORMS_ROOT = "/form"
-
-
-def resolved_path(href, page_url):
-    """Absolute, normalized, case-folded path for a rendered href.
-
-    Resolves relative, root-relative, protocol-relative and absolute URLs, then
-    collapses dot segments, duplicate slashes and backslashes, percent-decodes,
-    and strips the trailing-slash difference between /form and /form/.
-    """
-    raw = urljoin(page_url, href.strip())
-    path = unquote(urlparse(raw).path).replace("\\", "/")
-    path = posixpath.normpath(path) if path else "/"
-    return path.lower()
-
-
-def is_under_forms_root(path):
-    return path == FORMS_ROOT or path.startswith(FORMS_ROOT + "/")
-
-
-def is_unapproved_form_href(href, page_url):
-    """True when a rendered href resolves to a form page outside the trial."""
-    path = resolved_path(href, page_url)
-    return is_under_forms_root(path) and path not in APPROVED_FORM_PATHS
+# Any href that resolves under /form/ and is not one of these fails.
+APPROVED_FORM_PATHS = ("/form/", "/form/5ws-report.html")
 
 
 def main():
@@ -60,8 +31,7 @@ def main():
             ctx = browser.new_context(viewport={"width": width, "height": height})
             page = ctx.new_page()
             for path in PAGES:
-                page_url = BASE + path
-                page.goto(page_url, wait_until="load")
+                page.goto(BASE + path, wait_until="load")
                 page.wait_for_timeout(300)
                 hrefs = page.eval_on_selector_all(
                     "a[href]", "els => els.map(e => e.getAttribute('href'))"
@@ -70,10 +40,10 @@ def main():
                 for href in hrefs:
                     if href is None:
                         continue
-                    target_path = resolved_path(href, page_url)
-                    if is_under_forms_root(target_path):
+                    probe = href.split("#")[0].split("?")[0]
+                    if "/form/" in probe or probe.endswith("/form"):
                         form_targets.append(href)
-                        if is_unapproved_form_href(href, page_url):
+                        if not any(p in href for p in APPROVED_FORM_PATHS):
                             offenders.append(href)
                 body = page.inner_text("body")
                 for name in UNAPPROVED:
@@ -87,7 +57,7 @@ def main():
                 if offenders:
                     failures.append("%s %s: link outside trial scope %s"
                                     % (label, path, offenders))
-                # The rail group must expose exactly the three approved links.
+                # The rail group must expose exactly the two approved items.
                 rail = page.eval_on_selector_all(
                     '[data-g="forms"] a[href]',
                     "els => els.map(e => e.getAttribute('href'))",
