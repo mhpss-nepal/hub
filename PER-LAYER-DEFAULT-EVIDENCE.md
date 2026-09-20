@@ -156,8 +156,14 @@ gives English; after pressing ENG the preference survives navigation back to the
 
 ## 6. Base / head / production refs
 
-* Hub base `8273e9013b163549640d04b2ec86fa42c840a91b` → head `670763a662b0c04e3ad4b681a0353c7ea36e1919` (branch `task/t_2449fe51-i18n-per-layer-default`)
-* Form base `9c3a41eeccc768fcef5d8f241430ba831e8ad9a8` → head `79e761c` (branch `task/t_2449fe51-form-default`)
+* Hub base `8273e9013b163549640d04b2ec86fa42c840a91b`; head is the tip of branch
+  `task/t_2449fe51-i18n-per-layer-default` (local only). The latest **code** commit on it is
+  `670763a662b0c04e3ad4b681a0353c7ea36e1919` (the round-1 feedback-channel fix); the commits above
+  it are evidence-note edits and change no code, so the tip is not written as a literal that would
+  go stale the moment this note is edited.
+* Form base `9c3a41eeccc768fcef5d8f241430ba831e8ad9a8`; head is the tip of branch
+  `task/t_2449fe51-form-default` (a worktree of `design/form-frontend`), latest code commit
+  `79e761c` (the declared Nepali default).
 * Production refs **unchanged**: public `68bf197`, form `9032bb7`, hub `ff2d4e2`
 * No push, PR, merge or deploy. Both worktrees clean (`git status --porcelain -uall` empty).
 
@@ -176,9 +182,10 @@ ones have their own red/green proof (`tools/i18n-feedback-red-green.py`):
    overflow a 320×640 viewport; green at head: **0 of 40**. Rendered against the **real served 5Ws
    page**: 80 keyed targets, 0 overflowing, at 320×640 / 360×740 / 390×844.
 3. **Evidence-note corrections.** The red/green count is **5 of 8** failing (not 4/8); the Hub head
-   is `a11466832c6dc743adef4ab942d79dccf5bc0f82` (not `44bba2c`, which is the commit below the
-   evidence note); `4ws-report.html` is described as a **redirect/legacy entry**, not an
-   English-default page.
+   was written as `44bba2c` when the reviewed artifact was actually the evidence commit
+   `a11466832c6dc743adef4ab942d79dccf5bc0f82` on top of it (and section 6 now names the branch tip
+   rather than a literal that changes with every note edit); `4ws-report.html` is described as a
+   **redirect/legacy entry**, not an English-default page.
 4. **The reporting surface is stated, not implied.** It is no longer "any string": the engine
    declares `feedbackSurfaces` (`text`, `placeholder`, `aria-label`, `alt`, `title`) and the record
    carries `surface`. A key is reportable only on the surface it renders on that page.
