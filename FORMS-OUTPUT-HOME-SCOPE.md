@@ -73,7 +73,7 @@ allowlists are the one place that has to change with it.
 ## Verification
 
 ```
-python3 -m unittest -v test_trial_scope.py          # 7 tests, 0 failures
+python3 -m unittest -v test_trial_scope.py          # 8 tests, 0 failures
 python3 tools/rail.py                               # rail matches the generator
 python3 tools/text-setting-check.py                 # 0
 python3 tools/i18n-check.py                         # 0 (gate open)
@@ -106,20 +106,20 @@ exact equality on the normalized path, never a substring test, so
 case variant are all rejected (see the classifier table in
 `test_rendered_link_check_uses_exact_normalized_form_paths`).
 
-Failing-first: at base `ff2d4e2` the new suite fails 4 of 7 (page link, rail
-group, rail generator, QR asset); at head it passes 7 of 7. The round-1
-rendered-classifier defect is a property of the checker, not the tree: the
-classifier test is **red** against the pre-fix checker (`15d35b3`, kept verbatim
-at `tools/fixtures/render-check-prefix-15d35b3.py`) and **green** against the
-fixed one, and the served-DOM probe
-`tools/render-check-adversarial-probe.py` plants `../form/contact.html` into the
-rendered `forms.html` and proves the checker exits non-zero -- against the
-pre-fix checker the same probe is accepted and prints "checker is blind".
-`tools/round1-red-green-demo.py` runs both checks against both checkers in one
-command and passes only when the change is genuinely red-then-green, not
-green-only. Five static adversarial probes (planted page link, planted rail
-item, planted section hash, hand-edited rail block, restored unapproved QR)
-each make the suite exit 1.
+Failing-first: at base `ff2d4e2` the new suite fails 5 of 8 (page link, rail
+group, rail generator, QR asset, and the absent pre-fix fixture); at head it
+passes 8 of 8. The round-1 rendered-classifier defect is a property of the
+checker, not the tree: the classifier test is **red** against the pre-fix
+checker (`15d35b3`, kept verbatim at `tools/fixtures/render-check-prefix-15d35b3.py`
+and pinned by SHA-256 in the suite) and **green** against the fixed one, and the
+served-DOM probe `tools/render-check-adversarial-probe.py` plants
+`../form/contact.html` into the rendered `forms.html` and proves the checker
+exits non-zero -- against the pre-fix checker the same probe is accepted and
+prints "checker is blind". `tools/round1-red-green-demo.py` runs both checks
+against both checkers in one command and passes only when the change is
+genuinely red-then-green, not green-only. Five static adversarial probes
+(planted page link, planted rail item, planted section hash, hand-edited rail
+block, restored unapproved QR) each make the suite exit 1.
 
 ## Worktree and the two unrelated files
 

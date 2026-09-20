@@ -11,6 +11,7 @@ Run from the repository root:  python3 -m unittest -v test_trial_scope.py
 """
 from html.parser import HTMLParser
 from pathlib import Path
+import hashlib
 import importlib.util
 import posixpath
 import re
@@ -21,6 +22,12 @@ UNAPPROVED = ("contact", "phq9", "referral", "selfreport")
 # The layer-1 forms are a sibling repository, served at /form/ beside /hub/.
 FORMS_PREFIX = "../form/"
 APPROVED_FORM_LINKS = ("../form/", "../form/5ws-report.html")
+# The pre-fix rendered checker, kept verbatim so the round-1 red/green demo is
+# reproducible. Pinned by SHA-256 below: editing this fixture to make the demo
+# pass would itself fail the suite. This is the file at commit 15d35b3, the
+# version review round 1 probed at head 435a2c3.
+PRE_FIX_CHECKER = "tools/fixtures/render-check-prefix-15d35b3.py"
+PRE_FIX_CHECKER_SHA256 = "ebdcd25b5a54ad89afb0311fa2c2e53b55f593d15e53eaecc1684dea86f6f7dd"
 # Page keys of the hub pages that carry a generated rail.
 RAIL_PAGES = ("index.html", "forms.html", "access.html")
 # The one allowed "Field forms" rail group (the row that could regress).
@@ -155,6 +162,33 @@ class HubTrialScopeTest(unittest.TestCase):
         self.assertEqual(
             cases,
             {href: check.is_unapproved_form_href(href, page_url) for href in cases},
+        )
+
+    def test_pre_fix_checker_fixture_is_unmodified(self):
+        """The round-1 red/green demo must not be neutered by editing the fixture.
+
+        The pre-fix checker has no `is_unapproved_form_href` at all: its scope
+        rule lived inline in `main()` as a substring membership test
+        (`any(p in href ...)`), which is exactly the round-1 defect. The fixture
+        is pinned both by hash and by that substring signature, and the fixed
+        checker must no longer carry the signature.
+        """
+        raw = (ROOT / PRE_FIX_CHECKER).read_text(encoding="utf-8")
+        self.assertEqual(
+            PRE_FIX_CHECKER_SHA256,
+            hashlib.sha256(raw.encode("utf-8")).hexdigest(),
+            "%s was edited; it must stay the pre-fix checker verbatim" % PRE_FIX_CHECKER,
+        )
+        self.assertIn(
+            "any(p in href", raw,
+            "the fixture no longer carries the pre-fix substring scope test",
+        )
+        fixed = (ROOT / "tools" / "hub-trial-scope-render-check.py").read_text(
+            encoding="utf-8"
+        )
+        self.assertNotIn(
+            "any(p in href", fixed,
+            "the fixed checker still uses the substring scope test",
         )
 
     def test_no_hub_page_links_to_an_unapproved_form_page(self):
