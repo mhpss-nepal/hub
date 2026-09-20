@@ -34,7 +34,7 @@ non-committed worktree of the form repository** that the pairing makes:
 repository    /root/mhpss-nepal-audit-20260918/form        (branch main)
 worktree      /root/mhpss-nepal-work/perlayer/form         branch task/t_2449fe51-form-default
 base          9c3a41eeccc768fcef5d8f241430ba831e8ad9a8
-head          b449a59806748018157b5d99e1fac51fd605952c
+head          e3abd1ae2a747bf718fcb5f81b94c3a73e5e4144
 ```
 
 The declaration commit is `79e761c` (*"5Ws report declares its own Nepali default; trial-scope pin
@@ -44,7 +44,7 @@ from any shell:
 ```
 git -C /root/mhpss-nepal-work/perlayer/form rev-parse HEAD
 git -C /root/mhpss-nepal-work/perlayer/form show HEAD:5ws-report.html | sed -n 2p
-#   b449a59806748018157b5d99e1fac51fd605952c
+#   e3abd1ae2a747bf718fcb5f81b94c3a73e5e4144
 #   <html lang="en" data-i18n-default="ne">
 ```
 
@@ -204,12 +204,14 @@ gives English; after pressing ENG the preference survives navigation back to the
   it are evidence-note edits and change no code, so the tip is not written as a literal that would
   go stale the moment this note is edited.
 * Form base `9c3a41eeccc768fcef5d8f241430ba831e8ad9a8` (the tip of `design/form-frontend`); head
-  `b449a59806748018157b5d99e1fac51fd605952c`, the tip of branch
+  `e3abd1ae2a747bf718fcb5f81b94c3a73e5e4144`, the tip of branch
   `task/t_2449fe51-form-default` — a worktree of the **form repository**
   (`/root/mhpss-nepal-audit-20260918/form`) branched from that base, **not** a worktree of
   `design/form-frontend`. The code commits on it are
   `79e761c` (the declared Nepali default), `311eb91`/`b449a59` (`sw.js` bumps for the engine
-  changes) and `8836f6e` (the regenerated derived B2 page).
+  changes), `8836f6e` (the regenerated derived B2 page) and `e3abd1a` (untracking the
+  gitignore-covered `design-preview/__pycache__` bytecode the rebuild had re-dirtied, so the diff
+  carries no `.pyc` churn and a future test run cannot re-dirty it).
 * Production refs **unchanged**: public `68bf197`, form `9032bb7`, hub `ff2d4e2`
 * No push, PR, merge or deploy. Both worktrees clean (`git status --porcelain -uall` empty).
 
@@ -239,7 +241,7 @@ ones have their own red/green proof (`tools/i18n-feedback-red-green.py`):
    self-verifying.** The finding held that no worktree contains `data-i18n-default` and that §1
    therefore overstated the delivery. It is true that six of the seven form worktrees contain none,
    and true that the form half is not on `hub-real` — but the declaration *is* committed and clean
-   on the seventh, `perlayer/form` (branch `task/t_2449fe51-form-default`, head `b449a59`, commit
+   on the seventh, `perlayer/form` (branch `task/t_2449fe51-form-default`, head `e3abd1a`, commit
    `79e761c`, blob `ba35ab92…`), which that scan did not include. `search_files` over
    `/root/mhpss-nepal-work` returns exactly three hits and this is one of them. **No form change was
    needed or made**; §1 now states the exact worktree, base, head, commit and blob, with the two
@@ -295,7 +297,9 @@ The engine change to support this is in `assets/i18n.js`; the form side of the s
    the builder exists to prevent): one line changes — the `<html>` tag gains the same
    `data-i18n-default="ne"` the source declares — so the B2 preview of the 5Ws form matches the form
    it previews. `design-preview`: 48 passed. The form-side changed-file list is therefore
-   `5ws-report-b2.html`, `sw.js`, `tools/precache.sha`.
+   `5ws-report-b2.html`, `sw.js`, `tools/precache.sha` (plus `5ws-report.html` itself,
+   `test_trial_scope.py`, `tools/precache-fingerprint.py`, and the untracking of the two
+   `design-preview/__pycache__/*.pyc`).
 8. **A stale site server can make a rendered check report the opposite of the truth — check the
    port before believing a rendered run.** This round, the rendered checks were first pointed at
    `127.0.0.1:8791`; that port was already held by a **seven-hour-old** `python3 -m http.server`
