@@ -129,10 +129,39 @@ planted root-relative/dot-segment links do too.
 
 ## Worktree and the two unrelated files
 
-The required clean worktree is met. Two untracked files that appeared during
-the first attempt, `tools/i18n_apply.py` and `tools/terminology_lock.py`,
-belong to the concurrent i18n lane and have been **relocated** -- not deleted,
-not committed -- to `/root/mhpss-nepal-work/recovered/t_46e4cb25-collision/`
-with their mtimes and SHA-256 preserved. They are recoverable in one move, and
-the sibling `hub-translation` worktree keeps its own live copies. Nothing in
-this change ever referenced them.
+The required clean worktree is met.
+
+### The collision, and how it was reconciled
+
+During the first attempt this worktree was shared with the concurrent i18n lane
+and two untracked files appeared that this task never created or used:
+`tools/i18n_apply.py` and `tools/terminology_lock.py`. They were **relocated,
+not deleted and not committed**, to
+`/root/mhpss-nepal-work/recovered/t_46e4cb25-collision/`, with mtime and
+SHA-256 preserved:
+
+| file | bytes | SHA-256 | mtime (UTC) |
+| --- | --- | --- | --- |
+| `i18n_apply.py` | 6417 | `6d3e36e1aa936c2bc412993a28666fcc4f6316bbc5a0c3d3764baa9b0b4ebdf6` | 2026-09-20T08:18:34 |
+| `terminology_lock.py` | 3341 | `78b20aefc392390ab9357ff890c84bc3c9473db94135f1d5858c256c17939d28` | 2026-09-20T08:16:26 |
+
+The sibling `/root/mhpss-nepal-work/hub-translation` worktree on
+`task/t_2cfc3bab-i18n` keeps its own live copies (`i18n_apply.py`,
+`terminology_lock.py` does not appear there), so the owning lane is not blocked.
+Recovery is one move back into `tools/`. Nothing in this change references
+either file. The one-owner-one-worktree rule was still violated by concurrent
+dispatch; that is recorded, not fixed here.
+
+## Base, head, and production references
+
+| | value |
+| --- | --- |
+| Base | `ff2d4e2a43327ddc99330f83660ec75abd53a762` (`main`, `origin/main`) |
+| Head | `851023c` on branch `task/t_46e4cb25-hub-trial-scope` |
+| Field build head (untouched) | `form-frontend` `f1ee77e`, no `hub/` path changed by either task |
+| Production refs (unchanged) | public `68bf197`, form `9032bb7`, hub `ff2d4e2` |
+
+No push, no PR, no merge, no deploy: `git ls-remote origin` still shows only
+`refs/heads/main` at `ff2d4e2`, and no `task/t_46e4cb25-*` branch exists on the
+remote. Form-page content is unchanged and the field build is not in this
+repository, so neither was touched.
