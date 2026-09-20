@@ -106,15 +106,20 @@ exact equality on the normalized path, never a substring test, so
 case variant are all rejected (see the classifier table in
 `test_rendered_link_check_uses_exact_normalized_form_paths`).
 
-Failing-first: at base `ff2d4e2` the suite fails 4 of 7 (page link, rail group,
-QR asset, and the pre-fix rendered classifier); at head it passes 7 of 7. Five
-static adversarial probes (planted page link, planted rail item, planted
-section hash, hand-edited rail block, restored unapproved QR) each make the
-suite exit 1, and the served-DOM probe
+Failing-first: at base `ff2d4e2` the new suite fails 4 of 7 (page link, rail
+group, rail generator, QR asset); at head it passes 7 of 7. The round-1
+rendered-classifier defect is a property of the checker, not the tree: the
+classifier test is **red** against the pre-fix checker (`15d35b3`, kept verbatim
+at `tools/fixtures/render-check-prefix-15d35b3.py`) and **green** against the
+fixed one, and the served-DOM probe
 `tools/render-check-adversarial-probe.py` plants `../form/contact.html` into the
 rendered `forms.html` and proves the checker exits non-zero -- against the
-pre-fix checker the same probe is accepted and prints "checker is blind", so
-the fix is red-then-green, not green-only.
+pre-fix checker the same probe is accepted and prints "checker is blind".
+`tools/round1-red-green-demo.py` runs both checks against both checkers in one
+command and passes only when the change is genuinely red-then-green, not
+green-only. Five static adversarial probes (planted page link, planted rail
+item, planted section hash, hand-edited rail block, restored unapproved QR)
+each make the suite exit 1.
 
 ## Worktree and the two unrelated files
 
