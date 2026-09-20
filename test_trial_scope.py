@@ -11,6 +11,7 @@ Run from the repository root:  python3 -m unittest -v test_trial_scope.py
 """
 from html.parser import HTMLParser
 from pathlib import Path
+from urllib.parse import unquote, urlparse
 import hashlib
 import importlib.util
 import posixpath
@@ -103,27 +104,44 @@ def form_links(page_relpath, html):
     """In-repo hrefs of a page that resolve under the sibling /form/ app.
 
     A hub page lives at `/hub/<page>`, so a link resolves against `/hub/`.
-    Relative (`../form/...`), root-relative (`/form/...`) and dot-segment
-    spellings all reduce to the same normalized site path; a normalized path
-    that lands under `/form` and is not one of the two approved addresses is
-    returned. `page_relpath` is accepted for callers but the base is fixed,
+    Relative (`../form/...`), root-relative (`/form/...`), protocol-relative,
+    dot-segment, backslash, percent-encoded and case-variant spellings all
+    reduce to the same normalized site path, mirroring the rendered checker's
+    `resolved_path`. `unapproved_form_targets` applies the approved-address
+    filter. `page_relpath` is accepted for callers but the base is fixed,
     because the hub is served at a known address.
     """
     out = []
     for href in anchors(html):
-        href = href.strip()
-        if not href or href.startswith(("#", "//", "mailto:", "tel:")) or "://" in href:
-            continue
-        path = href.split("#", 1)[0].split("?", 1)[0]
-        if not path:
-            continue
-        if path.startswith("/"):
-            target = posixpath.normpath(path)
-        else:
-            target = posixpath.normpath(posixpath.join(SITE_DIR, path))
+        unapproved = False
+        target = resolved_form_target(href)
         if target == "/form" or target.startswith(FORMS_DIR_PREFIX):
+            unapproved = True
+        if unapproved:
             out.append(href)
     return out
+
+
+def resolved_form_target(href):
+    """Normalized site path an href resolves to from a page served at /hub/.
+
+    Mirrors tools/hub-trial-scope-render-check.py: percent-decode, treat
+    backslashes as separators, resolve relative roots, collapse dot segments,
+    strip the /form vs /form/ difference, lowercase.
+    """
+    href = href.strip()
+    if not href or href.startswith("#"):
+        return ""
+    if "://" in href or href.startswith("//"):
+        path = urlparse(href).path
+    else:
+        path = href
+    path = unquote(path.split("#", 1)[0].split("?", 1)[0]).replace("\\", "/")
+    if not path:
+        return ""
+    if path.startswith("/"):
+        return posixpath.normpath(path).lower()
+    return posixpath.normpath(posixpath.join(SITE_DIR, path)).lower()
 
 
 def unapproved_form_targets(page_relpath, html):
@@ -133,13 +151,6 @@ def unapproved_form_targets(page_relpath, html):
         for href in form_links(page_relpath, html)
         if resolved_form_target(href) not in APPROVED_FORM_TARGETS
     ]
-
-
-def resolved_form_target(href):
-    path = href.strip().split("#", 1)[0].split("?", 1)[0]
-    if path.startswith("/"):
-        return posixpath.normpath(path)
-    return posixpath.normpath(posixpath.join(SITE_DIR, path))
 
 
 def unapproved_nav_targets(html):
@@ -243,9 +254,14 @@ class HubTrialScopeTest(unittest.TestCase):
             '<a href="/form/phq9.html"></a>': True,
             '<a href="../form/sub/../referral.html"></a>': True,
             '<a href="../form/./selfreport.html"></a>': True,
+            '<a href="../form//contact.html"></a>': True,
+            '<a href="/FORM/Phq9.html"></a>': True,
+            '<a href="//mhpss-nepal.github.io/form/referral.html"></a>': True,
+            '<a href="../form%2fcontact.html"></a>': True,
             '<a href="../form/5ws-report.html"></a>': False,
             '<a href="../form/"></a>': False,
             '<a href="/form/"></a>': False,
+            '<a href="/form"></a>': False,
             '<a href="./#reports"></a>': False,
             '<a href="forms.html#phq9"></a>': False,
         }
