@@ -65,12 +65,46 @@
     return null;
   }
   var KEY = "mhpss-np-lang";
+
+  /* ---------- the default, and why it is not one constant -------------
+     The same engine is loaded by three layers whose right default differs:
+     the field forms (Layer 1) are read by field officers and want Nepali;
+     the Hub (Layer 2) and the public site (Layer 3) are read by
+     international staff and want English.
+
+     A single global DEFAULT cannot say that, and deciding from the URL path
+     would break the first time a page moves. So the default is DECLARED IN
+     THE PAGE and read here:
+
+       <html lang="en" data-i18n-default="ne">
+
+     The declaration belongs to that page's own markup, so one page's choice
+     cannot reach another: there is nothing global for it to overwrite. A
+     page that declares nothing keeps English. The declared value is
+     validated against the languages the dictionary actually offers, so a
+     typo cannot strand a reader on a language that does not exist.
+
+     This is the LAST fallback only. The URL, the remembered choice and the
+     browser preference are all consulted first, in that order, in pick()
+     below -- so a link stays shareable in either language, a reader who
+     picks English on the Nepali-default form stays in English, and a browser
+     set to Nepali still lands on Nepali wherever no explicit default
+     applies. */
   var DEFAULT = "en";
+  var DECLARED = "";
+  try {
+    DECLARED = (document.documentElement.getAttribute("data-i18n-default") || "").trim();
+  } catch (e) { /* ignore */ }
+
+  function defaultLang(codes) {
+    if (DECLARED && codes.indexOf(DECLARED) > -1) return DECLARED;
+    return codes.indexOf(DEFAULT) > -1 ? DEFAULT : (codes[0] || DEFAULT);
+  }
 
   /* ---------- which language ------------------------------------------
      The URL wins, so a link can be shared in either language and the
      Ministry can bookmark the Nepali one. Then the remembered choice.
-     Then the browser's own preference. Then English. */
+     Then the browser's own preference. Then this page's declared default. */
   function pick() {
     var codes = LANGS.map(function (l) { return l.code; });
     try {
@@ -83,7 +117,7 @@
     } catch (e) { /* ignore */ }
     var nav = (navigator.language || "").toLowerCase();
     if (nav.indexOf("ne") === 0 && codes.indexOf("ne") > -1) return "ne";
-    return codes.indexOf(DEFAULT) > -1 ? DEFAULT : (codes[0] || DEFAULT);
+    return defaultLang(codes);
   }
 
   var lang = pick();
@@ -121,6 +155,150 @@
     try { return sessionStorage.getItem(MKEY) === "1"; } catch (e) { return false; }
   }
   var MARKS = marksOn();
+
+  /* ---------- the reviewer's report mode ------------------------------
+     Adib's team reports wrong or awkward Nepali from the page itself, during
+     the trial. `?i18n=report` turns that on (kept for the session, like the
+     marks, so a reviewer can walk the site):
+
+       ?i18n=report   tap any string, pick a reason; the report is recorded
+       ?i18n=clean    turn it off again
+
+     Three deliberate properties, because this is the part that touches a
+     field user's phone:
+
+       IT ADDS NO PROSE. The reason buttons carry the four reason CODES that
+       go into the record ("wrong", "awkward", "unclear", "missing") -- the
+       same vocabulary a reviewer and the translator share. No new English
+       sentence is introduced, so nothing here needs translating itself.
+
+       IT DOES NOT SEND. A report is appended to sessionStorage and can be
+       handed over as a JSON file. There is no network call in this file; the
+       destination is a dependency, not something invented here.
+
+       IT IS OFF UNLESS ASKED FOR. A field worker filling in the 5Ws form
+       never sees it. */
+  var RKEY = "mhpss-np-i18n-report";
+  var RSTORE = "mhpss-np-i18n-reports";
+  function reportModeOn() {
+    var q = null;
+    try { q = new URLSearchParams(window.location.search).get("i18n"); } catch (e) { /* ignore */ }
+    if (q === "report") {
+      try { sessionStorage.setItem(RKEY, "1"); } catch (e) { /* ignore */ }
+      return true;
+    }
+    if (q === "clean" || q === "0") {
+      try { sessionStorage.removeItem(RKEY); } catch (e) { /* ignore */ }
+      return false;
+    }
+    try { return sessionStorage.getItem(RKEY) === "1"; } catch (e) { return false; }
+  }
+  var REPORT = reportModeOn();
+
+  function reports() {
+    try { return JSON.parse(sessionStorage.getItem(RSTORE) || "[]"); }
+    catch (e) { return []; }
+  }
+  function recordReport(rec) {
+    if (!rec) return null;
+    var all = reports();
+    /* One report per key per reason: a reviewer tapping twice is not two
+       problems, and the count should mean something. */
+    for (var i = 0; i < all.length; i++) {
+      if (all[i].key === rec.key && all[i].reason === rec.reason) return all[i];
+    }
+    rec.at = new Date().toISOString();
+    all.push(rec);
+    try { sessionStorage.setItem(RSTORE, JSON.stringify(all)); } catch (e) { /* ignore */ }
+    return rec;
+  }
+  function clearReports() {
+    try { sessionStorage.removeItem(RSTORE); } catch (e) { /* ignore */ }
+    paintReportChip();
+  }
+  function paintReportChip() {
+    if (!REPORT) return;
+    var chip = document.getElementById("i18nrpt");
+    if (!chip) {
+      chip = document.createElement("button");
+      chip.id = "i18nrpt";
+      chip.type = "button";
+      chip.style.cssText =
+        "position:fixed;z-index:61;left:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));" +
+        "font:700 11.5px/1 'Noto Sans',system-ui,sans-serif;padding:7px 10px;border:0;" +
+        "border-radius:7px;background:#7a2f2f;color:#fff;cursor:pointer";
+      /* Download the reports as a file. No upload: this hands the JSON to a
+         person, who passes it to the translation review by whatever channel
+         is already approved. */
+      chip.addEventListener("click", function () {
+        var data = JSON.stringify(reports(), null, 2);
+        try {
+          var blob = new Blob([data], { type: "application/json" });
+          var a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = "i18n-reports.json";
+          document.body.appendChild(a); a.click(); a.remove();
+        } catch (e) { /* fall back to the console */ }
+        console.log("[i18n] reports", reports());
+      });
+      document.body.appendChild(chip);
+    }
+    chip.textContent = "⚑ " + reports().length;
+    chip.title = "i18n-reports.json";
+  }
+
+  function mountReportMode() {
+    if (!REPORT) return;
+    document.documentElement.setAttribute("data-i18n-report", "on");
+    var style = document.createElement("style");
+    style.textContent =
+      '[data-i18n-report="on"] [data-i18n]{cursor:crosshair;' +
+        'outline:1px dashed rgba(122,47,47,.45);outline-offset:1px}' +
+      "#i18npick{position:fixed;z-index:62;background:#fff;border:1px solid #b9c4c8;" +
+        "border-radius:8px;box-shadow:0 3px 14px rgba(0,0,0,.25);padding:6px;display:flex;" +
+        "gap:6px;font:600 11.5px/1 'Noto Sans',system-ui,sans-serif}" +
+      "#i18npick button{border:1px solid #d6dde0;background:#f7f9fa;border-radius:6px;" +
+        "padding:7px 9px;cursor:pointer;min-height:32px}" +
+      "#i18npick button:hover{background:#eef3f5}";
+    document.head.appendChild(style);
+
+    var picker = null;
+    function closePicker() { if (picker) { picker.remove(); picker = null; } }
+
+    document.addEventListener("click", function (ev) {
+      var el = ev.target;
+      while (el && el !== document.body && !(el.getAttribute && el.getAttribute("data-i18n"))) {
+        el = el.parentNode;
+      }
+      if (!el || el === document.body || !el.getAttribute) { closePicker(); return; }
+      var key = el.getAttribute("data-i18n");
+      ev.preventDefault();
+      closePicker();
+      picker = document.createElement("div");
+      picker.id = "i18npick";
+      picker.setAttribute("role", "group");
+      picker.setAttribute("aria-label", key);
+      FEEDBACK_REASONS.forEach(function (reason) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.textContent = reason;
+        b.setAttribute("data-reason", reason);
+        b.addEventListener("click", function (e) {
+          e.stopPropagation();
+          recordReport(reportWording(key, reason));
+          closePicker();
+          paintReportChip();
+        });
+        picker.appendChild(b);
+      });
+      var r = el.getBoundingClientRect();
+      picker.style.left = Math.max(8, Math.min(r.left, window.innerWidth - 8)) + "px";
+      picker.style.top = Math.min(r.bottom + 6, window.innerHeight - 48) + "px";
+      document.body.appendChild(picker);
+    }, true);
+
+    paintReportChip();
+  }
 
   /* ---------- lookup ---------------------------------------------------
      Returns the string and whether it was actually translated, so the
@@ -469,10 +647,63 @@
     });
   }
 
+  /* ---------- reporting a wording problem -----------------------------
+     Adib's team will find Nepali wording that is wrong or awkward during the
+     trial, and a human reviews it afterwards. Two things make that review
+     possible without opening a privacy hole:
+
+       1. THE REPORT IS STRUCTURED, NOT TYPED. A field user picks one of a
+          fixed set of reasons for one dictionary KEY. There is no free-text
+          box, so there is no field a beneficiary's name could end up in.
+          The complaint is identified by the key and the reason -- which is
+          exactly what a translator needs to find the sentence.
+
+       2. IT IS NOT SENT FROM HERE. There is no transport in this file. The
+          dictionary and this engine ship to a public static host, so a URL
+          written in here would be a URL written where anyone can read it,
+          and the only writes the security rules allow are the field records
+          themselves -- a new collection is denied by the catch-all. Collecting
+          the reports therefore needs an approved rules change (or another
+          already-approved destination); reportWording() builds the record and
+          returns it, and the caller decides what to do with it. Until that
+          destination exists the record goes nowhere, which is the safe
+          failure: the page does not silently post somewhere unapproved.
+
+     What the record deliberately does NOT carry: the rendered text (it is
+     already in the dictionary, and a page's text is not the point), any
+     query string or fragment from the address bar (a shared link may carry
+     anything), or any free text at all. */
+  var FEEDBACK_REASONS = ["wrong", "awkward", "unclear", "missing"];
+  function reportWording(key, reason) {
+    if (typeof key !== "string" || !key) return null;
+    /* Only a key this page actually renders can be reported, so a report
+       cannot be used to enumerate the whole dictionary. */
+    var on = false;
+    var nodes = document.querySelectorAll("[data-i18n]");
+    for (var i = 0; i < nodes.length; i++) {
+      if (nodes[i].getAttribute("data-i18n") === key) { on = true; break; }
+    }
+    if (!on) return null;
+    if (FEEDBACK_REASONS.indexOf(reason) < 0) return null;
+    var path = "";
+    try { path = window.location.pathname; } catch (e) { /* ignore */ }
+    return {
+      kind: "i18n_feedback",
+      schema: "i18n-feedback/1",
+      key: key,
+      lang: lang,
+      revision: (S._meta && S._meta.revision) || null,
+      reason: reason,
+      page: path,
+      src: provenance(key)
+    };
+  }
+
   function start() {
     var cov = apply(document);
     mountToggle(cov);
     mountNotice(cov);
+    mountReportMode();
     if (cov.missing.length) {
       console.warn("[i18n] keys used on this page with no English string:", cov.missing);
     }
@@ -498,7 +729,17 @@
     setLang: setLang,
     lang: function () { return lang; },
     langs: LANGS,
-    coverage: null
+    coverage: null,
+    /* Build a structured wording report for a key on THIS page, or null if
+       the key is not rendered here or the reason is not one of the fixed
+       set. Nothing is sent: the caller passes the record to whatever
+       destination has been approved. See reportWording() above. */
+    reportWording: reportWording,
+    feedbackReasons: FEEDBACK_REASONS.slice(),
+    /* The reports recorded in this session (reviewer mode), and a way to
+       clear them. Nothing leaves the device: see reportWording() above. */
+    reports: reports,
+    clearReports: clearReports
   };
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
