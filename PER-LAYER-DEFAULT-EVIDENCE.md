@@ -246,6 +246,15 @@ ones have their own red/green proof (`tools/i18n-feedback-red-green.py`):
    commands to confirm them, so the claim is checkable rather than asserted. (A seventh, orphaned
    `verify-perlayer/form` directory also carries the line but is not a registered worktree — its
    `.git` points at a deleted gitdir — so it is scratch, not a deliverable.)
+6. **The declaration is not merely present, it is enforced — proved by falsifying it.** To answer
+   "the form half is missing" the same way the language default itself is answered (failing-first),
+   the one attribute was removed from the working tree and the form suite re-run: it goes **red** —
+   `test_form_pages_and_unrelated_pwa_runtime_keep_byte_parity` fails (the page then differs from
+   `base + the one authorized substitution`) and `test_precache_fingerprint_matches_current_form_and_hub_assets`
+   fails (`23f39a54… != 485967a7…`). The file was restored byte-exact from git (`sha256 c63f9c2c…`,
+   `git status --porcelain -uall` empty) and the suite is green again — form `test_trial_scope`
+   **8 passed**, `design-preview` **48 passed**. So the single line the operator was told to hand to
+   the form lane is already committed there and guarded by two tests; deleting it cannot pass CI.
 
 The engine change to support this is in `assets/i18n.js`; the form side of the same change is the
 `sw.js` cache bump (below).
