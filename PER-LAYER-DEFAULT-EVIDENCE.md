@@ -148,7 +148,7 @@ is served.
 | `python3 tools/i18n-check.py` (form) | exit 0 — Gate open |
 | `python3 tools/qr-check.py` (form) | exit 0 |
 | `python3 tools/sw-precache-check.py` (form) | exit 0 |
-| `python3 tools/precache-fingerprint.py` (form) | up to date (`d9a844b4…`) |
+| `python3 tools/precache-fingerprint.py` (form) | up to date (`23f39a54…`) |
 | `python3 tools/5ws-still-works.py http://127.0.0.1:8899` (form) | exit 0 — `lang: ne`, switch mounted, 24-name contract match, 8 pickers |
 | `python3 tools/trial-scope-render-check.py http://127.0.0.1:8899` (form) | exit 0 — 390/1280 px |
 | `python3 tools/hub-trial-scope-render-check.py http://127.0.0.1:8899` (hub) | exit 0 — 390/1280 px, `offenders=[]` |
@@ -165,13 +165,13 @@ gives English; after pressing ENG the preference survives navigation back to the
 
 * Hub base `8273e9013b163549640d04b2ec86fa42c840a91b`; head is the tip of branch
   `task/t_2449fe51-i18n-per-layer-default` (local only). The latest **code** commit on it is
-  `670763a662b0c04e3ad4b681a0353c7ea36e1919` (the round-1 feedback-channel fix); the commits above
+  `e14b2f63e40e10284b3dc0aebcec469598e6ec80` (the round-2 feedback-channel work); the commits above
   it are evidence-note edits and change no code, so the tip is not written as a literal that would
   go stale the moment this note is edited.
 * Form base `9c3a41eeccc768fcef5d8f241430ba831e8ad9a8`; head is the tip of branch
   `task/t_2449fe51-form-default` (a worktree of `design/form-frontend`). The code commits on it are
-  `79e761c` (the declared Nepali default), `311eb91` (`sw.js` v42 → v43 for the engine change) and
-  `8836f6e` (the regenerated derived B2 page).
+  `79e761c` (the declared Nepali default), `311eb91`/`b449a59` (`sw.js` bumps for the engine
+  changes) and `8836f6e` (the regenerated derived B2 page).
 * Production refs **unchanged**: public `68bf197`, form `9032bb7`, hub `ff2d4e2`
 * No push, PR, merge or deploy. Both worktrees clean (`git status --porcelain -uall` empty).
 
@@ -214,10 +214,11 @@ The engine change to support this is in `assets/i18n.js`; the form side of the s
    repo's sibling `hub/` is the durable hub repository — as in this verification harness. In the
    `form-frontend` checkout the sibling is the stale copy and the test still fails; reconciling that
    copy is a separate task, not this one.
-2. **`sw.js` cache v41 → v42 → v43.** The engine is precached, so an installed phone would otherwise
-   keep the old engine: v42 was required so the form opens in Nepali, and v43 so a phone does not
-   keep the engine that lost unexported feedback and overflowed the picker. Both bumps are required
-   by this task; `tools/precache.sha` regenerated to `d9a844b4…`.
+2. **`sw.js` cache v41 → v42 → v43 → v44.** The engine is precached, so an installed phone would
+   otherwise keep the old engine: v42 was required so the form opens in Nepali, v43 so a phone does
+   not keep the engine that lost unexported feedback and overflowed the picker, and v44 so it does
+   not keep the engine that merged a placeholder complaint with a sentence complaint on one key.
+   Every engine edit needs its own bump; `tools/precache.sha` is now `23f39a54…`.
 3. **`form/index.html` was not edited** (requirement from the sibling task).
 4. **The two inaccurate shared strings** flagged by the sibling task (`ml.p036`, `ml.p011`) are
    dictionary text and were **not** touched — this task does not change dictionary content.
