@@ -105,7 +105,7 @@ edge, because the left clamp ignored the picker's own width). Now:
   the first reason button, and Escape dismisses it and returns focus to the element. A field worker
   who is **not** in report mode gets no tab stops added.
 
-**Privacy properties (30 checks in `tools/i18n-feedback-record-proof.py`):**
+**Privacy properties (33 checks in `tools/i18n-feedback-record-proof.py`):**
 
 * the record is **structured, not typed** — `{kind, schema, key, surface, lang, revision, reason, page, src}`;
   there is **no free-text field**, so there is nowhere for a beneficiary's name to go;
@@ -165,8 +165,9 @@ gives English; after pressing ENG the preference survives navigation back to the
   it are evidence-note edits and change no code, so the tip is not written as a literal that would
   go stale the moment this note is edited.
 * Form base `9c3a41eeccc768fcef5d8f241430ba831e8ad9a8`; head is the tip of branch
-  `task/t_2449fe51-form-default` (a worktree of `design/form-frontend`), latest code commit
-  `79e761c` (the declared Nepali default).
+  `task/t_2449fe51-form-default` (a worktree of `design/form-frontend`). The code commits on it are
+  `79e761c` (the declared Nepali default), `311eb91` (`sw.js` v42 → v43 for the engine change) and
+  `8836f6e` (the regenerated derived B2 page).
 * Production refs **unchanged**: public `68bf197`, form `9032bb7`, hub `ff2d4e2`
 * No push, PR, merge or deploy. Both worktrees clean (`git status --porcelain -uall` empty).
 
