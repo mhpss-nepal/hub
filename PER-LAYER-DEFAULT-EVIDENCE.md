@@ -12,13 +12,48 @@ Layer 3 (public site) default to English, with Nepali available as a one-tap tog
 | Layer | Page | Default | How it is decided |
 |---|---|---|---|
 | 1 (field form) | `form/5ws-report.html` | **Nepali** | declares `<html lang="en" data-i18n-default="ne">` |
-| 1 (other forms) | `form/index.html`, `contact/phq9/referral/selfreport.html`, `5ws-report-b2.html` | **English** | declare nothing |
+| 1 (derived preview) | `form/5ws-report-b2.html` | **Nepali** | *generated* from `5ws-report.html` by `design-preview/build_b2.py`, which copies the source `<head>` — so it declares the same `ne`. Regenerated with the builder, never hand-edited. |
+| 1 (other forms) | `form/index.html`, `contact/phq9/referral/selfreport.html` | **English** | declare nothing |
 | 1 (legacy entry) | `form/4ws-report.html` | n/a — **redirect** | a stub that redirects to the Nepali-default `5ws-report.html`, so it inherits whatever that page resolves to. It is not an English-default page. |
 | 2 (Hub) | `hub/index.html`, `forms.html`, `access.html`, `inbox.html`, `coverage.html` | **English** | declare nothing |
 | 3 (public site) | every page in `public-layer3/` | **English** | declare nothing; own engine copy keeps `DEFAULT = "en"` |
 
 Only `5ws-report.html` gets a Nepali default, because it is the only trial form and the only
-page that is 100 % translated (101 of 101 keys it uses are in the `ne` block).
+page that is 100 % translated (101 of 101 keys it uses are in the `ne` block; 91 of those carry
+machine provenance). Measured live through the engine's own counter on the served page —
+`I18N.coverage` = `total 101, translated 101, untranslated 0, missing 0, kept 0, machine 91`.
+
+### Where the declaration physically lives — and how to confirm it, not trust this note
+
+The form half of this change is **not in the hub repository** the card names as its workspace, and
+it is **not in any of the six worktrees** the operator's scan covered (`form-frontend`,
+`form-translation`, `form-interface`, `form-safety`, `form`, `hub-real`). It lives on a **seventh,
+non-committed worktree of the form repository** that the pairing makes:
+
+```
+repository    /root/mhpss-nepal-audit-20260918/form        (branch main)
+worktree      /root/mhpss-nepal-work/perlayer/form         branch task/t_2449fe51-form-default
+base          9c3a41eeccc768fcef5d8f241430ba831e8ad9a8
+head          b449a59806748018157b5d99e1fac51fd605952c
+```
+
+The declaration commit is `79e761c` (*"5Ws report declares its own Nepali default; trial-scope pin
+narrowed to it"*), and the shipped blob is `ba35ab92b19523095c26d4aaa856c8d51922cb4e`. Confirm it
+from any shell:
+
+```
+git -C /root/mhpss-nepal-work/perlayer/form rev-parse HEAD
+git -C /root/mhpss-nepal-work/perlayer/form show HEAD:5ws-report.html | sed -n 2p
+#   b449a59806748018157b5d99e1fac51fd605952c
+#   <html lang="en" data-i18n-default="ne">
+```
+
+or, as a machine check over every worktree, from any directory one level above them:
+`search_files(pattern="data-i18n-default", path="/root/mhpss-nepal-work")` returns exactly three
+hits — `perlayer/form/5ws-report.html:2`, `perlayer/form/5ws-report-b2.html:2` (its derived preview)
+and a non-worktree scratch copy. The other six worktrees correctly return **zero**: only the 5Ws
+page is meant to declare a default. The worktree is clean (`git status --porcelain -uall` empty),
+which `scripts/land.py` requires.
 
 ## 2. The mechanism, and why it is per-layer
 
@@ -149,11 +184,11 @@ is served.
 | `python3 tools/qr-check.py` (form) | exit 0 |
 | `python3 tools/sw-precache-check.py` (form) | exit 0 |
 | `python3 tools/precache-fingerprint.py` (form) | up to date (`23f39a54…`) |
-| `python3 tools/5ws-still-works.py http://127.0.0.1:8899` (form) | exit 0 — `lang: ne`, switch mounted, 24-name contract match, 8 pickers |
-| `python3 tools/trial-scope-render-check.py http://127.0.0.1:8899` (form) | exit 0 — 390/1280 px |
-| `python3 tools/hub-trial-scope-render-check.py http://127.0.0.1:8899` (hub) | exit 0 — 390/1280 px, `offenders=[]` |
+| `python3 tools/5ws-still-works.py http://127.0.0.1:8799` (form) | exit 0 — `lang: ne`, ENG/NEP switch mounted, **24-name** contract match, **9** selects (`…palika, ward, modality…`) |
+| `python3 tools/trial-scope-render-check.py http://127.0.0.1:8799` (form) | exit 0 — 390/1280 px |
+| `python3 tools/hub-trial-scope-render-check.py http://127.0.0.1:8799` (hub) | exit 0 — 390/1280 px, `offenders=[]` |
 | `python3 -m unittest discover -s design-preview -p 'test_*.py'` (form) | **48 passed** — includes the deterministic rebuild of the derived B2 page |
-| `python3 tools/4ws-offline-redirect-check.py http://127.0.0.1:8899` (form) | exit 0 — distributed 4Ws address still reaches the 5Ws form offline, query/hash intact |
+| `python3 tools/4ws-offline-redirect-check.py http://127.0.0.1:8799` (form) | exit 0 — distributed 4Ws address still reaches the 5Ws form offline, query/hash intact |
 | `python3 tools/text-setting-check.py` (form) | **pre-existing red** at base `9c3a41e` as well — `design-preview/translation-review-index.html` bundles `th, td` on `text-align:left`; untouched by this task |
 
 Rendered evidence for the decision itself (served site): the 5Ws form opens in **Nepali**
@@ -168,8 +203,11 @@ gives English; after pressing ENG the preference survives navigation back to the
   `e14b2f63e40e10284b3dc0aebcec469598e6ec80` (the round-2 feedback-channel work); the commits above
   it are evidence-note edits and change no code, so the tip is not written as a literal that would
   go stale the moment this note is edited.
-* Form base `9c3a41eeccc768fcef5d8f241430ba831e8ad9a8`; head is the tip of branch
-  `task/t_2449fe51-form-default` (a worktree of `design/form-frontend`). The code commits on it are
+* Form base `9c3a41eeccc768fcef5d8f241430ba831e8ad9a8` (the tip of `design/form-frontend`); head
+  `b449a59806748018157b5d99e1fac51fd605952c`, the tip of branch
+  `task/t_2449fe51-form-default` — a worktree of the **form repository**
+  (`/root/mhpss-nepal-audit-20260918/form`) branched from that base, **not** a worktree of
+  `design/form-frontend`. The code commits on it are
   `79e761c` (the declared Nepali default), `311eb91`/`b449a59` (`sw.js` bumps for the engine
   changes) and `8836f6e` (the regenerated derived B2 page).
 * Production refs **unchanged**: public `68bf197`, form `9032bb7`, hub `ff2d4e2`
@@ -197,6 +235,17 @@ ones have their own red/green proof (`tools/i18n-feedback-red-green.py`):
 4. **The reporting surface is stated, not implied.** It is no longer "any string": the engine
    declares `feedbackSurfaces` (`text`, `placeholder`, `aria-label`, `alt`, `title`) and the record
    carries `surface`. A key is reportable only on the surface it renders on that page.
+5. **A parent finding that the form half was "missing" — investigated, refuted, and the note made
+   self-verifying.** The finding held that no worktree contains `data-i18n-default` and that §1
+   therefore overstated the delivery. It is true that six of the seven form worktrees contain none,
+   and true that the form half is not on `hub-real` — but the declaration *is* committed and clean
+   on the seventh, `perlayer/form` (branch `task/t_2449fe51-form-default`, head `b449a59`, commit
+   `79e761c`, blob `ba35ab92…`), which that scan did not include. `search_files` over
+   `/root/mhpss-nepal-work` returns exactly three hits and this is one of them. **No form change was
+   needed or made**; §1 now states the exact worktree, base, head, commit and blob, with the two
+   commands to confirm them, so the claim is checkable rather than asserted. (A seventh, orphaned
+   `verify-perlayer/form` directory also carries the line but is not a registered worktree — its
+   `.git` points at a deleted gitdir — so it is scratch, not a deliverable.)
 
 The engine change to support this is in `assets/i18n.js`; the form side of the same change is the
 `sw.js` cache bump (below).
@@ -238,3 +287,15 @@ The engine change to support this is in `assets/i18n.js`; the form side of the s
    `data-i18n-default="ne"` the source declares — so the B2 preview of the 5Ws form matches the form
    it previews. `design-preview`: 48 passed. The form-side changed-file list is therefore
    `5ws-report-b2.html`, `sw.js`, `tools/precache.sha`.
+8. **A stale site server can make a rendered check report the opposite of the truth — check the
+   port before believing a rendered run.** This round, the rendered checks were first pointed at
+   `127.0.0.1:8791`; that port was already held by a **seven-hour-old** `python3 -m http.server`
+   from an earlier session serving a *different* checkout of the form (one that still carries a
+   runtime-injected `ward` field). The new server silently failed to bind, so
+   `5ws-still-works.py` read that other tree and failed with *"name= contract drifted; extra
+   `['ward']`"*, while `hub-trial-scope-render-check.py` read a hub tree whose rail group had
+   moved. Both were **false**: the committed trees are unaffected, and the `ward` field belongs to
+   a separate Layer 1→2 task, not this one. Re-run on a fresh port (`8799`) that nothing else held,
+   every rendered check is green again (24-name contract match, 9 selects). Recorded because a
+   passing rendered suite is only evidence if it was run against the tree being claimed: `ss -ltnp`
+   the port first, or serve on a port nobody else can already own.
