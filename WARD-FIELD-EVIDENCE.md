@@ -4,7 +4,10 @@
 **Status:** DONE — REVIEW ARTIFACT
 **Worktree:** `/root/mhpss-nepal-work/hub-real`, branch `task/t_e26d775b-ward-csv-patches`
 **Base:** `724a7da5a3fcf9a67932afe044d7444e4759b8bb` (the tip of the per-layer-default
-branch, which is built on `main` = `ff2d4e2`) → **head:** the tip of this branch (local only).
+branch, which is built on `main` = `ff2d4e2`). **Code head:**
+`e7c5a61d9f4951b604a0122b36cc04606ed33cda` (the commit this note describes; the tip is that
+commit plus this note's own edit). Worktree clean (`git status --porcelain -uall` empty), which
+`scripts/land.py` requires.
 **Production refs unchanged:** public `ee912c7`, form `9032bb7`, hub `ff2d4e2`. No push, PR,
 merge or deploy.
 
@@ -255,5 +258,5 @@ Dictionary at this head: **728 English, 180 Nepali** (base `ff2d4e2` + the three
    lane's own patch, and the form repo stays clean for `scripts/land.py`.
 7. **Hub `main` is not the branch point.** This worktree's base is the per-layer-default tip
    (`724a7da`), which sits on `main` (`ff2d4e2`). The patch was tested against `ff2d4e2`, which
-   is an ancestor, so it applies — and the delivered head is recorded as a branch tip rather than
-   a literal that this note's own commit would invalidate.
+   is an ancestor, so it applies — and the code head is recorded as `e7c5a61` (the commit this
+   note describes; the tip carries this note's own edit on top).
