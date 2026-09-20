@@ -32,6 +32,12 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 #                    each form's OUTPUT HOME in the hub: where the entries
 #                    made on that form can be found. The Sadar Hati pattern
 #                    ("Rumah Output"). One link opens the forms themselves.
+#                    SUPERVISED TRIAL (20 Sep 2026): only the approved 5Ws
+#                    activity report is offered here. The four unapproved
+#                    instruments (contact, referral, phq9, selfreport) keep
+#                    their output homes on forms.html but are no longer rail
+#                    items -- see FORMS-OUTPUT-HOME-SCOPE.md. Do not put them
+#                    back until they are approved.
 #   Public site   -- one item, Home. The public pages navigate themselves.
 #   Admin         -- at the bottom, and only drawn for an admin account
 #                    (the rail script asks the bridge for the role). Rules
@@ -48,10 +54,12 @@ GROUPS = [
     ]),
     ("forms", "Field forms", "1", "outputs", [
         ("outact",      "Activity report (5Ws)",  "./#reports"),
-        ("outcontact",  "Service contact",        "forms.html#contact"),
-        ("outref",      "Referral",               "forms.html#referral"),
-        ("outphq",      "PHQ-9 follow-up",        "forms.html#phq9"),
-        ("outself",     "Self-report",            "forms.html#selfreport"),
+        # One neutral entry to the Hub's own review surface (forms.html),
+        # which is where a coordinator reads imported entries. It opens a
+        # Hub page that describes and imports the four unapproved forms; it
+        # is not itself a path to one of their pages, and it does not name
+        # them in the rail. See FORMS-OUTPUT-HOME-SCOPE.md.
+        ("outforms",    "Form entries",           "forms.html"),
         ("outopen",     "Open the forms &rarr;",  "../form/"),
     ]),
     ("public", "Public site", "3", "layer 3", [
@@ -64,7 +72,7 @@ GROUPS = [
 # which group a PAGE stands in (its rail key is the page's, not an item's)
 PAGE_GROUP = {"hubindex": "coord", "hubforms": "forms", "hubaccess": "admin"}
 # the item lit when the page is opened without a hash
-PAGE_DEFAULT = {"hubindex": "hubindex", "hubforms": "outcontact", "hubaccess": "hubaccess"}
+PAGE_DEFAULT = {"hubindex": "hubindex", "hubforms": "outforms", "hubaccess": "hubaccess"}
 # kept for the completeness check below: every hub page the rail points at
 RAIL = [(k, l, h) for g in GROUPS for (k, l, h) in g[4]]
 
