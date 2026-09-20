@@ -20,8 +20,13 @@ import unittest
 ROOT = Path(__file__).resolve().parent
 UNAPPROVED = ("contact", "phq9", "referral", "selfreport")
 # The layer-1 forms are a sibling repository, served at /form/ beside /hub/.
-FORMS_PREFIX = "../form/"
-APPROVED_FORM_LINKS = ("../form/", "../form/5ws-report.html")
+FORMS_DIR_PREFIX = "/form/"
+# The two form addresses a Hub page may resolve to, as normalized absolute site
+# paths. Compared after resolution, never as raw substrings: `/form/` alone
+# would wave `/form/phq9.html` through (the round-1 defect).
+APPROVED_FORM_TARGETS = ("/form", "/form/5ws-report.html")
+# Hub pages are served under /hub/, so a link resolves against that base.
+SITE_DIR = "/hub"
 # The pre-fix rendered checker, kept verbatim so the round-1 red/green demo is
 # reproducible. Pinned by SHA-256 below: editing this fixture to make the demo
 # pass would itself fail the suite. This is the file at commit 15d35b3, the
@@ -95,18 +100,46 @@ def rail_group_hrefs(html, group):
 
 
 def form_links(page_relpath, html):
-    """In-repo hrefs of a page that resolve under the sibling /form/ app."""
+    """In-repo hrefs of a page that resolve under the sibling /form/ app.
+
+    A hub page lives at `/hub/<page>`, so a link resolves against `/hub/`.
+    Relative (`../form/...`), root-relative (`/form/...`) and dot-segment
+    spellings all reduce to the same normalized site path; a normalized path
+    that lands under `/form` and is not one of the two approved addresses is
+    returned. `page_relpath` is accepted for callers but the base is fixed,
+    because the hub is served at a known address.
+    """
     out = []
     for href in anchors(html):
-        if href.startswith(("#", "//")) or "://" in href or href.startswith("mailto:"):
+        href = href.strip()
+        if not href or href.startswith(("#", "//", "mailto:", "tel:")) or "://" in href:
             continue
         path = href.split("#", 1)[0].split("?", 1)[0]
         if not path:
             continue
-        target = posixpath.normpath(posixpath.join(posixpath.dirname(page_relpath), path))
-        if target == "../form" or target.startswith(FORMS_PREFIX):
+        if path.startswith("/"):
+            target = posixpath.normpath(path)
+        else:
+            target = posixpath.normpath(posixpath.join(SITE_DIR, path))
+        if target == "/form" or target.startswith(FORMS_DIR_PREFIX):
             out.append(href)
     return out
+
+
+def unapproved_form_targets(page_relpath, html):
+    """Resolved form links that are not one of the two approved addresses."""
+    return [
+        href
+        for href in form_links(page_relpath, html)
+        if resolved_form_target(href) not in APPROVED_FORM_TARGETS
+    ]
+
+
+def resolved_form_target(href):
+    path = href.strip().split("#", 1)[0].split("?", 1)[0]
+    if path.startswith("/"):
+        return posixpath.normpath(path)
+    return posixpath.normpath(posixpath.join(SITE_DIR, path))
 
 
 def unapproved_nav_targets(html):
@@ -194,8 +227,8 @@ class HubTrialScopeTest(unittest.TestCase):
     def test_no_hub_page_links_to_an_unapproved_form_page(self):
         offenders = {}
         for page in pages():
-            found = sorted(set(form_links(page.name, page.read_text(encoding="utf-8")))
-                           - set(APPROVED_FORM_LINKS))
+            found = sorted(set(unapproved_form_targets(
+                page.name, page.read_text(encoding="utf-8"))))
             if found:
                 offenders[page.name] = found
         self.assertEqual(
@@ -203,14 +236,33 @@ class HubTrialScopeTest(unittest.TestCase):
             "a hub page offers a link that opens a form page outside the trial scope",
         )
 
+    def test_static_form_link_rule_matches_the_rendered_rule(self):
+        """The static scan must flag the same spellings the browser check does."""
+        cases = {
+            '<a href="../form/contact.html"></a>': True,
+            '<a href="/form/phq9.html"></a>': True,
+            '<a href="../form/sub/../referral.html"></a>': True,
+            '<a href="../form/./selfreport.html"></a>': True,
+            '<a href="../form/5ws-report.html"></a>': False,
+            '<a href="../form/"></a>': False,
+            '<a href="/form/"></a>': False,
+            '<a href="./#reports"></a>': False,
+            '<a href="forms.html#phq9"></a>': False,
+        }
+        for html, must_flag in cases.items():
+            self.assertEqual(
+                must_flag,
+                bool(unapproved_form_targets("forms.html", html)),
+                "static rule disagrees with the rendered rule for %s" % html,
+            )
+
     def test_rail_generator_cannot_reintroduce_an_unapproved_form_link(self):
         rail = rail_module()
         offenders = sorted({
             href
             for _key, _label, _layer, _em, items in rail.GROUPS
             for _k, _l, href in items
-            if form_links("index.html", '<a href="%s"></a>' % href)
-            and href not in APPROVED_FORM_LINKS
+            if unapproved_form_targets("index.html", '<a href="%s"></a>' % href)
         } | {
             href
             for _key, _label, _layer, _em, items in rail.GROUPS
