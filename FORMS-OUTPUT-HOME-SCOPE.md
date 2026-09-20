@@ -157,7 +157,7 @@ dispatch; that is recorded, not fixed here.
 | | value |
 | --- | --- |
 | Base | `ff2d4e2a43327ddc99330f83660ec75abd53a762` (`main`, `origin/main`) |
-| Code head (verified) | `851023c` on branch `task/t_46e4cb25-hub-trial-scope`; this document's own commit sits on top of it and changes no code |
+| Head | tip of branch `task/t_46e4cb25-hub-trial-scope` (local only) |
 | Field build head (untouched) | `form-frontend` `f1ee77e`, no `hub/` path changed by either task |
 | Production refs (unchanged) | public `68bf197`, form `9032bb7`, hub `ff2d4e2` |
 
