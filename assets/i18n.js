@@ -161,7 +161,7 @@
      the trial. `?i18n=report` turns that on (kept for the session, like the
      marks, so a reviewer can walk the site):
 
-       ?i18n=report   tap any string, pick a reason; the report is recorded
+       ?i18n=report   select keyed page text, pick a reason; the report is recorded
        ?i18n=clean    turn it off again
 
      Three deliberate properties, because this is the part that touches a
@@ -172,9 +172,9 @@
        same vocabulary a reviewer and the translator share. No new English
        sentence is introduced, so nothing here needs translating itself.
 
-       IT DOES NOT SEND. A report is appended to sessionStorage and can be
-       handed over as a JSON file. There is no network call in this file; the
-       destination is a dependency, not something invented here.
+       IT DOES NOT SEND. A report is appended to durable device storage and
+       can be handed over as a JSON file. There is no network call in this
+       file; the destination is a dependency, not something invented here.
 
        IT IS OFF UNLESS ASKED FOR. A field worker filling in the 5Ws form
        never sees it. */
@@ -196,7 +196,7 @@
   var REPORT = reportModeOn();
 
   function reports() {
-    try { return JSON.parse(sessionStorage.getItem(RSTORE) || "[]"); }
+    try { return JSON.parse(localStorage.getItem(RSTORE) || "[]"); }
     catch (e) { return []; }
   }
   function recordReport(rec) {
@@ -209,11 +209,11 @@
     }
     rec.at = new Date().toISOString();
     all.push(rec);
-    try { sessionStorage.setItem(RSTORE, JSON.stringify(all)); } catch (e) { /* ignore */ }
+    try { localStorage.setItem(RSTORE, JSON.stringify(all)); } catch (e) { /* ignore */ }
     return rec;
   }
   function clearReports() {
-    try { sessionStorage.removeItem(RSTORE); } catch (e) { /* ignore */ }
+    try { localStorage.removeItem(RSTORE); } catch (e) { /* ignore */ }
     paintReportChip();
   }
   function paintReportChip() {
@@ -250,30 +250,59 @@
   function mountReportMode() {
     if (!REPORT) return;
     document.documentElement.setAttribute("data-i18n-report", "on");
+    /* Which keyed surfaces a reviewer can report, and what each is called in
+       the record. Not only text: a wrong placeholder or a wrong aria-label is
+       just as visible to a field officer, and the trial has to catch it. */
+    var REPORT_SELECTOR = FEEDBACK_ATTRS.map(function (p) {
+      return "[" + p[0] + "]";
+    }).join(",");
     var style = document.createElement("style");
     style.textContent =
-      '[data-i18n-report="on"] [data-i18n]{cursor:crosshair;' +
-        'outline:1px dashed rgba(122,47,47,.45);outline-offset:1px}' +
+      '[data-i18n-report="on"] ' + REPORT_SELECTOR +
+        '{cursor:crosshair;outline:1px dashed rgba(122,47,47,.45);outline-offset:1px}' +
       "#i18npick{position:fixed;z-index:62;background:#fff;border:1px solid #b9c4c8;" +
         "border-radius:8px;box-shadow:0 3px 14px rgba(0,0,0,.25);padding:6px;display:flex;" +
-        "gap:6px;font:600 11.5px/1 'Noto Sans',system-ui,sans-serif}" +
+        "flex-wrap:wrap;max-width:calc(100vw - 16px);gap:6px;" +
+        "font:600 11.5px/1 'Noto Sans',system-ui,sans-serif}" +
       "#i18npick button{border:1px solid #d6dde0;background:#f7f9fa;border-radius:6px;" +
         "padding:7px 9px;cursor:pointer;min-height:32px}" +
       "#i18npick button:hover{background:#eef3f5}";
     document.head.appendChild(style);
 
     var picker = null;
-    function closePicker() { if (picker) { picker.remove(); picker = null; } }
+    var returnFocus = null;
+    function closePicker() {
+      if (picker) { picker.remove(); picker = null; }
+      if (returnFocus && typeof returnFocus.focus === "function") returnFocus.focus();
+      returnFocus = null;
+    }
 
-    document.addEventListener("click", function (ev) {
-      var el = ev.target;
-      while (el && el !== document.body && !(el.getAttribute && el.getAttribute("data-i18n"))) {
+    /* Which keyed surface a clicked/focused element carries. Text wins when an
+       element carries both, because that is what the reader is reading. */
+    function surfaceOf(el) {
+      for (var i = 0; i < FEEDBACK_ATTRS.length; i++) {
+        if (el.getAttribute && el.getAttribute(FEEDBACK_ATTRS[i][0]) != null) {
+          return FEEDBACK_ATTRS[i];
+        }
+      }
+      return null;
+    }
+    function keyedTarget(start) {
+      var el = start;
+      while (el && el !== document.body && !(el.matches && el.matches(REPORT_SELECTOR))) {
         el = el.parentNode;
       }
-      if (!el || el === document.body || !el.getAttribute) { closePicker(); return; }
-      var key = el.getAttribute("data-i18n");
-      ev.preventDefault();
+      if (!el || el === document.body) return null;
+      var pair = surfaceOf(el);
+      return pair ? { el: el, attr: pair[0], surface: pair[1],
+                      key: el.getAttribute(pair[0]) } : null;
+    }
+
+    function openPicker(target) {
+      if (!target) { closePicker(); return; }
+      var key = target.key;
       closePicker();
+      returnFocus = target.el;
       picker = document.createElement("div");
       picker.id = "i18npick";
       picker.setAttribute("role", "group");
@@ -285,17 +314,61 @@
         b.setAttribute("data-reason", reason);
         b.addEventListener("click", function (e) {
           e.stopPropagation();
-          recordReport(reportWording(key, reason));
+          recordReport(reportWording(key, reason, target.surface));
           closePicker();
           paintReportChip();
         });
         picker.appendChild(b);
       });
-      var r = el.getBoundingClientRect();
-      picker.style.left = Math.max(8, Math.min(r.left, window.innerWidth - 8)) + "px";
-      picker.style.top = Math.min(r.bottom + 6, window.innerHeight - 48) + "px";
       document.body.appendChild(picker);
+      var r = target.el.getBoundingClientRect();
+      var pr = picker.getBoundingClientRect();
+      var left = Math.max(8, Math.min(r.left, window.innerWidth - pr.width - 8));
+      var top = r.bottom + 6;
+      if (top + pr.height > window.innerHeight - 8) top = r.top - pr.height - 6;
+      picker.style.left = Math.max(8, left) + "px";
+      picker.style.top = Math.max(8, Math.min(top, window.innerHeight - pr.height - 8)) + "px";
+      var first = picker.querySelector("button");
+      if (first) first.focus();
+    }
+
+    document.addEventListener("click", function (ev) {
+      var target = keyedTarget(ev.target);
+      if (!target) { closePicker(); return; }
+      ev.preventDefault();
+      openPicker(target);
     }, true);
+
+    document.addEventListener("keydown", function (ev) {
+      if (ev.key === "Escape" && picker) { ev.preventDefault(); closePicker(); return; }
+      if (ev.key === "Tab") { makeKeyedFocusable(); return; }
+      if (ev.key === "Enter" || ev.key === " ") {
+        /* Never steal Enter/Space from a field the reviewer is typing in:
+           those keyed surfaces (placeholder, aria-label on an input) are
+           opened with a click. Typing must keep working. */
+        if (editable(ev.target)) return;
+        var target = keyedTarget(ev.target);
+        if (target) { ev.preventDefault(); openPicker(target); }
+      }
+    }, true);
+
+    function editable(el) {
+      if (!el || !el.tagName) return false;
+      var tag = el.tagName.toUpperCase();
+      return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT"
+             || el.isContentEditable === true;
+    }
+
+    /* A reviewer using only a keyboard must be able to reach a string. In
+       report mode every keyed element becomes focusable; it is left alone
+       outside report mode, so a field worker's form is not given a tab stop
+       per sentence. Re-run on Tab so text added after mount is reachable. */
+    function makeKeyedFocusable() {
+      document.querySelectorAll(REPORT_SELECTOR).forEach(function (el) {
+        if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "0");
+      });
+    }
+    makeKeyedFocusable();
 
     paintReportChip();
   }
@@ -669,28 +742,50 @@
           destination exists the record goes nowhere, which is the safe
           failure: the page does not silently post somewhere unapproved.
 
+     WHAT CAN BE REPORTED, stated exactly: every keyed surface the engine
+     fills -- `data-i18n` text, `data-i18n-ph` placeholder, `data-i18n-aria`
+     aria-label, `data-i18n-alt` alt text and `data-i18n-title` title. The
+     record names the surface, so a translator is not left guessing whether the
+     complaint is about the visible sentence or the field's placeholder.
+
      What the record deliberately does NOT carry: the rendered text (it is
      already in the dictionary, and a page's text is not the point), any
      query string or fragment from the address bar (a shared link may carry
      anything), or any free text at all. */
   var FEEDBACK_REASONS = ["wrong", "awkward", "unclear", "missing"];
-  function reportWording(key, reason) {
+  /* [attribute, surface name] in the order a report should prefer them: the
+     visible sentence first, then the surfaces a reader hears or sees instead
+     of it. */
+  var FEEDBACK_ATTRS = [
+    ["data-i18n", "text"],
+    ["data-i18n-ph", "placeholder"],
+    ["data-i18n-aria", "aria-label"],
+    ["data-i18n-alt", "alt"],
+    ["data-i18n-title", "title"]
+  ];
+  var FEEDBACK_SURFACES = FEEDBACK_ATTRS.map(function (p) { return p[1]; });
+  function reportWording(key, reason, surface) {
     if (typeof key !== "string" || !key) return null;
-    /* Only a key this page actually renders can be reported, so a report
-       cannot be used to enumerate the whole dictionary. */
+    if (FEEDBACK_REASONS.indexOf(reason) < 0) return null;
+    /* Only a keyed surface this page actually renders can be reported, so a
+       report cannot be used to enumerate the whole dictionary. Default to
+       text so the direct API call stays the common case. */
+    var want = surface == null ? "text" : surface;
+    if (FEEDBACK_SURFACES.indexOf(want) < 0) return null;
     var on = false;
-    var nodes = document.querySelectorAll("[data-i18n]");
+    var attr = FEEDBACK_ATTRS.filter(function (p) { return p[1] === want; })[0][0];
+    var nodes = document.querySelectorAll("[" + attr + "]");
     for (var i = 0; i < nodes.length; i++) {
-      if (nodes[i].getAttribute("data-i18n") === key) { on = true; break; }
+      if (nodes[i].getAttribute(attr) === key) { on = true; break; }
     }
     if (!on) return null;
-    if (FEEDBACK_REASONS.indexOf(reason) < 0) return null;
     var path = "";
     try { path = window.location.pathname; } catch (e) { /* ignore */ }
     return {
       kind: "i18n_feedback",
       schema: "i18n-feedback/1",
       key: key,
+      surface: want,
       lang: lang,
       revision: (S._meta && S._meta.revision) || null,
       reason: reason,
@@ -736,6 +831,9 @@
        destination has been approved. See reportWording() above. */
     reportWording: reportWording,
     feedbackReasons: FEEDBACK_REASONS.slice(),
+    /* The keyed surfaces a report can name, so a caller/UI can state the
+       exact supported surface instead of claiming "any string". */
+    feedbackSurfaces: FEEDBACK_SURFACES.slice(),
     /* The reports recorded in this session (reviewer mode), and a way to
        clear them. Nothing leaves the device: see reportWording() above. */
     reports: reports,
