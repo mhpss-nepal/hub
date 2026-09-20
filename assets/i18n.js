@@ -65,12 +65,46 @@
     return null;
   }
   var KEY = "mhpss-np-lang";
+
+  /* ---------- the default, and why it is not one constant -------------
+     The same engine is loaded by three layers whose right default differs:
+     the field forms (Layer 1) are read by field officers and want Nepali;
+     the Hub (Layer 2) and the public site (Layer 3) are read by
+     international staff and want English.
+
+     A single global DEFAULT cannot say that, and deciding from the URL path
+     would break the first time a page moves. So the default is DECLARED IN
+     THE PAGE and read here:
+
+       <html lang="en" data-i18n-default="ne">
+
+     The declaration belongs to that page's own markup, so one page's choice
+     cannot reach another: there is nothing global for it to overwrite. A
+     page that declares nothing keeps English. The declared value is
+     validated against the languages the dictionary actually offers, so a
+     typo cannot strand a reader on a language that does not exist.
+
+     This is the LAST fallback only. The URL, the remembered choice and the
+     browser preference are all consulted first, in that order, in pick()
+     below -- so a link stays shareable in either language, a reader who
+     picks English on the Nepali-default form stays in English, and a browser
+     set to Nepali still lands on Nepali wherever no explicit default
+     applies. */
   var DEFAULT = "en";
+  var DECLARED = "";
+  try {
+    DECLARED = (document.documentElement.getAttribute("data-i18n-default") || "").trim();
+  } catch (e) { /* ignore */ }
+
+  function defaultLang(codes) {
+    if (DECLARED && codes.indexOf(DECLARED) > -1) return DECLARED;
+    return codes.indexOf(DEFAULT) > -1 ? DEFAULT : (codes[0] || DEFAULT);
+  }
 
   /* ---------- which language ------------------------------------------
      The URL wins, so a link can be shared in either language and the
      Ministry can bookmark the Nepali one. Then the remembered choice.
-     Then the browser's own preference. Then English. */
+     Then the browser's own preference. Then this page's declared default. */
   function pick() {
     var codes = LANGS.map(function (l) { return l.code; });
     try {
@@ -83,7 +117,7 @@
     } catch (e) { /* ignore */ }
     var nav = (navigator.language || "").toLowerCase();
     if (nav.indexOf("ne") === 0 && codes.indexOf("ne") > -1) return "ne";
-    return codes.indexOf(DEFAULT) > -1 ? DEFAULT : (codes[0] || DEFAULT);
+    return defaultLang(codes);
   }
 
   var lang = pick();
@@ -121,6 +155,226 @@
     try { return sessionStorage.getItem(MKEY) === "1"; } catch (e) { return false; }
   }
   var MARKS = marksOn();
+
+  /* ---------- the reviewer's report mode ------------------------------
+     Adib's team reports wrong or awkward Nepali from the page itself, during
+     the trial. `?i18n=report` turns that on (kept for the session, like the
+     marks, so a reviewer can walk the site):
+
+       ?i18n=report   select keyed page text, pick a reason; the report is recorded
+       ?i18n=clean    turn it off again
+
+     Three deliberate properties, because this is the part that touches a
+     field user's phone:
+
+       IT ADDS NO PROSE. The reason buttons carry the four reason CODES that
+       go into the record ("wrong", "awkward", "unclear", "missing") -- the
+       same vocabulary a reviewer and the translator share. No new English
+       sentence is introduced, so nothing here needs translating itself.
+
+       IT DOES NOT SEND. A report is appended to durable device storage and
+       can be handed over as a JSON file. There is no network call in this
+       file; the destination is a dependency, not something invented here.
+
+       IT IS OFF UNLESS ASKED FOR. A field worker filling in the 5Ws form
+       never sees it. */
+  var RKEY = "mhpss-np-i18n-report";
+  var RSTORE = "mhpss-np-i18n-reports";
+  function reportModeOn() {
+    var q = null;
+    try { q = new URLSearchParams(window.location.search).get("i18n"); } catch (e) { /* ignore */ }
+    if (q === "report") {
+      try { sessionStorage.setItem(RKEY, "1"); } catch (e) { /* ignore */ }
+      return true;
+    }
+    if (q === "clean" || q === "0") {
+      try { sessionStorage.removeItem(RKEY); } catch (e) { /* ignore */ }
+      return false;
+    }
+    try { return sessionStorage.getItem(RKEY) === "1"; } catch (e) { return false; }
+  }
+  var REPORT = reportModeOn();
+
+  function reports() {
+    try { return JSON.parse(localStorage.getItem(RSTORE) || "[]"); }
+    catch (e) { return []; }
+  }
+  function recordReport(rec) {
+    if (!rec) return null;
+    var all = reports();
+    /* One report per key, per SURFACE, per reason: a reviewer tapping twice is
+       not two problems, and the count should mean something. The surface is
+       part of the identity, or a complaint about a field's placeholder would
+       swallow a separate complaint about the same key's visible sentence. */
+    for (var i = 0; i < all.length; i++) {
+      if (all[i].key === rec.key && all[i].reason === rec.reason
+          && all[i].surface === rec.surface) return all[i];
+    }
+    rec.at = new Date().toISOString();
+    all.push(rec);
+    try { localStorage.setItem(RSTORE, JSON.stringify(all)); } catch (e) { /* ignore */ }
+    return rec;
+  }
+  function clearReports() {
+    try { localStorage.removeItem(RSTORE); } catch (e) { /* ignore */ }
+    paintReportChip();
+  }
+  function paintReportChip() {
+    if (!REPORT) return;
+    var chip = document.getElementById("i18nrpt");
+    if (!chip) {
+      chip = document.createElement("button");
+      chip.id = "i18nrpt";
+      chip.type = "button";
+      chip.style.cssText =
+        "position:fixed;z-index:61;left:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));" +
+        "font:700 11.5px/1 'Noto Sans',system-ui,sans-serif;padding:7px 10px;border:0;" +
+        "border-radius:7px;background:#7a2f2f;color:#fff;cursor:pointer";
+      /* Download the reports as a file. No upload: this hands the JSON to a
+         person, who passes it to the translation review by whatever channel
+         is already approved. */
+      chip.addEventListener("click", function () {
+        var data = JSON.stringify(reports(), null, 2);
+        try {
+          var blob = new Blob([data], { type: "application/json" });
+          var a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = "i18n-reports.json";
+          document.body.appendChild(a); a.click(); a.remove();
+        } catch (e) { /* fall back to the console */ }
+        console.log("[i18n] reports", reports());
+      });
+      document.body.appendChild(chip);
+    }
+    chip.textContent = "⚑ " + reports().length;
+    chip.title = "i18n-reports.json";
+  }
+
+  function mountReportMode() {
+    if (!REPORT) return;
+    document.documentElement.setAttribute("data-i18n-report", "on");
+    /* Which keyed surfaces a reviewer can report, and what each is called in
+       the record. Not only text: a wrong placeholder or a wrong aria-label is
+       just as visible to a field officer, and the trial has to catch it. */
+    var REPORT_SELECTOR = FEEDBACK_ATTRS.map(function (p) {
+      return "[" + p[0] + "]";
+    }).join(",");
+    var style = document.createElement("style");
+    style.textContent =
+      '[data-i18n-report="on"] ' + REPORT_SELECTOR +
+        '{cursor:crosshair;outline:1px dashed rgba(122,47,47,.45);outline-offset:1px}' +
+      "#i18npick{position:fixed;z-index:62;background:#fff;border:1px solid #b9c4c8;" +
+        "border-radius:8px;box-shadow:0 3px 14px rgba(0,0,0,.25);padding:6px;display:flex;" +
+        "flex-wrap:wrap;max-width:calc(100vw - 16px);gap:6px;" +
+        "font:600 11.5px/1 'Noto Sans',system-ui,sans-serif}" +
+      "#i18npick button{border:1px solid #d6dde0;background:#f7f9fa;border-radius:6px;" +
+        "padding:7px 9px;cursor:pointer;min-height:32px}" +
+      "#i18npick button:hover{background:#eef3f5}";
+    document.head.appendChild(style);
+
+    var picker = null;
+    var returnFocus = null;
+    function closePicker() {
+      if (picker) { picker.remove(); picker = null; }
+      if (returnFocus && typeof returnFocus.focus === "function") returnFocus.focus();
+      returnFocus = null;
+    }
+
+    /* Which keyed surface a clicked/focused element carries. Text wins when an
+       element carries both, because that is what the reader is reading. */
+    function surfaceOf(el) {
+      for (var i = 0; i < FEEDBACK_ATTRS.length; i++) {
+        if (el.getAttribute && el.getAttribute(FEEDBACK_ATTRS[i][0]) != null) {
+          return FEEDBACK_ATTRS[i];
+        }
+      }
+      return null;
+    }
+    function keyedTarget(start) {
+      var el = start;
+      while (el && el !== document.body && !(el.matches && el.matches(REPORT_SELECTOR))) {
+        el = el.parentNode;
+      }
+      if (!el || el === document.body) return null;
+      var pair = surfaceOf(el);
+      return pair ? { el: el, attr: pair[0], surface: pair[1],
+                      key: el.getAttribute(pair[0]) } : null;
+    }
+
+    function openPicker(target) {
+      if (!target) { closePicker(); return; }
+      var key = target.key;
+      closePicker();
+      returnFocus = target.el;
+      picker = document.createElement("div");
+      picker.id = "i18npick";
+      picker.setAttribute("role", "group");
+      picker.setAttribute("aria-label", key);
+      FEEDBACK_REASONS.forEach(function (reason) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.textContent = reason;
+        b.setAttribute("data-reason", reason);
+        b.addEventListener("click", function (e) {
+          e.stopPropagation();
+          recordReport(reportWording(key, reason, target.surface));
+          closePicker();
+          paintReportChip();
+        });
+        picker.appendChild(b);
+      });
+      document.body.appendChild(picker);
+      var r = target.el.getBoundingClientRect();
+      var pr = picker.getBoundingClientRect();
+      var left = Math.max(8, Math.min(r.left, window.innerWidth - pr.width - 8));
+      var top = r.bottom + 6;
+      if (top + pr.height > window.innerHeight - 8) top = r.top - pr.height - 6;
+      picker.style.left = Math.max(8, left) + "px";
+      picker.style.top = Math.max(8, Math.min(top, window.innerHeight - pr.height - 8)) + "px";
+      var first = picker.querySelector("button");
+      if (first) first.focus();
+    }
+
+    document.addEventListener("click", function (ev) {
+      var target = keyedTarget(ev.target);
+      if (!target) { closePicker(); return; }
+      ev.preventDefault();
+      openPicker(target);
+    }, true);
+
+    document.addEventListener("keydown", function (ev) {
+      if (ev.key === "Escape" && picker) { ev.preventDefault(); closePicker(); return; }
+      if (ev.key === "Tab") { makeKeyedFocusable(); return; }
+      if (ev.key === "Enter" || ev.key === " ") {
+        /* Never steal Enter/Space from a field the reviewer is typing in:
+           those keyed surfaces (placeholder, aria-label on an input) are
+           opened with a click. Typing must keep working. */
+        if (editable(ev.target)) return;
+        var target = keyedTarget(ev.target);
+        if (target) { ev.preventDefault(); openPicker(target); }
+      }
+    }, true);
+
+    function editable(el) {
+      if (!el || !el.tagName) return false;
+      var tag = el.tagName.toUpperCase();
+      return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT"
+             || el.isContentEditable === true;
+    }
+
+    /* A reviewer using only a keyboard must be able to reach a string. In
+       report mode every keyed element becomes focusable; it is left alone
+       outside report mode, so a field worker's form is not given a tab stop
+       per sentence. Re-run on Tab so text added after mount is reachable. */
+    function makeKeyedFocusable() {
+      document.querySelectorAll(REPORT_SELECTOR).forEach(function (el) {
+        if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "0");
+      });
+    }
+    makeKeyedFocusable();
+
+    paintReportChip();
+  }
 
   /* ---------- lookup ---------------------------------------------------
      Returns the string and whether it was actually translated, so the
@@ -469,10 +723,85 @@
     });
   }
 
+  /* ---------- reporting a wording problem -----------------------------
+     Adib's team will find Nepali wording that is wrong or awkward during the
+     trial, and a human reviews it afterwards. Two things make that review
+     possible without opening a privacy hole:
+
+       1. THE REPORT IS STRUCTURED, NOT TYPED. A field user picks one of a
+          fixed set of reasons for one dictionary KEY. There is no free-text
+          box, so there is no field a beneficiary's name could end up in.
+          The complaint is identified by the key and the reason -- which is
+          exactly what a translator needs to find the sentence.
+
+       2. IT IS NOT SENT FROM HERE. There is no transport in this file. The
+          dictionary and this engine ship to a public static host, so a URL
+          written in here would be a URL written where anyone can read it,
+          and the only writes the security rules allow are the field records
+          themselves -- a new collection is denied by the catch-all. Collecting
+          the reports therefore needs an approved rules change (or another
+          already-approved destination); reportWording() builds the record and
+          returns it, and the caller decides what to do with it. Until that
+          destination exists the record goes nowhere, which is the safe
+          failure: the page does not silently post somewhere unapproved.
+
+     WHAT CAN BE REPORTED, stated exactly: every keyed surface the engine
+     fills -- `data-i18n` text, `data-i18n-ph` placeholder, `data-i18n-aria`
+     aria-label, `data-i18n-alt` alt text and `data-i18n-title` title. The
+     record names the surface, so a translator is not left guessing whether the
+     complaint is about the visible sentence or the field's placeholder.
+
+     What the record deliberately does NOT carry: the rendered text (it is
+     already in the dictionary, and a page's text is not the point), any
+     query string or fragment from the address bar (a shared link may carry
+     anything), or any free text at all. */
+  var FEEDBACK_REASONS = ["wrong", "awkward", "unclear", "missing"];
+  /* [attribute, surface name] in the order a report should prefer them: the
+     visible sentence first, then the surfaces a reader hears or sees instead
+     of it. */
+  var FEEDBACK_ATTRS = [
+    ["data-i18n", "text"],
+    ["data-i18n-ph", "placeholder"],
+    ["data-i18n-aria", "aria-label"],
+    ["data-i18n-alt", "alt"],
+    ["data-i18n-title", "title"]
+  ];
+  var FEEDBACK_SURFACES = FEEDBACK_ATTRS.map(function (p) { return p[1]; });
+  function reportWording(key, reason, surface) {
+    if (typeof key !== "string" || !key) return null;
+    if (FEEDBACK_REASONS.indexOf(reason) < 0) return null;
+    /* Only a keyed surface this page actually renders can be reported, so a
+       report cannot be used to enumerate the whole dictionary. Default to
+       text so the direct API call stays the common case. */
+    var want = surface == null ? "text" : surface;
+    if (FEEDBACK_SURFACES.indexOf(want) < 0) return null;
+    var on = false;
+    var attr = FEEDBACK_ATTRS.filter(function (p) { return p[1] === want; })[0][0];
+    var nodes = document.querySelectorAll("[" + attr + "]");
+    for (var i = 0; i < nodes.length; i++) {
+      if (nodes[i].getAttribute(attr) === key) { on = true; break; }
+    }
+    if (!on) return null;
+    var path = "";
+    try { path = window.location.pathname; } catch (e) { /* ignore */ }
+    return {
+      kind: "i18n_feedback",
+      schema: "i18n-feedback/1",
+      key: key,
+      surface: want,
+      lang: lang,
+      revision: (S._meta && S._meta.revision) || null,
+      reason: reason,
+      page: path,
+      src: provenance(key)
+    };
+  }
+
   function start() {
     var cov = apply(document);
     mountToggle(cov);
     mountNotice(cov);
+    mountReportMode();
     if (cov.missing.length) {
       console.warn("[i18n] keys used on this page with no English string:", cov.missing);
     }
@@ -498,7 +827,20 @@
     setLang: setLang,
     lang: function () { return lang; },
     langs: LANGS,
-    coverage: null
+    coverage: null,
+    /* Build a structured wording report for a key on THIS page, or null if
+       the key is not rendered here or the reason is not one of the fixed
+       set. Nothing is sent: the caller passes the record to whatever
+       destination has been approved. See reportWording() above. */
+    reportWording: reportWording,
+    feedbackReasons: FEEDBACK_REASONS.slice(),
+    /* The keyed surfaces a report can name, so a caller/UI can state the
+       exact supported surface instead of claiming "any string". */
+    feedbackSurfaces: FEEDBACK_SURFACES.slice(),
+    /* The reports recorded in this session (reviewer mode), and a way to
+       clear them. Nothing leaves the device: see reportWording() above. */
+    reports: reports,
+    clearReports: clearReports
   };
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);

@@ -101,14 +101,39 @@ complete in a summary and is not.
 ## Location granularity
 
 Site-level, coded, and no finer. No GPS coordinates. A ward is recorded
-against a *site* in the code list, as sourced, never against a person or a
-report.
+against a *site* in the code list, as sourced. **Since 20 September 2026 a
+report may additionally state its own optional `ward`** — see *The optional
+`ward` field* below; the site's ward and the report's ward are two different
+things and neither is derived from the other.
 
 The 4Ws manual leaves granularity open — town names, neighbourhood names or
 GPS. In a displacement setting, a precise location combined with a specific
 target group becomes identifying even with no names attached: "three people in
 this target group at this coordinate on this date" can be enough. The coarsest
 level that still supports referral is the right level.
+
+### The optional `ward` field (added 20 September 2026)
+
+The Layer 1 field form now records an **optional** `ward` on the report
+(`design-preview/HANDOFF-ward-field-to-hub.md`). Layer 2's treatment, decided
+here rather than assumed:
+
+| Property | Layer 2's rule |
+|---|---|
+| **New field** | `ward` is accepted. Nothing enumerates or validates the record against a closed field list, so an unknown field is never rejected or dropped. It is carried to the CSV export (`CSV_COLUMNS`) and to the register body, and a stated ward is preserved by both. |
+| **`""` means "not stated"** | A blank `ward` is "not stated", matching the existing convention already used for province, district, activity and modality (`index.html` DIM labels render `""` as "not stated"). It is not missing and not invalid. |
+| **Never a denominator** | `ward` is optional, so a ward-level total is a **subset**, never a denominator. It is a location attribute, not a count, so it adds no reconstruction risk of its own — but if a ward figure is ever published, its `basis` must say so and the below-floor suppression applies **at that grain too**, exactly as it does for every other published grain. |
+| **No ward filter or presentation yet** | The Hub's `DIMS` list (`index.html`) deliberately does **not** include `ward`. Ward is recorded as a **known-but-not-yet-dimensioned** field. This is the explicit, conservative choice: adding `ward` to `DIMS` would change what the dashboard shows, and no ward presentation has been reviewed by Adib. **Flagged for Adib** — see below. |
+| **If a ward filter is ever added** | A record with no ward must be **stated**, not silently dropped — the same rule the district filter already follows (a district recorded as a name is read as its code; a record that states nothing shows under "not stated"). |
+
+**Marked for Adib (presentation change, not made here).** Adding `ward` to the
+Hub's `DIMS` would put a Ward filter and a ward breakdown on the dashboard, and
+would let a ward-level figure reach the publish path. It is not done in this
+change because it alters what the dashboard shows and nobody has reviewed that
+presentation. When it is wanted, the work is: add `"ward"` to `DIMS` and a
+`ward` entry to `DIM` (`index.html`), which gives the filter and the "not
+stated" treatment for free, and add the ward grain to the publish-path check so
+the below-floor rule is applied at that grain.
 
 ## Site list
 
