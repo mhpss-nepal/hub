@@ -159,5 +159,19 @@ affected-area counts remain; at least 753 palikas are present.
 * **Before this branch.** The reverts were being served:
   `https://mhpss-nepal.github.io/hub/assets/store.js` — HTTP 200, 27 357 B,
   sha256 `663230653cd732b5…`, stale header present, `syncToRegister` absent.
-* **After the merge.** Measured from a fresh cache-busted fetch and re-checked
-  in the browser — see the closing note at the end of this file.
+* **After the merge** (hub#25, merged as `c1607ef`). Measured from a fresh
+  cache-busted fetch, and the served bytes compared with the merged commit:
+
+  | file | HTTP | live sha256 | == merged commit |
+  |---|---|---|---|
+  | `assets/store.js` | 200 | `ffeee988efc0d961…` | yes |
+  | `assets/i18n-strings.js` | 200 | `feb9241604dafc18…` | yes |
+  | `assets/codes.js` | 200 | `846aec4e5f980d9a…` | yes |
+
+  `/hub/assets/store.js` now carries `syncToRegister()` and no longer carries
+  the local-only paragraph. `https://mhpss-nepal.github.io/hub/` loads in a
+  fresh headless Chromium (clean context, cache-busted, `locale=en-US`) with
+  `data-lang=en` and **no console errors**.
+
+  The full suite was re-run on the merged commit, not only on the branch:
+  `c1607ef` — 32 tests, **OK (skipped=1)**; the three deploy guards pass.
