@@ -1089,6 +1089,12 @@ window.I18N_STRINGS = {
   },
 
   en: {
+    "sr.age.0to4": "0 to 4",
+    "sr.age.5to9": "5 to 9",
+    "sr.age.10to19": "10 to 19",
+    "sr.age.20to59": "20 to 59",
+    "f4.provLab": "Province",
+    "f4.provHelp": "All seven provinces are listed. Choosing one shortens the district list; choosing nothing keeps every district available.",
 
     /* Added by the form lane, 227 keys; see LANGUAGE-COVERAGE.md */
     "phq9.cutoff.interpretation": "Bands are the standard PHQ-9 cut-points (Kroenke, Spitzer &amp; Williams, 2001): 0–4 minimal, 5–9 mild, 10–14 moderate, 15–19 moderately severe, 20–27 severe. The action threshold of <b>10 or more</b> is the one validated in Nepal (Kohrt et al., 2016; sensitivity 0.94, specificity 0.80, in 125 primary-care patients in Chitwan). A score is not a diagnosis and must not be recorded as one.",
@@ -2151,6 +2157,12 @@ window.I18N_STRINGS = {
      general translation engine cannot do that, and would invent its own
      vocabulary that then fails to match the national one. */
   ne: {
+    "sr.age.0to4": "० देखि ४",
+    "sr.age.5to9": "५ देखि ९",
+    "sr.age.10to19": "१० देखि १९",
+    "sr.age.20to59": "२० देखि ५९",
+    "f4.provLab": "प्रदेश",
+    "f4.provHelp": "सातै प्रदेश सूचीबद्ध छन्। एउटा छान्दा जिल्लाको सूची छोटो हुन्छ; नछान्दा सबै जिल्ला उपलब्ध रहन्छन्।",
 
     /* Added by the form lane, 775 keys; machine-drafted, await human review */
     "phq9.p004": "तह १ · Rasuwa / Bhote Koshi",
