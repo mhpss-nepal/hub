@@ -24,10 +24,34 @@ from pathlib import Path
 DICT = Path(__file__).resolve().parent.parent / "assets" / "i18n-strings.js"
 PREFIXES = ("phq9.item", "consent.", "safeguard.", "clinical.")
 
-# Keys inside those prefixes that are legitimately allowed Nepali, if any. Empty
-# on purpose: none of these is safe to machine-translate. Listed so that adding
-# one is a visible decision, not an accident.
-ALLOW_NEPALI: tuple = ()
+# Keys inside those prefixes that are legitimately allowed Nepali, if any.
+# Listed so that adding one is a visible decision, not an accident.
+#
+# 2026-09-21 -- DECISION: the PHQ-9 items and the two instruction lines are
+# allowed Nepali, and this is the only entry ever added.
+#
+#   phq9.item1..9      NOT machine output. The validated Nepali instrument from
+#                      Kohrt et al. (BMC Psychiatry 2016;16:58, PMC4782581,
+#                      Additional file 1), converted out of the legacy
+#                      non-Unicode font and cross-checked with a second
+#                      independent converter. Two mappers agree on all nine
+#                      items. The cut-off of 10 or more belongs to these words,
+#                      so these published words are what ships. Verbatim: not
+#                      one item is re-worded.
+#   phq9.itemInstruction  the "over the last 2 weeks" line, plain draft.
+#   phq9.itemDifficulty   the impairment question, plain draft.
+#                      Both carry NO scoring weight and are marked as drafts
+#                      pending a Nepali-speaking clinician.
+#
+# STILL NOT ALLOWED, and this is deliberate: phq9.item9Instruction (the crisis
+# instruction after item 9 -- someone acts on it in a real emergency and no
+# verified Nepali exists, so it stays English and the engine marks it kept),
+# phq9.cutoff.*, consent.*, safeguard.*, clinical.*.
+ALLOW_NEPALI: tuple = (
+    "phq9.item1", "phq9.item2", "phq9.item3", "phq9.item4", "phq9.item5",
+    "phq9.item6", "phq9.item7", "phq9.item8", "phq9.item9",
+    "phq9.itemInstruction", "phq9.itemDifficulty",
+)
 
 
 def load() -> dict:
