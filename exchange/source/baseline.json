@@ -1,0 +1,35 @@
+{
+  "note": "The ONLY figures the exchange feed may carry: aggregates already published on the NDRRMA/OCHA public 5Ws Power BI dashboard, MHPSS sector, Rasuwa Flood Response. No individual-level data. Reach is NON-ADDITIVE (max per location, as the source computes it) -- cross-row sums disagree by design and must not be summed. Source of the values: the frozen MHPSS-Nepal baseline (knowledge/MHPSS-Nepal). Refresh only by regenerating this file from a new capture; never hand-edit a figure.",
+  "source": "NDRRMA/OCHA public 5Ws Power BI dashboard - Rasuwa Flood Response, MHPSS sector",
+  "source_url": "https://ndrrma.gov.np/ (public Power BI embed; read-only, no account)",
+  "retrieved_date": "2026-09-19",
+  "data_date": "2026-09-19",
+  "period_from": "2026-08-26",
+  "period_to": "2026-09-19",
+  "reach_basis": "People reached with MHPSS activities, as the source reports it, counted once per location (max per location). The measure is non-additive: it must not be summed across rows, dimensions or organisations.",
+  "classification": "public-aggregate",
+  "rows": [
+    { "mun": "Benighat Rorang Gaunpalika", "district_code": "DHA", "reached": 118,  "activities": 6 },
+    { "mun": "Gajuri Gaunpalika",          "district_code": "DHA", "reached": 177,  "activities": 12 },
+    { "mun": "Galchhi Gaunpalika",         "district_code": "DHA", "reached": 217,  "activities": 18 },
+    { "mun": "Belkotgadhi Municipality",   "district_code": "NUW", "reached": 651,  "activities": 19 },
+    { "mun": "Bidur Municipality",         "district_code": "NUW", "reached": 3165, "activities": 101 },
+    { "mun": "Kispang Gaunpalika",         "district_code": "NUW", "reached": 250,  "activities": 7 },
+    { "mun": "Aamachhodingmo Gaunpalika",  "district_code": "RAS", "reached": 16,   "activities": 2 },
+    { "mun": "Gosaikunda Gaunpalika",      "district_code": "RAS", "reached": 532,  "activities": 21 },
+    { "mun": "Kalika Gaunpalika",          "district_code": "RAS", "reached": 314,  "activities": 7 },
+    { "mun": "Uttargaya Gaunpalika",       "district_code": "RAS", "reached": 390,  "activities": 34 }
+  ],
+  "palika_pcodes": {
+    "Benighat Rorang Gaunpalika": "NP0330408",
+    "Gajuri Gaunpalika":          "NP0330409",
+    "Galchhi Gaunpalika":         "NP0330410",
+    "Belkotgadhi Municipality":   "NP0328302",
+    "Bidur Municipality":         "NP0328301",
+    "Kispang Gaunpalika":         "NP0328402",
+    "Aamachhodingmo Gaunpalika":  "NP0329401",
+    "Gosaikunda Gaunpalika":      "NP0329402",
+    "Kalika Gaunpalika":          "NP0329404",
+    "Uttargaya Gaunpalika":       "NP0329403"
+  }
+}
