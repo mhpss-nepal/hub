@@ -630,6 +630,22 @@
   });
 
   /* ---------- the live register ---------------------------------------- */
+  /* This page reads the four INSTRUMENT kinds. It must ask the server for
+     each kind separately (watchKind), because Firestore evaluates a query
+     against its potential result set and rules v4 refuses an unfiltered read
+     for any restricted role -- so an unfiltered watch() would show an empty
+     page (or, under an older ruleset, the whole register). The kinds watched
+     here are exactly the kinds this page renders; do not add a kind without
+     adding it to LIVE_KINDS. */
+  var LIVE_KINDS = ["service_contact", "referral", "phq9", "self_report"];
+  var liveByKind = {}, liveOk = {};
+  function mergeKind(kind, rows) {
+    liveOk[kind] = true;
+    liveByKind[kind] = rows || [];
+    var all = [];
+    LIVE_KINDS.forEach(function (k) { all = all.concat(liveByKind[k] || []); });
+    mergeLive(all);
+  }
   function mergeLive(rows) {
     LIVE = rows.map(function (r) {
       var o = JSON.parse(JSON.stringify(r));
@@ -698,12 +714,23 @@
       paintLive(st);
       if (st.ready && st.user && !watching) {
         watching = true;
-        window.FB.watch(mergeLive, function (err) {
+        var onErr = function (err) {
+          /* A restricted role may be granted some kinds and refused others.
+             Only a read where NO kind could be read at all is a hard refusal
+             worth a banner; otherwise the page shows exactly what it may. */
+          if (Object.keys(liveOk).length > 0) return;
           $("livePanel").innerHTML = '<div class="banner stop" style="margin:0 0 14px"><b>The register refused ' +
             'the read.</b> ' + esc(err) + '<br><br>Almost always this means the account is signed in ' +
             'but has not been granted access. Signing in proves who you are; it does not grant ' +
             'sight of the records. An admin adds the address on the Access page.</div>';
-        });
+        };
+        if (!window.FB.watchKind) {
+          onErr("this build cannot scope the read to a record kind");
+        } else {
+          LIVE_KINDS.forEach(function (k) {
+            window.FB.watchKind(k, function (rows) { mergeKind(k, rows); }, onErr);
+          });
+        }
       }
       if (!st.user) { watching = false; LIVE = []; render(); }
     });
