@@ -1,14 +1,16 @@
 /* =====================================================================
    MHPSS Nepal — local store
    ---------------------------------------------------------------------
-   Deliberately has NO backend. Records are held in this browser only,
-   and leave it only when a person exports them. That is not a temporary
-   shortcut: until the three governance questions have written answers,
-   no operational data may sit on infrastructure that is not WHO's or
-   the government's. A form with no server cannot breach that rule.
+   The device copy is the first durable copy. `save()` writes it to
+   localStorage, then `syncToRegister()` hands a stripped copy to the loaded
+   Firebase bridge (`fb.js`) for the `submissions` register; failed delivery
+   stays queued for retry. The Hub reads that register.
 
-   When a backend is authorised, only `save()` and `all()` change. The
-   record shape, the deterministic id and the validation stay as they are.
+   Focal-point name, phone and email deliberately never cross the network:
+   `fb.js` removes them and the security rules reject them. They remain only
+   in this device store and in the CSV/JSON export. Collect an export before
+   clearing or replacing a handset, because the remote register cannot restore
+   those contact details.
    ===================================================================== */
 
 const KEY = "mhpss-np-4ws-v1";

@@ -11,6 +11,13 @@ A field report may now carry an OPTIONAL `ward` (Layer 1 handoff,
   4. keep the Ward control's labels out of the raw-key state, and keep the
      ward list built from the palika's own `wards` count in codes.js.
 
+Two of these assertions were re-aligned on 21 Sep 2026 after two shipped
+decisions made them stale -- the validated Nepali PHQ-9 (hub#21) and the
+official 753-palika MoFAGA list (hub#19). Neither was a merge-order artefact
+and neither was dropped: see the docstrings on the two tests for what each one
+now pins, and `test_store_data_path_contract.py` for the one that was a silent
+revert rather than a stale test.
+
 The defect this suite pins first is the silent one: `toCSV()` builds BOTH
 the header and every row from `CSV_COLUMNS`, and `ward` was not in it, so a
 reporter picked a ward, the record carried it, and the export lost it with
@@ -46,6 +53,16 @@ CODES = ROOT / "assets" / "codes.js"
 DICT = ROOT / "assets" / "i18n-strings.js"
 PROBE = ROOT / "tools" / "fixtures" / "store-probe.js"
 
+# The protected-string rule belongs to `assets/i18n-strings.js` and to
+# `tools/protected-strings-check.py`. This suite used to carry its OWN copy of
+# the prefix list, frozen before the validated Nepali PHQ-9 shipped (hub#21,
+# Kohrt et al. 2016 Additional file 1: nine items + the four-level scale) and so
+# reported that deliberate release as a leak. Keeping a private copy of a rule
+# that lives in the file under test is how the two drift apart, so there is no
+# copy here any more: the rule and its published exception list are READ from
+# the guard, and the two extra properties the release rests on are asserted
+# against the dictionary's own declarations.
+
 # The form build is materialised from FORM_REF below, not served from a
 # working tree -- see the note there.
 # The form repository, and the commit whose 5Ws page carries the ward field the
@@ -55,17 +72,65 @@ FORM_REF = os.environ.get("MHPSS_FORM_REF", "24c7a2a")
 
 # Keys that must render English on the Nepali page whatever the dictionary
 # holds -- re-checked here because this change edits the dictionary.
-PROTECTED_PREFIXES = [
-    "phq9.item", "phq9.scale", "phq9.cutoff",
-    "consent.", "safeguard.", "clinical.",
-    "sr.p007", "sr.p001", "sr.clinicalNote",
-]
+#
+# The rule itself is shipped in ONE place: `tools/protected-strings-check.py`
+# holds `PREFIXES` (the families no machine may translate) and `ALLOW_NEPALI`
+# (the one published exception). Read from there, never copied.
+def _shipped_rule():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "protected_strings_check", ROOT / "tools" / "protected-strings-check.py")
+    assert spec is not None and spec.loader is not None, (
+        "the guard this suite reads its rule from is missing: "
+        "tools/protected-strings-check.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.PREFIXES, mod.ALLOW_NEPALI
+
+
+PROTECTED_PREFIXES, ALLOW_NEPALI = _shipped_rule()
+
+
+def _is_protected(key):
+    return any(key == p or key.startswith(p) for p in PROTECTED_PREFIXES)
+
+
+def _meta_list(src, name):
+    """A quoted-string list from `_meta` (`professionalOnly`, `source.human`)."""
+    import re
+    m = re.search(r"\b" + re.escape(name) + r":\s*\[(.*?)\n    \]", src, re.S)
+    if not m:
+        return []
+    return re.findall(r'"((?:[^"\\]|\\.)*)"', m.group(1))
+
+
+# The named protected keys that must hold NO Nepali value at all: the card's
+# named set MINUS the exception the dictionary publishes for itself. (The old
+# copy listed phq9.item9 and phq9.scale1 here -- exactly the two keys the
+# validated Nepali shipped for.)
 PROTECTED_NAMED = [
-    "phq9.item9", "phq9.item9Instruction", "phq9.scale1", "phq9.cutoff.interpretation",
+    "phq9.item9Instruction",           # the crisis instruction after item 9
     "consent.label", "consent.phq9",
     "safeguard.checkLabel", "safeguard.confirmation", "safeguard.consequence",
-    "safeguard.referralExclusion", "sr.clinicalNote", "sr.p001", "sr.p007",
+    "safeguard.referralExclusion",
+    "clinical.phq9ValidatedTextWarning",
 ]
+
+# Keys whose English is enforced at RENDER time by `_meta.professionalOnly`
+# (`i18n.js` isProtected()): the engine shows the English whatever the `ne`
+# table holds. This is how sr.* and phq9.cutoff.* stay English while a Nepali
+# entry exists, so what is asserted is the declaration, not the absence of a
+# value. Prefix matching, because the engine matches prefixes.
+RENDER_FORCED_NAMED = [
+    "sr.p001", "sr.p007", "sr.clinicalNote",
+    "phq9.item9Instruction", "phq9.cutoff.interpretation", "phq9.cutoff.useWarning",
+]
+
+# hub#21's release, as the dictionary records it in `_meta.source.human`: the
+# validated instrument (nine items) and the validated four-level scale. Asserted
+# so a merge-order revert cannot remove the Nepali PHQ-9 quietly.
+VALIDATED_NEPALI = (["phq9.item%d" % i for i in range(1, 10)]
+                    + ["phq9.scale%d" % i for i in range(4)])
 
 # The four palikas whose ward counts the hub patch adds, with the count that
 # must appear. Aamachhodingmo is one NDRRMA names as affected.
@@ -191,16 +256,43 @@ class WardCodesTest(unittest.TestCase):
                              "%s should carry wards: %d" % (pcode, count))
             self.assertIn(name, m.group(0))
 
-    def test_every_palika_still_carries_a_ward_count(self):
-        """The ward control stays hidden where a count is unknown -- verify none
-        regressed, since a missing count is what the patch exists to fix."""
+    def test_a_palika_with_a_ward_count_carries_a_usable_one_and_a_missing_one_is_declared(self):
+        """The ward control is built from the palika's own `wards` count.
+
+        This assertion used to be "every palika carries a ward count". That
+        stopped being true by DECISION, not by accident: hub#19 replaced the 20
+        OCHA p-codes of the affected-area list with the official 753-palika
+        MoFAGA list, and that list publishes no ward count, so its entries carry
+        none. The property that survives is the one the original defect
+        violated: a palika from the affected-area lane still carries its count,
+        that count is a usable number, and a palika WITHOUT one says where it
+        came from. A silent absence is still a failure.
+        """
         src = CODES.read_text(encoding="utf-8")
         import re
         block = re.search(r"const PALIKAS = \[(.*?)\n\];", src, re.S).group(1)
         entries = re.findall(r"\{[^{}]*\}", block)
         self.assertTrue(entries)
+        counted = uncounted = 0
         for e in entries:
-            self.assertRegex(e, r"\bwards:\s*\d+", "a palika carries no ward count: %s" % e[:80])
+            m = re.search(r"\bwards:\s*([^,}]+)", e)
+            if m is None:
+                uncounted += 1
+                self.assertIn("MoFAGA", e,
+                              "a palika carries no ward count and declares no "
+                              "MoFAGA source, so the absence is silent: %s" % e[:90])
+                continue
+            counted += 1
+            value = m.group(1).strip()
+            self.assertRegex(value, r"^\d+$",
+                             "a ward count is not a whole number: %s" % e[:90])
+            self.assertTrue(5 <= int(value) <= 35,
+                            "a ward count is outside Nepal's 5-35 range: %s" % e[:90])
+        # Both lists, so the check cannot pass on a shrunken file.
+        self.assertGreaterEqual(counted, 20,
+                                "the affected-area palikas' ward counts are gone")
+        self.assertGreaterEqual(counted + uncounted, 753,
+                                "the official MoFAGA list is not all there")
 
 
 class WardDictionaryTest(unittest.TestCase):
@@ -211,6 +303,7 @@ class WardDictionaryTest(unittest.TestCase):
         cls.src = DICT.read_text(encoding="utf-8")
         cls.en = _block(cls.src, "en")
         cls.ne = _block(cls.src, "ne")
+        cls.human = _meta_list(cls.src, "human")
 
     def test_the_ward_label_strings_exist_in_both_languages(self):
         for k in WARD_LABEL_KEYS:
@@ -231,12 +324,39 @@ class WardDictionaryTest(unittest.TestCase):
                     "%s/%s carries markup but is rendered as plain text" % (lang, k))
 
     def test_no_protected_key_gained_a_nepali_value(self):
-        """Safety, not translation: a machine-rendered PHQ-9 is not the PHQ-9."""
+        """The card's safety property, aligned with the shipped rule.
+
+        The rule is: no key in a protected family carries a Nepali value, with
+        the ONE published exception the dictionary declares for itself
+        (`ALLOW_NEPALI`, hub#21's validated instrument). The old private copy of
+        the list predated that release and reported it as a leak; the exception
+        is now read from the guard instead of copied.
+
+        A Nepali value inside a protected family must also be DECLARED for what
+        it is: `_meta.source.human` (a person wrote or checked it) or
+        `_meta.professionalOnly` (the engine forces the English and the Nepali is
+        inert). An undeclared Nepali value in a protected family is the thing to
+        catch, whatever the prefix list says.
+        """
         leaked = [k for k in self.ne
-                  if any(k.startswith(p) for p in PROTECTED_PREFIXES)]
+                  if _is_protected(k) and k not in ALLOW_NEPALI]
         self.assertEqual([], leaked,
-                         "a protected key carries a Nepali value, so it would "
+                         "a protected key carries a Nepali value outside the "
+                         "dictionary's published exception list, so it would "
                          "render translated on a Nepali page")
+        # ...and the exception is the validated instrument, not a hole: every
+        # key allowed Nepali inside a protected family is either declared
+        # human-sourced (the nine items and the four-level scale) or is one of
+        # the two non-scored instruction lines the guard names in writing.
+        human = _meta_list(self.src, "human")
+        guard_named = [k for k in ALLOW_NEPALI if k in ("phq9.itemInstruction",
+                                                        "phq9.itemDifficulty")]
+        unexplained = [k for k in ALLOW_NEPALI
+                       if k not in human and k not in guard_named]
+        self.assertEqual([], unexplained,
+                         "a key is allowed Nepali inside a protected family "
+                         "without being declared either human-sourced or one of "
+                         "the guard's named instruction lines")
         for k in PROTECTED_NAMED:
             self.assertFalse(self.ne.get(k, "").strip(),
                              "%s must have no Nepali value" % k)
@@ -448,10 +568,14 @@ class SafetyStringsRenderedTest(unittest.TestCase):
     page that actually carries the protected keys (`selfreport.html`), reading
     the text the page shows. A source grep is not evidence the page works.
 
-    Only `selfreport.html` uses a protected prefix in the current form build;
-    the named PHQ-9 / consent / safeguard keys live on pages the trial build has
-    removed, so for those the check is on the dictionary: they must hold no
-    Nepali value at all.
+    Only `selfreport.html` uses a protected prefix in the current form build.
+    The named PHQ-9 / consent / safeguard keys live on pages the trial build has
+    removed, so for those the check is on the dictionary: they must carry a
+    non-empty English string and no Nepali value. The keys that DO carry Nepali
+    text (the validated instrument, and the render-forced sr.* and
+    phq9.cutoff.* keys) are checked against the dictionary's own declarations --
+    `source.human` and `professionalOnly` -- because that is what keeps them
+    English on the page.
     """
 
     @classmethod
@@ -523,25 +647,50 @@ class SafetyStringsRenderedTest(unittest.TestCase):
     def test_every_named_protected_key_holds_no_nepali_value(self):
         """The named list in the card, checked against the dictionary itself.
 
-        NOTE, recorded rather than assumed: in `hub` main, the named PHQ-9 /
-        consent / safeguard keys carry NEITHER an English NOR a Nepali entry --
-        they are simply absent, because the pages that would use them are not
-        in this build. The safety property is therefore two-fold: (a) this
-        change adds no Nepali for a protected key, and (b) where the hub does
-        carry the key (sr.p001 / sr.p007 / sr.clinicalNote), the Nepali is
-        absent too, so nothing renders translated on a Nepali page.
+        What changed here, and why it is not a relaxation: the old copy of this
+        test recorded that in `hub` main the named PHQ-9 / consent / safeguard
+        keys were ABSENT from both tables, and pinned the set of present keys to
+        the three sr.* ones. Both halves of that record were overtaken by the
+        protected-english-text fix (hub#12) and by the validated Nepali PHQ-9
+        (hub#21): all of them are now present in `en` -- which is the property
+        that stops the page rendering a literal `[key]` -- and the two keys the
+        old copy named as "must hold no Nepali" (phq9.item9, phq9.scale1) are
+        exactly the ones the validated instrument ships for.
+
+        So the assertions are: every named key has a non-empty ENGLISH string;
+        none of them carries Nepali; the keys the engine does not force English
+        for at render time are exactly the ones that hold no Nepali; and the
+        keys that DO carry Nepali machine text are declared render-forced.
         """
-        en = _block(DICT.read_text(encoding="utf-8"), "en")
-        ne = _block(DICT.read_text(encoding="utf-8"), "ne")
+        src = DICT.read_text(encoding="utf-8")
+        en = _block(src, "en")
+        ne = _block(src, "ne")
         for k in PROTECTED_NAMED:
             self.assertFalse(ne.get(k, "").strip(),
                              "%s carries a Nepali value" % k)
-        # every protected key the hub actually carries must have an English string
-        present = [k for k in PROTECTED_NAMED if k in en]
-        self.assertEqual(sorted(present), ["sr.clinicalNote", "sr.p001", "sr.p007"],
-                         "the set of named protected keys in the dictionary moved")
-        for k in present:
+            self.assertTrue(en.get(k, "").strip(),
+                            "%s has no English string, so the page would render "
+                            "the literal [key]" % k)
+        # every protected key the dictionary carries must render as English text
+        for k in sorted(k for k in en if _is_protected(k)):
             self.assertTrue(en[k].strip(), "%s has an empty English string" % k)
+        # the keys that carry Nepali and must still render English are declared
+        # render-forced, so the engine's isProtected() is what keeps them English
+        forced = _meta_list(src, "professionalOnly")
+        for k in RENDER_FORCED_NAMED:
+            self.assertTrue(
+                any(k == p or k.startswith(p) for p in forced),
+                "%s carries Nepali text and is no longer declared in "
+                "_meta.professionalOnly, so it would render translated" % k)
+        # and the released instrument is declared as a person's text, so a
+        # merge-order revert cannot take it away without this failing
+        human = _meta_list(src, "human")
+        for k in VALIDATED_NEPALI:
+            self.assertIn(k, human,
+                          "%s is not declared in _meta.source.human, so the "
+                          "validated Nepali is no longer claimed as human text" % k)
+            self.assertTrue(ne.get(k, "").strip(),
+                            "%s lost the validated Nepali value" % k)
 
 
 if __name__ == "__main__":
