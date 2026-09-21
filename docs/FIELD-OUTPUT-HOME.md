@@ -41,9 +41,11 @@ Measured on the frozen hub tree:
 
 | Surface | Route | Register kinds it asks the server for | Contract that pins it |
 |---|---|---|---|
-| Coordination dashboard | `hub/` | `["activity"]` (`Q_KINDS`, `index.html:902`) | `tools/hub-live-read-scoping-check.py` |
-| Per-form output homes | `hub/forms.html` | `["service_contact", "referral", "phq9", "self_report"]` (`LIVE_KINDS`, `forms.html:640`) | same guard, second surface |
+| Coordination dashboard | `hub/` | `["activity"]` (`Q_KINDS`, `index.html:902`) | `tools/hub-live-read-scoping-check.py` (static) + `-browser-check.py` |
+| Per-form output homes | `hub/forms.html` | `["service_contact", "referral", "phq9", "self_report"]` (`LIVE_KINDS`, `forms.html:640`) | `tools/hub-live-read-scoping-browser-check.py` (the four kinds, as a subset of the requests) |
 | **The receiving surface added here** | `hub/field-output-home.html` | `["activity"]` | `tests/test_field_output_home.py` |
+
+The static guard in the third column checks the *scope* of each read (kind-scoped, never an unfiltered `watch()`), and for `forms.html` it only requires that whatever `LIVE_KINDS` declares is also requested. The four instrument kinds are pinned by the **browser** check, which asserts them as a subset of what the page actually asks the server for.
 
 Two consequences, both of which were being carried silently:
 
@@ -53,6 +55,19 @@ Two consequences, both of which were being carried silently:
   reading them for internal review. `FORMS-OUTPUT-HOME-SCOPE.md` says as much in its own closing
   section ("A static host still serves the four page files to anyone typing the exact URL"); the
   read half of that sentence was never written down. It is written down here.
+
+  **Qualified by measurement.** What *pins* those four homes is **not** `tools/hub-live-read-scoping-check.py`,
+  which this document first claimed. Measured on a copy of the frozen tree: shrinking
+  `forms.html`'s `LIVE_KINDS` from four kinds to two — the read half of a link removal — leaves that
+  guard **green** (exit 0). The guard only fails when the `watchKind` call itself is deleted, or when
+  a read is widened (`watchKind` asking for a kind `LIVE_KINDS` does not declare). So the guard pins
+  *scope*, not the four kinds. The thing that pins the four kinds is
+  `tools/hub-live-read-scoping-browser-check.py` — it loads `forms.html` with a stub `fb.js` and
+  fails unless `{service_contact, referral, phq9, self_report}` is a **subset** of the kinds actually
+  requested — plus `test_trial_scope.py`, whose `APPROVED_FORM_TARGETS` admits `/form`, the 5Ws page
+  and `all-forms.html`, and whose comment records that `forms.html` keeps its read-only review
+  tables. A hub-side "consolidation" that trimmed those four homes would be caught by the browser
+  check and the trial-scope suite, not by the static guard.
 * **The read is the boundary, not the filter.** Firestore evaluates a query against its whole
   potential result set: the rules are not filters. A page must therefore *ask for* exactly the
   kinds it renders. That is why `watchKind` exists and why the guard forbids `watch()`.
@@ -163,8 +178,11 @@ The questions he is being asked:
 firebase emulators:start --only firestore --project mhpss-nepal-hub   # listens on 127.0.0.1:8081
 
 # 2. the suite. The round-trip and negative-control bodies SKIP when no emulator is
-#    listening — they never pass green on nothing.
-python3 -m unittest -v tests.test_field_output_home
+#    listening — they never pass green on nothing. 26 tests, OK, ~193 s.
+python3 -m unittest discover -s tests -p 'test_*.py' -v
+
+#    …and the whole-suite form, which is where the four pre-existing reds (§8) appear.
+python3 -m unittest discover -p 'test_*.py'
 
 # 3. the existing gates, unchanged
 python3 tools/hub-live-read-scoping-check.py
@@ -176,6 +194,48 @@ python3 tools/contrast-check.py
 python3 tools/rail.py
 ```
 
+### Measured on this head (all exit 0)
+
+| command | result |
+|---|---|
+| `python3 -m unittest discover -s tests -p 'test_*.py'` | **Ran 26 tests … OK** (~193 s), incl. the emulator round trip |
+| `python3 tools/hub-live-read-scoping-check.py` | `PASS (every register read is kind-scoped)` |
+| `python3 tools/hub-live-read-scoping-check.py --break` | `SELF-TEST OK: the guard went red exactly as it must.` |
+| `python3 tools/protected-strings-check.py` | `OK` — 19 protected keys in `en`, 0 carrying Nepali |
+| `python3 tools/i18n-check.py` | `Gate open` — the new page is listed under "NOT YET MIGRATED" (929 words), the same class as `index.html`/`forms.html`; the gate is not weakened |
+| `python3 tools/text-setting-check.py` | `True: running text is set justified…` |
+| `python3 tools/contrast-check.py` | `True: every declared token clears AA…` (25 pairs) |
+| `python3 tools/rail.py` | `True: every page's rail is the one written in tools/rail.py` |
+
+### The suite bites when the read path breaks (mutation check)
+
+A copy of this tree with one character changed — the page's `KINDS` set from `["activity"]` to
+`["referral"]`, i.e. the read pointed at a kind the form does not write — turns **three** tests red:
+
+```
+FAIL test_round_trip_a_record_written_by_the_current_form_is_read_on_layer_two
+     AssertionError: 'read succeeded' != 'refused: no answer from the register within 20s'
+FAIL test_the_page_asks_for_one_kind_and_never_writes
+     AssertionError: Lists differ: ['activity'] != ['referral']
+FAIL test_it_asks_for_exactly_one_kind_and_it_is_the_trial_instrument
+     AssertionError: 'var KINDS = ["activity"];' not found
+Ran 11 tests … FAILED (failures=3)
+```
+
+So the round trip is a real read, not a tautology: point it at the wrong kind and it goes red.
+
+### Re-measured live site (cache-busted, read-only fetch)
+
+| what | live value |
+|---|---|
+| `https://mhpss-nepal.github.io/hub/field-output-home.html` | **404** — expected: the receiving surface is not deployed (this card forbids deployment; the preview link in the completion summary is the way to open it) |
+| `.../hub/index.html` | 200, `sha256 5493ce92…` |
+| `.../hub/forms.html` | 200, `sha256 2a299d18…`; live `LIVE_KINDS` still the four instruments; **no** unfiltered `FB.watch(` |
+| `.../hub/assets/i18n-strings.js` | 200, 314 445 B — the validated PHQ-9 / protected strings intact |
+
+The recent work the card protects (validated Nepali PHQ-9, skip link, MoFAGA 753 palikas) is
+unchanged on the live host by this branch, because nothing here is deployed.
+
 ## 8. Known limitations
 
 * **The emulator is a stand-in for the deployed register.** It is the same API and the same code
@@ -184,14 +244,32 @@ python3 tools/rail.py
   behaviour is proven separately (`docs/OPERATIONAL-READINESS.md`, `test/store-data-path` family).
 * **The proof runs locally, not on the deployed host,** so it is evidence about the code, not about
   production. This is deliberate: the card forbids any deployment beyond what is already live.
-* **Two adjacent tasks on the hub tree leave before this one:**
-  * `fix/store-backend-comment` (`326ffbb`) corrects the stale `assets/store.js` header, which
-    currently claims the store has no backend while the same file implements `syncToRegister()`.
-    `test_store_data_path_contract.py::test_header_describes_the_register_bridge_not_a_local_only_store`
-    is red at the frozen head and green with that branch. Sharing the same file is what makes this
-    a **merge-order** matter, not a defect in either change; the page here reads `store.js` and
-    depends on neither wording.
-  * `test_ward_field.py` is also red at the frozen head, for the same reason, on the same file
-    (`assets/codes.js`), and is fixed by `task/t_e26d775b-ward-csv-patches`. Neither is touched by
-    this change. They are named here so an independent reader is not surprised by a red suite that
-    is not this card's.
+* **Four tests are already red at the frozen hub head, and none of them is this card's.** Measured
+  twice: on the frozen commit itself (`git worktree add --detach /tmp/basehub-dfe660a dfe660a`) and on
+  this branch, `python3 -m unittest discover -p 'test_*.py'` from the repository root reports the
+  **same four** failures — `test_store_data_path_contract` ×1 and `test_ward_field` ×3 — and the same
+  single skip. This branch adds no failure and removes none.
+
+  Two earlier explanations for them were wrong and are corrected here:
+
+  * **`assets/store.js`'s header is a silent revert, not an unmerged branch.** An earlier draft of
+    this document said `fix/store-backend-comment` (`326ffbb`) was "ahead of `main` and unmerged".
+    That is false: `326ffbb` **is** merged (`e231549`, hub#3) and **is** an ancestor of `origin/main`.
+    It was then silently undone — `e479582` (hub#14, the Ministry age bands, merged as `dab6329`)
+    carries the header **back** to the stale "Deliberately has NO backend" text, even though its own
+    parent `e34018c` already contained the fix. So the same failure mode the card names for protected
+    strings ("a branch cut before a hotfix and merged after it has silently reverted…") has now
+    happened a fourth time, on a **comment**, and the guard that would have caught it
+    (`test_store_data_path_contract.py`) is red on `main` because of it. Merging that branch again
+    would do nothing; the header has to be re-applied. It is **not** this card's file — `assets/store.js`
+    is a shared hotspot — so it is reported, not repaired here.
+  * **`test_ward_field.py` is stale relative to the validated Nepali PHQ-9.** Two of its three
+    failures are its own `PROTECTED_PREFIXES` copy of the no-Nepali rule, which still lists
+    `phq9.item`/`phq9.scale`; hub#21 deliberately shipped the validated Nepali for exactly those keys
+    and updated `tools/protected-strings-check.py` (`ALLOW_NEPALI`) — but did **not** update this test.
+    The third failure is `test_every_palika_still_carries_a_ward_count`, which expects `wards:` on every
+    palika entry; hub#19 replaced the 20 OCHA pcodes with the official 753-palika MoFAGA list, whose
+    entries carry no ward count. Both are real regressions at the frozen head, both belong to the lanes
+    that made them, and neither is touched by this change.
+
+  Filed as a follow-up card rather than fixed here (this card adds a reader; it repairs nothing else).
