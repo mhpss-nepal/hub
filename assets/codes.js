@@ -56,8 +56,8 @@ const DISTRICTS = [
   { code: "DHA", name: "Dhading", province: "Bagmati", np: "धादिङ", np_src: "draft" },
   { code: "KTM", name: "Kathmandu", province: "Bagmati", np: "काठमाडौं", np_src: "draft" },
   { code: "CHT", name: "Chitwan", province: "Bagmati", np: "चितवन", np_src: "draft" },
-  { code: "NAW", name: "Nawalparasi (Bardaghat Susta East)", alias: "Nawalpur", province: "Gandaki", np: "नवलपरासी (बर्दघाट सुस्ता पूर्व)", np_src: "draft" },
-  { code: "SIN", name: "Sindhupalchok", province: "Bagmati", np: "सिन्धुपाल्चोक", np_src: "draft", question: "D-S23" },
+  { code: "NAW", pcode: "NP0447", name: "Nawalparasi (Bardaghat Susta East)", alias: "Nawalpur", province: "Gandaki", np: "नवलपरासी (बर्दघाट सुस्ता पूर्व)", np_src: "draft" },
+  { code: "SIN", pcode: "NP0323", name: "Sindhupalchok", province: "Bagmati", np: "सिन्धुपाल्चोक", np_src: "draft", question: "D-S23" },
   /* Added 17 Sep 2026: Gorkha named by EDCD in the review and listed as a
      core assessment district in the RDNA (local levels Shahid Lakhan and
      Gandaki RMs); Tanahun listed in the RDNA "where information available"
@@ -97,7 +97,6 @@ const DISTRICTS = [
   { code: "SIND", name: "Sindhuli", province: "Bagmati", pcode: "NP0320", np_src: "pending" },
   { code: "RAM", name: "Ramechhap", province: "Bagmati", pcode: "NP0321", np_src: "pending" },
   { code: "DOL", name: "Dolakha", province: "Bagmati", pcode: "NP0322", np_src: "pending" },
-  { code: "SINDH", name: "Sindhupalchowk", province: "Bagmati", pcode: "NP0323", np_src: "pending", alias: ["Sindhupalchok"] },
   { code: "KAV", name: "Kavre", province: "Bagmati", pcode: "NP0324", np_src: "pending", alias: ["Kavrepalanchok"] },
   { code: "LAL", name: "Lalitpur", province: "Bagmati", pcode: "NP0325", np_src: "pending" },
   { code: "BHA", name: "Bhaktapur", province: "Bagmati", pcode: "NP0326", np_src: "pending" },
@@ -110,7 +109,6 @@ const DISTRICTS = [
   { code: "BAG", name: "Baglung", province: "Gandaki", pcode: "NP0443", np_src: "pending" },
   { code: "MYA", name: "Myagdi", province: "Gandaki", pcode: "NP0444", np_src: "pending" },
   { code: "MUS", name: "Mustang", province: "Gandaki", pcode: "NP0445", np_src: "pending" },
-  { code: "NAWA", name: "Nawalparasi East", province: "Gandaki", pcode: "NP0447", np_src: "pending" },
   { code: "PAL", name: "Palpa", province: "Lumbini", pcode: "NP0546", np_src: "pending" },
   { code: "NAWAL", name: "Nawalparasi West", province: "Lumbini", pcode: "NP0547", np_src: "pending" },
   { code: "RUP", name: "Rupandehi", province: "Lumbini", pcode: "NP0548", np_src: "pending" },
