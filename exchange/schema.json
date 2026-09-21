@@ -1,0 +1,94 @@
+{
+  "columns": [
+    {
+      "hxl": "#activity",
+      "name": "activity",
+      "type": "text"
+    },
+    {
+      "hxl": "#sector",
+      "name": "sector",
+      "type": "text"
+    },
+    {
+      "hxl": "#org",
+      "name": "org",
+      "type": "text"
+    },
+    {
+      "hxl": "#adm1",
+      "name": "adm1_name",
+      "type": "text"
+    },
+    {
+      "hxl": "#adm1+code",
+      "name": "adm1_pcode",
+      "type": "pcode"
+    },
+    {
+      "hxl": "#adm2",
+      "name": "adm2_name",
+      "type": "text"
+    },
+    {
+      "hxl": "#adm2+code",
+      "name": "adm2_pcode",
+      "type": "pcode"
+    },
+    {
+      "hxl": "#adm3",
+      "name": "adm3_name",
+      "type": "text"
+    },
+    {
+      "hxl": "#adm3+code",
+      "name": "adm3_pcode",
+      "type": "pcode"
+    },
+    {
+      "hxl": "#reached",
+      "name": "reached",
+      "type": "int"
+    },
+    {
+      "hxl": "#activity+count",
+      "name": "activity_count",
+      "type": "int"
+    },
+    {
+      "hxl": "#meta+basis",
+      "name": "basis",
+      "type": "text"
+    },
+    {
+      "hxl": "#date",
+      "name": "data_date",
+      "type": "date"
+    },
+    {
+      "hxl": "#date+start",
+      "name": "period_from",
+      "type": "date"
+    },
+    {
+      "hxl": "#date+end",
+      "name": "period_to",
+      "type": "date"
+    },
+    {
+      "hxl": "#meta+version",
+      "name": "schema_version",
+      "type": "int"
+    }
+  ],
+  "data_date": "2026-09-19",
+  "description": "Pull-only aggregate exchange feed for OCHA/NDRRMA. One row per reporting unit (adm3 palika). Aggregates only; no individual, case or identity data.",
+  "generated_by": "tools/exchange/build_exchange.py (stdlib only; no network, no AI)",
+  "join_key": "OCHA COD-AB P-code (adm1/adm2/adm3). Join on the P-code, never on a place name.",
+  "period_from": "2026-08-26",
+  "period_to": "2026-09-19",
+  "reach_is_additive": false,
+  "reach_note": "People reached with MHPSS activities, as the source reports it, counted once per location (max per location). NON-ADDITIVE: never sum across rows, dimensions or organisations; cross-dimension sums disagree by design.",
+  "schema_version": 1,
+  "suppressed_below": 10
+}

@@ -1,0 +1,28 @@
+{
+  "note": "Verified OCHA COD-AB P-code map for the districts and provinces this platform reports on. Derived from the OCHA COD-AB global P-code list (adm1+adm2, HXL-tagged CSV, HDX) retrieved 2026-09-20 and cross-validated against the file - every pcode and its parent. Source of truth is COD-AB; regenerate, never hand-edit. See coordination t4-pcodes.",
+  "source_url": "https://data.humdata.org/dataset/cb963915-d7d1-4ffa-90dc-31277e24406f",
+  "retrieved_utc": "2026-09-20",
+  "country": "NPL",
+  "provinces": {
+    "NP01": "Koshi", "NP02": "Madhesh", "NP03": "Bagmati", "NP04": "Gandaki",
+    "NP05": "Lumbini", "NP06": "Karnali", "NP07": "Sudur Paschim"
+  },
+  "districts": {
+    "RAS": { "adm2_pcode": "NP0329", "cod_name": "Rasuwa",   "adm1_pcode": "NP03", "adm1_name": "Bagmati" },
+    "NUW": { "adm2_pcode": "NP0328", "cod_name": "Nuwakot",  "adm1_pcode": "NP03", "adm1_name": "Bagmati" },
+    "DHA": { "adm2_pcode": "NP0330", "cod_name": "Dhading",  "adm1_pcode": "NP03", "adm1_name": "Bagmati" },
+    "KTM": { "adm2_pcode": "NP0327", "cod_name": "Kathmandu","adm1_pcode": "NP03", "adm1_name": "Bagmati" },
+    "CHT": { "adm2_pcode": "NP0335", "cod_name": "Chitawan", "adm1_pcode": "NP03", "adm1_name": "Bagmati" },
+    "SIN": { "adm2_pcode": "NP0323", "cod_name": "Sindhupalchok","adm1_pcode": "NP03", "adm1_name": "Bagmati" },
+    "NAW": { "adm2_pcode": "NP0447", "cod_name": "Nawalparasi East","adm1_pcode": "NP04", "adm1_name": "Gandaki" },
+    "GOR": { "adm2_pcode": "NP0436", "cod_name": "Gorkha",   "adm1_pcode": "NP04", "adm1_name": "Gandaki" },
+    "TAN": { "adm2_pcode": "NP0440", "cod_name": "Tanahu",   "adm1_pcode": "NP04", "adm1_name": "Gandaki" }
+  },
+  "not_a_district": {
+    "OTH": "the free-text 'Other - specify' escape; it must never carry a P-code"
+  },
+  "name_traps": [
+    "Chitwan (ours) == Chitawan (COD); Tanahun (ours) == Tanahu (COD).",
+    "Nawalparasi is TWO districts: East NP0447/Gandaki (ours, alias Nawalpur) and West NP0547/Lumbini (NOT ours)."
+  ]
+}

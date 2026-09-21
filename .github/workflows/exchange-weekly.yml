@@ -1,0 +1,57 @@
+name: Exchange feed build and contract check
+
+# Institution-owned, AI-FREE, automatic. The exchange feed is a *pull* target
+# for OCHA/NDRRMA; this job keeps it reproducing from the frozen, public-safe
+# source on a schedule. No LLM, no account, no token, no third-party secret, no
+# network call: standard-library Python only. If the frozen source moves (a
+# maintainer refreshes the snapshot), the job regenerates the feed and commits
+# it; if nothing moved it produces no commit and no noise.
+
+on:
+  schedule:
+    # 03:30 UTC every Monday = 09:15 NPT / 09:30 WIB.
+    - cron: '30 3 * * 1'
+  workflow_dispatch:
+
+# Least privilege: the only scope needed is the one the commit-back step uses.
+permissions:
+  contents: write
+
+concurrency:
+  group: exchange-weekly-build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out the repository
+        # Pinned to the v5.0.0 commit SHA; never a floating tag.
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          persist-credentials: false
+
+      - name: Contract tests (failing-first guards)
+        run: python3 -m unittest discover -s tests -p 'test_exchange*.py' -v
+
+      - name: Rebuild the feed from the frozen source
+        run: python3 tools/exchange/build_exchange.py
+
+      - name: Strict self-check (committed files must match the source)
+        run: python3 tools/exchange/build_exchange.py --verify
+
+      - name: Commit only when the frozen source moved
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -z "$(git status --porcelain -- exchange)" ]; then
+            echo "Exchange feed is unchanged; no commit required."
+            exit 0
+          fi
+          git config user.name "mhpss-nepal automation"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- exchange
+          git diff --cached --check
+          git commit -m "data: refresh the OCHA/NDRRMA exchange feed"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${GITHUB_REF_NAME}"

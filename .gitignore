@@ -8,6 +8,17 @@
 !data/demo.json
 !package.json
 
+# The OCHA/NDRRMA exchange feed is the ONE reviewed place where published
+# aggregates may be committed: it is public-safe by contract (aggregates only,
+# small cells suppressed, P-code join key) and a machine check refuses to build
+# it if it breaks that contract. Nothing else under exchange/ is whitelisted --
+# a stray operational file dropped there still fails. See exchange/README.md.
+!exchange/*.csv
+!exchange/CHANGELOG.md
+!exchange/README.md
+!exchange/schema.json
+!exchange/source/*.json
+
 # Working files
 shot-*.png
 __pycache__/
