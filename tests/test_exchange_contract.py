@@ -138,6 +138,18 @@ class ExchangeContract(unittest.TestCase):
         finally:
             bx.BASIS = orig
 
+    def test_missing_source_is_a_clean_failure_not_a_traceback(self):
+        # An "automatic" job must fail loudly but cleanly: exit 2, no traceback.
+        rc = bx.main(["--source-dir", str(self.src / "nope"),
+                      "--exchange-dir", str(self.out), "--check"])
+        self.assertEqual(rc, 2)
+
+    def test_check_writes_nothing(self):
+        before = set(self.out.iterdir()) if self.out.exists() else set()
+        bx.build(self.src, self.out, write=False)
+        after = set(self.out.iterdir()) if self.out.exists() else set()
+        self.assertEqual(before, after)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
