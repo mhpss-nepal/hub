@@ -1,0 +1,58 @@
+{
+  "hard_failures": 0,
+  "pages": {
+    "index.html": {
+      "overflow": 0,
+      "tap": 0,
+      "axe": 0,
+      "overlay": 0,
+      "external": 0,
+      "filters": 0,
+      "empty": 0,
+      "freshness": 0,
+      "shareUrl": 0,
+      "sheet": 0,
+      "reconcile": 0
+    },
+    "concept-conservative.html": {
+      "overflow": 0,
+      "tap": 0,
+      "axe": 0,
+      "overlay": 0,
+      "external": 0,
+      "filters": 0,
+      "empty": 0,
+      "freshness": 0,
+      "shareUrl": 0,
+      "sheet": 0,
+      "reconcile": 0
+    },
+    "concept-recommended.html": {
+      "overflow": 0,
+      "tap": 0,
+      "axe": 0,
+      "overlay": 0,
+      "external": 0,
+      "filters": 0,
+      "empty": 0,
+      "freshness": 0,
+      "shareUrl": 0,
+      "sheet": 0,
+      "reconcile": 0
+    },
+    "concept-divergent.html": {
+      "overflow": 0,
+      "tap": 0,
+      "axe": 0,
+      "overlay": 0,
+      "external": 0,
+      "filters": 0,
+      "empty": 0,
+      "freshness": 0,
+      "shareUrl": 0,
+      "sheet": 0,
+      "reconcile": 0
+    }
+  },
+  "external_requests": []
+}

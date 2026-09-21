@@ -1,0 +1,62 @@
+{
+  "wrote": "/root/mhpss-nepal-work/hub-layer2-redesign/design-preview/topology.json",
+  "sections": [
+    "p-ov",
+    "p-who",
+    "p-act",
+    "p-raw",
+    "p-pub"
+  ],
+  "duplicate_rail": {
+    "#reports": 2
+  },
+  "two_control_destinations": [
+    "#activities",
+    "#overview",
+    "#publish",
+    "#reports",
+    "#who-is-where"
+  ],
+  "stub_pages": {
+    "coverage.html": "\"./\" + location.search + \"#\" + (MAP[h] || \"overview\"",
+    "inbox.html": "\"forms.html\" + location.search + (location.hash || \"\""
+  },
+  "legacy_aliases": [
+    "#gaps",
+    "#duplication",
+    "#matrix",
+    "#activity",
+    "#records",
+    "#publish",
+    "#coverage",
+    "#who",
+    "#what",
+    "#when",
+    "#people",
+    "#helpline"
+  ],
+  "bridge_globals": [
+    "status",
+    "myRole",
+    "listRoles",
+    "grantRole",
+    "revokeRole",
+    "publish",
+    "readPublic",
+    "sendLink",
+    "OWNER",
+    "ROLES",
+    "onStatus",
+    "onUser",
+    "submit",
+    "flush",
+    "queue",
+    "rid",
+    "watch",
+    "watchKind",
+    "signIn",
+    "signOut",
+    "clearQueue"
+  ],
+  "csv_columns": 71
+}
