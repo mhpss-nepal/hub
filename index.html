@@ -891,6 +891,15 @@
      clicking Connect again used to paint "attaching the listener..." over the
      one screen that explained what was actually wrong. */
   var LIVE_ON = false, LIVE_AT = null, LIVE_TICK = null, WANT_LIVE = false, REFUSED = false;
+  /* Q_KINDS -- which record kinds the live listen actually asked the SERVER for.
+     THE READ IS THE BOUNDARY, NOT THE FILTER. Firestore rules are not filters,
+     and rules v4 scopes /submissions reads BY KIND: an unfiltered listen is
+     refused for any restricted (non-admin) role. So the dashboard must ask for
+     exactly the kind it renders -- kind = activity. The filter inside
+     liveApply() is a DISPLAY guard only (it also protects a hand-loaded file);
+     this list is the QUERY, and tools/hub-live-read-scoping-check.py asserts
+     the two agree. Do not widen the query to "everything and filter here". */
+  var Q_KINDS = ["activity"];
   /* OPEN_MODE: reading through the time-boxed window rather than as a named
      account -- the strip has to say so, because what is on screen is then a
      subset (activity reports only) and it is readable by anyone with the URL.
@@ -899,10 +908,10 @@
   var WINDOW_ENDS = "30 September 2026";
 
   function liveApply(rows) {
-    /* Only activity reports belong on this page. The register also carries
-       service contacts, referrals and PHQ-9 follow-ups; those have their own
-       shape and their own view, and counting them here would inflate every
-       figure on the page. */
+    /* The listen asks the server for ONE kind (liveListen() -> watchKind).
+       The filter below is a display guard, not the boundary: it also stops a
+       hand-loaded file, or any future broader query, from inflating the page. */
+    Q_KINDS = ["activity"];
     var recs = rows.filter(function (r) { return (r.kind || "") === "activity"; })
       .map(function (r) {
         var o = JSON.parse(JSON.stringify(r));
@@ -990,19 +999,31 @@
       '.</b> Attaching the listener…</div>';
   }
 
-  /* The open demonstration window (rules v3, until 30 Sep 2026).
-     Activity reports read without an account; every other record kind still
-     needs one. Tried FIRST, because during the window the Ministry should be
-     able to open the URL and use the thing, not be met by a password box.
-     The listen MUST name the kind: rules are not filters, so an unfiltered
-     anonymous listen is refused even though every document would pass. */
+  /* The ONE live listen. It MUST name the kind.
+     - During the open demonstration window (rules v3, until 30 Sep 2026)
+       anonymous readers get activity reports; the listen still names the kind,
+       because Firestore evaluates a query against its potential result set and
+       an unfiltered anonymous listen is refused even when every document would
+       pass.
+     - Under rules v4 a restricted (non-admin) role may read only the kinds its
+       role covers, so an unfiltered listen is refused even when signed in.
+     Asking per-kind is also the least data the page needs. If watchKind is
+     missing this returns false and no listener is attached, so an old cached
+     fb.js cannot silently fall back to an unfiltered read. */
+  function liveListen(ok, err) {
+    if (!window.FB || !window.FB.watchKind) return false;
+    Q_KINDS = ["activity"];
+    window.FB.watchKind("activity", ok, err);
+    return true;
+  }
+
   function liveAttachOpen() {
     if (!WANT_LIVE || LIVE_ON || REFUSED) return;
     var st = window.FB.status();
     if (!st.ready || st.user) return;          /* signed in -> use the full path */
     if (!window.FB.watchKind) return;
     OPEN_TRIED = true;
-    window.FB.watchKind("activity", function (rows) {
+    liveListen(function (rows) {
       OPEN_MODE = true;
       liveApply(rows);
     }, function () {
@@ -1017,8 +1038,15 @@
     if (!WANT_LIVE || LIVE_ON || REFUSED) return;
     var st = window.FB.status();
     if (!(st.ready && st.user)) return;
+    if (!window.FB.watchKind) {
+      /* No kind-scoped read available: refuse rather than send an unfiltered
+         query that the rules would reject (or, worse, an older ruleset would
+         answer with the whole register). */
+      livePaint({ configured: true, ready: true, user: true }, true);
+      return;
+    }
     LIVE_ON = true;
-    window.FB.watch(liveApply, function (err) {
+    liveListen(liveApply, function (err) {
       LIVE_ON = false; REFUSED = true;
       clearInterval(LIVE_TICK);
       $("liveStrip").hidden = true;
