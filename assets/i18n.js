@@ -697,6 +697,17 @@
     acts.appendChild(enBtn); acts.appendChild(x);
     n.appendChild(acts);
     document.body.insertBefore(n, document.body.firstChild);
+    /* Accessibility (21 Sep 2026, CMC-Nepal): this notice is injected as the
+       first child of <body>, which puts its buttons AHEAD of the page's own
+       skip link in the tab order -- so a keyboard user tabbing from the top
+       hits "Read in English" before they can skip anything. The skip link must
+       be first, because its whole job is to be the first thing a keyboard user
+       reaches. Move it back in front after the injection. */
+    var _skip = document.querySelector(".a11y-skip");
+    if (_skip && _skip.parentNode === document.body
+        && document.body.firstChild !== _skip) {
+      document.body.insertBefore(_skip, document.body.firstChild);
+    }
 
     /* Keep a floating toggle clear of the notice. The notice is in flow at
        the top of the page; the toggle is fixed in the same corner, so on a
