@@ -43,9 +43,19 @@ Measured on the frozen hub tree:
 |---|---|---|---|
 | Coordination dashboard | `hub/` | `["activity"]` (`Q_KINDS`, `index.html:902`) | `tools/hub-live-read-scoping-check.py` (static) + `-browser-check.py` |
 | Per-form output homes | `hub/forms.html` | `["service_contact", "referral", "phq9", "self_report"]` (`LIVE_KINDS`, `forms.html:640`) | `tools/hub-live-read-scoping-browser-check.py` (the four kinds, as a subset of the requests) |
-| **The receiving surface added here** | `hub/field-output-home.html` | `["activity"]` | `tests/test_field_output_home.py` |
+| **The receiving surface added here** | `hub/field-output-home.html` | `["activity"]` (`KINDS`) | `tools/hub-live-read-scoping-check.py` (added to `SURFACES` by this change) + `tests/test_field_output_home.py` |
 
 The static guard in the third column checks the *scope* of each read (kind-scoped, never an unfiltered `watch()`), and for `forms.html` it only requires that whatever `LIVE_KINDS` declares is also requested. The four instrument kinds are pinned by the **browser** check, which asserts them as a subset of what the page actually asks the server for.
+
+**This change strengthens that guard; it does not weaken it.** The new page reads the register, so it
+was added to the guard's explicit `SURFACES` map (`{"declared": "KINDS"}`) and to the `--break`
+self-test. Measured on this head: the guard passes, the self-test still goes red, and two planted
+defects on the *new* page each turn it red —
+
+| planted on `field-output-home.html` | guard output |
+|---|---|
+| read widened to a literal kind the page does not declare | `watchKind asks for ['referral'] but KINDS does not declare them` |
+| read made unfiltered (`FB.watch`) | `an UNFILTERED register listen (.watch() with no kind) is present` |
 
 Two consequences, both of which were being carried silently:
 
@@ -116,14 +126,21 @@ field the model calls personal — the focal point — is a fixed placeholder an
 `NEVER_SENT` before the write, which the round trip reads back as absent:
 
 ```
-form      : 5ws-report.html          report id (recordId)  R13ZH9PD
-register  : submissions/activity_…   register doc id (FB.rid)
+form      : 5ws-report.html          report id (recordId)  R13GIWOU
+register  : submissions/…            register doc id (FB.rid, starting with the record id)
 scheme    : 5ws-np-0.7.0             kind "activity"
-values    : org CMC · site NUW-02 · palika NP0328301 · activity 1.1 · modality HC
-            date 2026-09-21 · session 09:30 · attendance 3 · f04 3
+values    : org CMC · cadre HW · district NUW · site NUW-02 · activity 1.1
+            modality HC · status ONG · date 2026-09-21 · session 09:30
+            attendance 3 · f04 3
+basis     : CMC||NUW-02|||2026-09-21|1.1|HC|09:30   (store.js recordId: FNV-1a over
+            org, orgOther, site, siteOther, palika, dateAD, activity, modality, sessionTime)
 stripped  : focalName, focalPhone, focalEmail  (fb.js NEVER_SENT — absent on read-back)
 read at   : hub/field-output-home.html — kind-scoped read; queue drained to 0
 ```
+
+The id is not transcribed: it is what `recordId()` returns for that exact basis, computed from the
+frozen `assets/store.js` (the test asserts the row the page shows carries the id the form wrote, so
+a drift in either the basis or the renderer turns the round trip red).
 
 **Negative control.** A synthetic record of a different kind is written into the same collection
 and the page does not show it — the kind scope is a boundary, not decoration.
@@ -133,7 +150,8 @@ and the page does not show it — the kind scope is a boundary, not decoration.
 | planted defect | what must go red |
 |---|---|
 | the page asks for `kind == "activity"` but the form writes `activity` under another spelling | round trip finds no row |
-| `watchKind` widened to `watch` (an unfiltered listen) | guard + browser test |
+| `watchKind` widened to `watch` (an unfiltered listen) | guard (all three surfaces) + browser test |
+| the page's read pointed at a literal kind `KINDS` does not declare | guard (the new page is in `SURFACES`) |
 | the page's row renderer looks for a different id field | round trip can no longer show the record's id |
 | the bridge's `_rid` basis changed | the deterministic vector changes |
 | a second kind added to the page's `KINDS` | "asks for one kind" + negative control |
@@ -226,15 +244,39 @@ So the round trip is a real read, not a tautology: point it at the wrong kind an
 
 ### Re-measured live site (cache-busted, read-only fetch)
 
-| what | live value |
-|---|---|
-| `https://mhpss-nepal.github.io/hub/field-output-home.html` | **404** — expected: the receiving surface is not deployed (this card forbids deployment; the preview link in the completion summary is the way to open it) |
-| `.../hub/index.html` | 200, `sha256 5493ce92…` |
-| `.../hub/forms.html` | 200, `sha256 2a299d18…`; live `LIVE_KINDS` still the four instruments; **no** unfiltered `FB.watch(` |
-| `.../hub/assets/i18n-strings.js` | 200, 314 445 B — the validated PHQ-9 / protected strings intact |
+Measured **before** the merge that landed this change, and again **after** it, from the live host:
 
-The recent work the card protects (validated Nepali PHQ-9, skip link, MoFAGA 753 palikas) is
-unchanged on the live host by this branch, because nothing here is deployed.
+| what | before | after |
+|---|---|---|
+| `https://mhpss-nepal.github.io/hub/field-output-home.html` | **404** | **200**, 18 121 B, `sha256 7fd5d52b145c496636e5d5aa91191cedd00de0d3bf4106be356e47f29ce661dc` |
+| `.../hub/index.html` | 200, `sha256 5493ce92…` | unchanged, same digest |
+| `.../hub/forms.html` | 200, `sha256 2a299d18…` | unchanged, same digest |
+| `.../hub/assets/i18n-strings.js` | 200, 314 445 B | unchanged, same size |
+| live `LIVE_KINDS` / `Q_KINDS` | four instruments / `activity` | unchanged |
+
+So the recent work the card protects (validated Nepali PHQ-9, skip link, MoFAGA 753 palikas) is
+untouched on the live host, and the only live difference is the one added page.
+
+**The live page, rendered in a fresh headless browser** (`locale=en-US`, no session, no account):
+
+| measurement | value |
+|---|---|
+| page errors on load | **0** |
+| `#kinds` / `#rOther` / `#rWrite` before the read | `activity` / `—` / `0` |
+| bridge | `assets/fb.js loaded; ready` |
+| `#colCount` (read from the frozen `CSV_COLUMNS`) | `85` |
+| any rail link to the page | **none** |
+| after pressing "Read the register now" | `Outcome: read succeeded` · `Rows: 312` · `Other kinds asked for: none` · `Writes attempted: 0` |
+
+The 312 is the same figure, the same kind and the same deliberate window that the live dashboard
+already shows — `index.html` renders *"Open demonstration window — activity reports only, readable
+without an account until 30 September 2026 · 312 activity report(s)"*. This page adds a **second
+reader of the same kind**, not a new data class, and it asks for no kind the dashboard does not
+already ask for.
+
+**The preview link:** <https://mhpss-nepal.github.io/hub/field-output-home.html> — reachable by URL
+only; no hub page links to it and `tools/rail.py` does not offer it, because adding it to the
+navigation is a visible change and that is Adib's call (§6, question 1).
 
 ## 8. Known limitations
 
