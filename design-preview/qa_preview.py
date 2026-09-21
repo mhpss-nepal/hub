@@ -354,6 +354,19 @@ def run(base_url: str | None) -> dict:
                         rec["screenshot"] = str(shot)
                         pg.evaluate("() => { const p=document.getElementById('filterPanel'); if(p) p.hidden=false; }")
                         rec["filterSheet"] = sheet_probe(pg)
+                    else:
+                        # A page with no filter system (the landing board) still
+                        # gets its phone screenshot, so the report's "every page
+                        # at 375px, captured by the same run" is reproducible
+                        # from this harness rather than resting on a file an
+                        # earlier run happened to leave behind. Drop focus first:
+                        # the Tab walk above leaves an element focused and its
+                        # focus ring would be baked into the capture.
+                        pg.evaluate("() => { const a = document.activeElement; "
+                                    "if (a && a.blur) a.blur(); window.scrollTo(0,0); }")
+                        shot = HERE / "screens" / f"{page_name.replace('.html','')}-{width}.png"
+                        pg.screenshot(path=str(shot), full_page=True)
+                        rec["screenshot"] = str(shot)
                 if width == 1280:
                     shot = HERE / "screens" / f"{page_name.replace('.html','')}-wide.png"
                     pg.screenshot(path=str(shot), full_page=True)

@@ -17,7 +17,7 @@ transcribed by hand, so the report cannot drift from the measurement.
 
 **hard failures: 0** — 0 hard checks failed across
 4 pages, 5 widths, 16 keyboard traversals and
-797 measured controls.
+812 measured controls.
 
 ## Horizontal overflow
 
@@ -45,9 +45,9 @@ rect over an inner glyph.
 | Concept | controls measured | under 44px |
 |---|---|---|
 | `index.html` | 40 | 0 |
-| `concept-conservative.html` | 334 | 0 |
-| `concept-recommended.html` | 314 | 0 |
-| `concept-divergent.html` | 109 | 0 |
+| `concept-conservative.html` | 339 | 0 |
+| `concept-recommended.html` | 319 | 0 |
+| `concept-divergent.html` | 114 | 0 |
 
 ## Accessibility engine
 
@@ -71,11 +71,11 @@ element after each step.
 | Concept | 320 | 375 | 768 | 1280 | overlay intersections |
 |---|---|---|---|---|---|
 | `index.html` | 8 | 8 | 8 | 8 | 0 |
-| `concept-conservative.html` | 59 | 59 | 60 | 60 | 0 |
-| `concept-recommended.html` | 55 | 55 | 60 | 60 | 0 |
-| `concept-divergent.html` | 14 | 14 | 27 | 27 | 0 |
+| `concept-conservative.html` | 60 | 60 | 60 | 60 | 0 |
+| `concept-recommended.html` | 56 | 56 | 60 | 60 | 0 |
+| `concept-divergent.html` | 15 | 15 | 28 | 28 | 0 |
 
-**0 overlay intersections in 582 recorded Tab steps.** Two defects were found by
+**0 overlay intersections in 590 recorded Tab steps.** Two defects were found by
 this probe and fixed on the current revision: the phone filter drawer covered the
 page (moved to a bottom sheet that starts closed), and sticky-header anchor
 targets needed `scroll-margin-top` so a section link does not land under the bar.
@@ -143,9 +143,9 @@ anchors the current Hub uses (`#overview`, `#reports`, …).
 
 ```json
 {
-  "stale": "Showing the last successful refreshThe most recent refresh did not complete. These figures",
-  "failed": "This view could not be refreshedThe refresh failed. The best last-known contribution is sh",
-  "fresh": "Synthetic fixture loadedLast successful refresh 13 Sep 2026, 14:20 \u00b7 data date 13 Sep 2026",
+  "stale": "Showing the last successful refresh\u00b7data date 13 Sep 2026\u00b7refresh 14:20\u00b7source: synthetic ",
+  "failed": "This view could not be refreshed\u00b7data date 13 Sep 2026\u00b7refresh 14:20\u00b7source: synthetic rev",
+  "fresh": "Synthetic fixture loaded\u00b7data date 13 Sep 2026\u00b7refresh 14:20\u00b7source: synthetic review fixt",
   "distinct": true
 }
 ```
@@ -200,6 +200,22 @@ run — the organisation bars showed 119 of 163 and said nothing about the other
 The other 3 account for the remaining 44 reports; the bars above are a ranking,
 not a sum of the selection"). The QA gate fails any concept whose bars reconcile
 neither by sum nor by disclosure.
+
+## Requirement coverage (21 Sep refinement)
+
+Each operator requirement is either demonstrated in the artifact or reported as a
+deliberate gap. Nothing is claimed without a measurement behind it.
+
+| # | Requirement | Where it is met | Evidence |
+|---|---|---|---|
+| 1 | Infographic/KPI-first homepage, concise labels, definitions on demand | hero priority figure + KPI band lead both A and B; every method note sits in a closed expander | screenshot `concept-recommended-375.png`; `viewKpis` render; `details.method` |
+| 2 | Cross-filtering for geography, period, organisation, activity, status, target group, data-quality state | 11 exposes: period, district, palika, ward, organisation, activity, IASC layer, modality, status, target group, data-quality state — each rendered **only when it can slice** | filter probe `count_before → count_after_district` |
+| 3 | Active chips, clear-all, result count, empty state, URL state | chips with per-chip removal; `Clear all`; `N of M reports · K filters active`; no-match panel; `#flt=…` fragment | filters / empty / shareUrl probes |
+| 4 | Charts and tables reconcile and expose source, data date, refresh status, metric basis | district/activity/layer totals equal the selection; top-N rankings print their remainder; freshness block names source + data date; "sessions, not unique people" on the attendance figure | reconcile probe |
+| 5 | No unsupported trend or coverage claim; no summing non-additive reach; no invented denominator | no time series anywhere; attendances labelled non-additive; activities/layers/target groups labelled non-additive; the only denominator is the roster, named as such, with its own validity flagged open | method expander text; reconcile probe `metric_basis_stated` |
+| 6 | Progressive detail without crowding | one question per block (B); four questions then one view (C); method, definitions, export and admin all secondary | `details_expanders` in `topology.json`; C shows 4 hidden panels |
+| 7 | Keyboard-accessible filters, 44px targets, mobile drawer, no horizontal overflow | 0 tap failures, 0 axe violations, 0 overflow at 320/375/768/1280/1920; phone filter drawer is a closable bottom sheet | tap / axe / overflow / sheet probes |
+| 8 | Search must not weaken role boundaries, expose restricted fields, or open raw export | no concept loads the bridge, reaches a server, reads a role document, or offers an export control; search runs over an in-page fixture | network isolation: `none` external requests |
 
 ## Network isolation
 
