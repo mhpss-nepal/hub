@@ -24,7 +24,10 @@ VIEWPORTS = [(390, 844, "mobile"), (1280, 900, "desktop")]
 # The two addresses a Hub page may resolve to under /form/. Anything else that
 # lands under /form/ fails. Compared after resolution and normalization, so a
 # substring match cannot wave an unapproved instrument through.
-APPROVED_FORM_PATHS = ("/form", "/form/5ws-report.html")
+# /form/all-forms.html is the review page: it opens every instrument through
+# the review frame and carries no direct link to an unapproved one, so it is
+# not a field entry point and the trial needs it reachable.
+APPROVED_FORM_PATHS = ("/form", "/form/5ws-report.html", "/form/all-forms.html")
 # The sibling form app's directory segment, normalized and case-folded.
 FORMS_ROOT = "/form"
 

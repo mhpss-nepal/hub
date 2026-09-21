@@ -25,7 +25,19 @@ FORMS_DIR_PREFIX = "/form/"
 # The two form addresses a Hub page may resolve to, as normalized absolute site
 # paths. Compared after resolution, never as raw substrings: `/form/` alone
 # would wave `/form/phq9.html` through (the round-1 defect).
-APPROVED_FORM_TARGETS = ("/form", "/form/5ws-report.html")
+# The addresses a hub page may open.
+#
+#   /form/               the form landing page
+#   /form/5ws-report.html  the one instrument approved for field use
+#   /form/all-forms.html   the REVIEW page Adib asked for: it lists every
+#                          instrument and opens each through the review frame
+#
+# all-forms.html is on this list because it is not a field entry point. It
+# carries no direct link to an unapproved instrument -- it routes every open
+# through preview.html?preview_form=<file>, which is the review surface the
+# repository already keeps out of the field app. Forbidding it here would
+# forbid the very review listing the trial needs.
+APPROVED_FORM_TARGETS = ("/form", "/form/5ws-report.html", "/form/all-forms.html")
 # Hub pages are served under /hub/, so a link resolves against that base.
 SITE_DIR = "/hub"
 # The pre-fix rendered checker, kept verbatim so the round-1 red/green demo is
@@ -234,6 +246,33 @@ class HubTrialScopeTest(unittest.TestCase):
             "any(p in href", fixed,
             "the fixed checker still uses the substring scope test",
         )
+
+    def test_the_review_page_is_allowed_and_a_field_instrument_is_not(self):
+        """The list is the decision, so the decision is pinned against real strings.
+
+        A reviewer needs all-forms.html reachable. An unapproved instrument must
+        never be reachable directly. Both must hold, or the trial scope is wrong
+        in one direction or the other.
+        """
+        allowed = {
+            '<a href="../form/all-forms.html"></a>': True,
+            '<a href="../form/5ws-report.html"></a>': True,
+            '<a href="../form/"></a>': True,
+        }
+        refused = {
+            '<a href="../form/contact.html"></a>': False,
+            '<a href="../form/referral.html"></a>': False,
+            '<a href="../form/phq9.html"></a>': False,
+            '<a href="../form/selfreport.html"></a>': False,
+        }
+        for html, must_pass in {**allowed, **refused}.items():
+            found = unapproved_form_targets("forms.html", html)
+            if must_pass:
+                self.assertEqual([], found,
+                                 f"a permitted address was refused: {html}")
+            else:
+                self.assertTrue(found,
+                                f"an unapproved instrument was permitted: {html}")
 
     def test_no_hub_page_links_to_an_unapproved_form_page(self):
         offenders = {}
