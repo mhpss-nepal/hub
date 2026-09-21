@@ -2089,7 +2089,7 @@ window.I18N_STRINGS = {
        FIRST string that should go to a human, ahead of any page content:
        it is the sentence that tells a Ministry reader how much to trust
        everything else on the page. */
-    "mt.notice.ne":       "यो पृष्ठ स्वचालित रूपमा अनुवाद गरिएको हो।",
+    "mt.notice.ne":       "यो पृष्ठको धेरैजसो नेपाली मेसिनबाट अनुवाद गरिएको छ।",
     "mt.authoritative.ne": "अंग्रेजी संस्करण आधिकारिक हो।",
     "mt.clinicalKept.ne": "चिकित्सकीय शब्दावली अंग्रेजीमै राखिएको छ।",
     /* The wording for a page that is NOT yet keyed up: its prose is still
@@ -2109,7 +2109,7 @@ window.I18N_STRINGS = {
     "mt.partial.auth.ne": "अंग्रेजी संस्करण आधिकारिक हो।",
     "mt.partial.en":      "The choices in this form's lists have been translated automatically into Nepali. The rest of this page is still in English.",
     "mt.partial.auth.en": "The English version is the authoritative one.",
-    "mt.notice.en":       "This page was translated automatically.",
+    "mt.notice.en":       "Most of this page's Nepali was machine-translated.",
     "mt.authoritative.en": "The English version is the authoritative one.",
     "mt.clinicalKept.en": "Clinical wording is kept in English.",
     "mt.readEnglish":     "Read in English",
@@ -2198,6 +2198,8 @@ window.I18N_STRINGS = {
     "f4.phActOther": "What was done — no names",
     "f4.phDesc": "What happened, in one sentence. No names, no clinical detail.",
     "f4.phTgOther": "Name the group — never a person",
+    "mt.validated.en": "The questionnaire is the published one — the PHQ-9 items and response scale on this page reproduce the published Nepali wording (Kohrt et al., 2016), not machine output.",
+    "mt.validated.ne": "प्रश्नावली प्रकाशित रूपमा नै राखिएको छ — यो पृष्ठको PHQ-9 प्रश्न र उत्तर-विकल्प कोहर्त एवं अन्य (२०१६) को प्रकाशित नेपाली संस्करणबाट शब्दशः हुन्, मेसिनबाट अनुवाद गरिएको होइन।",
   },
 
   /* Filled by the translator, imported from the worksheet. Empty is not a
@@ -2879,8 +2881,8 @@ window.I18N_STRINGS = {
     "mt.authoritative.ne": "अंग्रेजी संस्करण आधिकारिक हो।",
     "mt.clinicalKept.en": "क्लिनिकल वाक्यांश अंग्रेजीमा राखिएको छ।",
     "mt.clinicalKept.ne": "चिकित्सा शब्दावली अंग्रेजीमा राखिएको छ।",
-    "mt.notice.en": "यो पृष्ठ स्वचालित रूपमा अनुवाद गरिएको थियो।",
-    "mt.notice.ne": "यो पृष्ठ स्वचालित रूपमा अनुवाद गरिएको छ।",
+    "mt.notice.en": "Most of this page's Nepali was machine-translated.",
+    "mt.notice.ne": "यो पृष्ठको धेरैजसो नेपाली मेसिनबाट अनुवाद गरिएको छ।",
     "mt.notyet.auth.en": "अंग्रेजी संस्करण आधिकारिक छ।",
     "mt.notyet.auth.ne": "अंग्रेजी संस्करण आधिकारिक हो।",
     "mt.notyet.en": "यो पृष्ठ नेपाली भाषामा अहिले सम्म उपलब्ध छैन।",
@@ -3227,6 +3229,8 @@ window.I18N_STRINGS = {
     "map.type.mun": "नगरपालिका",
     "map.type.rm": "गाउँपालिका",
     "home.hl": "हेल्पलाइन",
-    /* ==== END layer3-shared ==== */
+    /* ==== END layer3-shared ==== */    "mt.validated.ne": "प्रश्नावली प्रकाशित रूपमा नै राखिएको छ — यो पृष्ठको PHQ-9 प्रश्न र उत्तर-विकल्प कोहर्त एवं अन्य (२०१६) को प्रकाशित नेपाली संस्करणबाट शब्दशः हुन्, मेसिनबाट अनुवाद गरिएको होइन।",
+    "mt.validated.en": "प्रश्नावली प्रकाशित रूपमा नै राखिएको छ — यो पृष्ठको PHQ-9 प्रश्न र उत्तर-विकल्प कोहर्त एवं अन्य (२०१६) को प्रकाशित नेपाली संस्करणबाट शब्दशः हुन्, मेसिनबाट अनुवाद गरिएको होइन।",
+
   }
 };
