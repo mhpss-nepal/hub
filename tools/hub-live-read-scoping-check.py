@@ -27,10 +27,18 @@ from pathlib import Path
 HUB = Path(__file__).resolve().parent.parent
 
 # Surfaces that read the register, and the kind set each is expected to watch.
-# index.html renders ONLY activity; forms.html renders the four instruments.
+# index.html renders ONLY activity; forms.html renders the four instruments;
+# field-output-home.html (the receiving surface for the field forms' output) reads
+# ONLY activity and never writes.
+#
+# The set is explicit rather than discovered on purpose: a page that starts
+# reading the register must be named here, so "every register read is
+# kind-scoped" is a claim about a listed set and not about whatever files happen
+# to be present.
 SURFACES = {
     "index.html": {"declared": "Q_KINDS"},
     "forms.html": {"declared": "LIVE_KINDS"},
+    "field-output-home.html": {"declared": "KINDS"},
 }
 
 # A listener that names no kind: FB.watch(fn, err). Matches `.watch(` followed by
@@ -50,6 +58,8 @@ def _text(path: Path, broken: bool) -> str:
                       'window.FB.watch(ok, err)')
         t = t.replace('window.FB.watchKind(k, function (rows) { mergeKind(k, rows); }, onErr);',
                       'window.FB.watch(function (rows) { mergeKind(k, rows); }, onErr);')
+        t = t.replace('window.FB.watchKind(KINDS[0], function (rows) {',
+                      'window.FB.watch(KINDS[0], function (rows) {')
     return t
 
 
