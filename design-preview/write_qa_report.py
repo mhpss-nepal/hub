@@ -68,6 +68,31 @@ def fmt(obj):
     return "```json\n" + json.dumps(obj, indent=2) + "\n```"
 
 
+RAW_KEYS = ("qa-results.json", "topology.json", "contract-inventory.json",
+            "serve-report.json")
+
+
+def machine_readable_raw() -> str:
+    """State plainly that the raw JSON is measured but gitignored.
+
+    The repository's own `.gitignore` hides `*.json`, so the raw measurement
+    files are present in the worktree and reproducible from the commands in
+    this report, but they are NOT in the commit. A reviewer who opens only the
+    commit cannot open them, so the report says so rather than citing files
+    that are not there. The tracked copies of the *scripts* that produce them
+    are: qa_preview.py, diagnose.py, build_preview.py, write_qa_report.py.
+    """
+    missing = [k for k in RAW_KEYS if not (HERE / k).exists()]
+    return ("- Raw measurement files (`" + "`, `".join(RAW_KEYS) +
+            "`) are **gitignored by this repository** (`*.json`), so they are "
+            "not part of the commit even though the figures below are read "
+            "from them. Regenerate with the commands listed above; the scripts "
+            "that produce them are tracked.\n"
+            "- Missing at the time of this run: " +
+            (", ".join("`%s`" % m for m in missing) if missing else "none") +
+            ".\n")
+
+
 SERVE_KEYS = ("ok", "plain_http_base", "bind", "port", "tailnet_dns",
               "served_css_carries_new_rules", "served_markup_uses_hashed_assets")
 serve_summary = fmt({k: serve[k] for k in SERVE_KEYS})
@@ -97,6 +122,15 @@ vendored `axe-core 4.10.2` (MPL-2.0, `vendor/axe.min.js`,
 Every figure in this report is read out of `qa-results.json`, `topology.json`
 and `serve-report.json` by `design-preview/write_qa_report.py`. Nothing here is
 transcribed by hand, so the report cannot drift from the measurement.
+
+### Reproducing this record
+
+    python3 design-preview/build_preview.py                 # rebuild the pages
+    python3 design-preview/qa_preview.py                    # measure -> qa-results.json
+    python3 design-preview/write_qa_report.py               # -> this report
+    python3 design-preview/check_links.py                   # every link resolves
+
+{machine_readable_raw()}
 
 ## Hard result
 

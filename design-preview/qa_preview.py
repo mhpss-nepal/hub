@@ -467,12 +467,17 @@ def main() -> int:
     a = ap.parse_args()
     rep = run(a.base_url)
     Path(a.out).write_text(json.dumps(rep, indent=2) + "\n")
-    print(json.dumps({
+    summary = json.dumps({
         "hard_failures": rep["hard_failures"],
         "pages": {k: {kk: (len(vv) if isinstance(vv, list) else vv) for kk, vv in v.items()}
                   for k, v in rep["verdicts"].items()},
         "external_requests": sorted(set(rep["network"])),
-    }, indent=2))
+    }, indent=2)
+    # The run log is written BY the run, not by hand after it: QA-REPORT.md
+    # cites it as the run log, so it has to be a product of the harness or the
+    # citation points at a file nobody can reproduce.
+    (HERE / "qa-run.log").write_text(summary + "\n")
+    print(summary)
     return 0 if rep["ok"] else 1
 
 

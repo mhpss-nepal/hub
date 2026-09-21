@@ -13,6 +13,17 @@ Every figure in this report is read out of `qa-results.json`, `topology.json`
 and `serve-report.json` by `design-preview/write_qa_report.py`. Nothing here is
 transcribed by hand, so the report cannot drift from the measurement.
 
+### Reproducing this record
+
+    python3 design-preview/build_preview.py                 # rebuild the pages
+    python3 design-preview/qa_preview.py                    # measure -> qa-results.json
+    python3 design-preview/write_qa_report.py               # -> this report
+    python3 design-preview/check_links.py                   # every link resolves
+
+- Raw measurement files (`qa-results.json`, `topology.json`, `contract-inventory.json`, `serve-report.json`) are **gitignored by this repository** (`*.json`), so they are not part of the commit even though the figures below are read from them. Regenerate with the commands listed above; the scripts that produce them are tracked.
+- Missing at the time of this run: none.
+
+
 ## Hard result
 
 **hard failures: 0** — 0 hard checks failed across
