@@ -92,9 +92,13 @@ window.I18N_STRINGS = {
          consent given to different words is not consent. */
       /* phq9.item* and phq9.scale* were here. They are not any more: the
          validated Nepali (Kohrt et al. 2016, Additional file 1) is now in the
-         `ne` table, converted and cross-checked by two independent converters.
-         The cut-off belongs to those words, so those words are what ships.
-         Everything below is still guarded. */
+         `ne` table, converted and cross-checked by two independent converters,
+         and declared in source.human below so the page says it was written by
+         a person and not drafted by a machine. The cut-off belongs to those
+         words, so those words are what ships. phq9.item9Instruction is still
+         here and still has no Nepali: someone acts on that line in a real
+         crisis and no verified Nepali of it exists. Everything below is still
+         guarded. */
       "phq9.item9Instruction", "phq9.cutoff",
       "consent.", "safeguard.", "clinical."
     ],
