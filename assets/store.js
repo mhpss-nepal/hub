@@ -1,20 +1,18 @@
 /* =====================================================================
    MHPSS Nepal — local store
    ---------------------------------------------------------------------
-   The device copy is the first durable copy. `save()` writes it to
-   localStorage, then `syncToRegister()` hands a stripped copy to the loaded
-   Firebase bridge (`fb.js`) for the `submissions` register; failed delivery
-   stays queued for retry. The Hub reads that register.
+   Deliberately has NO backend. Records are held in this browser only,
+   and leave it only when a person exports them. That is not a temporary
+   shortcut: until the three governance questions have written answers,
+   no operational data may sit on infrastructure that is not WHO's or
+   the government's. A form with no server cannot breach that rule.
 
-   Focal-point name, phone and email deliberately never cross the network:
-   `fb.js` removes them and the security rules reject them. They remain only
-   in this device store and in the CSV/JSON export. Collect an export before
-   clearing or replacing a handset, because the remote register cannot restore
-   those contact details.
+   When a backend is authorised, only `save()` and `all()` change. The
+   record shape, the deterministic id and the validation stay as they are.
    ===================================================================== */
 
 const KEY = "mhpss-np-4ws-v1";
-const SCHEMA_VERSION = "5ws-np-0.5.0";  /* 0.2.0: four age bands · 0.3.0: donors list, partners, palika, iascSub, 16 Sep 2026 · 0.4.0: five age groups, settings, cadre list, "Other" text fields, funding source off the form — EDCD review 17 Sep 2026 · 0.5.0 (17 Sep 2026, afternoon): the instrument is the 5Ws; activity list v3 (layer.item codes, IASC terms in the backend only); one report per session with its attendance — countBasis no longer asked, always CONTACTS; sessionTime in the record id */
+const SCHEMA_VERSION = "5ws-np-0.6.0";  /* 0.2.0: four age bands · 0.3.0: donors list, partners, palika, iascSub, 16 Sep 2026 · 0.4.0: five age groups, settings, cadre list, "Other" text fields, funding source off the form — EDCD review 17 Sep 2026 · 0.5.0 (17 Sep 2026, afternoon): the instrument is the 5Ws; activity list v3 (layer.item codes, IASC terms in the backend only); one report per session with its attendance — countBasis no longer asked, always CONTACTS; sessionTime in the record id */
 
 /* ---------------------------------------------------------------------
    Deterministic record id.
@@ -179,13 +177,21 @@ function active() {
    fold(); nothing else knows the shapes.
    ------------------------------------------------------------------- */
 const BANDS = [
+  { key: "04",     lo: 0,  hi: 4,    label: "0\u20134",   f: "f04",     m: "m04",     o: "o04",     child: true  },
+  { key: "5to9",   lo: 5,  hi: 9,    label: "5\u20139",   f: "f5to9",   m: "m5to9",   o: "o5to9",   child: true  },
+  { key: "10to19", lo: 10, hi: 19,   label: "10\u201319", f: "f10to19", m: "m10to19", o: "o10to19", child: false },
+  { key: "20to59", lo: 20, hi: 59,   label: "20\u201359", f: "f20to59", m: "m20to59", o: "o20to59", child: false },
+  { key: "60",     lo: 60, hi: null, label: "60+",   f: "f60",     m: "m60",     o: "o60",     child: false },
+];
+const FOLD_BOUNDARY = 20;   /* child: true means younger than this */
+
+const BANDS_V04 = [
   { key: "04",   lo: 0,  hi: 4,    label: "0–4",   f: "f04",   m: "m04",   o: "o04",   child: true  },
   { key: "514",  lo: 5,  hi: 14,   label: "5–14",  f: "f514",  m: "m514",  o: "o514",  child: true  },
   { key: "1549", lo: 15, hi: 49,   label: "15–49", f: "f1549", m: "m1549", o: "o1549", child: false },
   { key: "5059", lo: 50, hi: 59,   label: "50–59", f: "f5059", m: "m5059", o: "o5059", child: false },
   { key: "60",   lo: 60, hi: null, label: "60+",   f: "f60",   m: "m60",   o: "o60",   child: false },
 ];
-const FOLD_BOUNDARY = 15;   /* child: true means younger than this */
 const PART_IDS = BANDS.reduce((a, b) => a.concat([b.f, b.m, b.o]), []);
 
 /* Schema 0.3.0 (16–17 Sep 2026): kept so those records still read and
@@ -226,11 +232,14 @@ const OF_WHOM_LABEL = {
    from the schema version when neither is filled. */
 function ageShape(r) {
   const has = (k) => num(r[k]) !== null;
+  const v05only = ["f5to9", "m5to9", "o5to9", "f10to19", "m10to19", "o10to19",
+                   "f20to59", "m20to59", "o20to59"];
   const v04only = ["f514", "m514", "o514", "f1549", "m1549", "o1549", "f5059", "m5059", "o5059"];
   const v03only = ["f517", "m517", "o517", "f1859", "m1859", "o1859"];
+  if (v05only.some(has)) return "v05";
   if (v04only.some(has)) return "v04";
   if (v03only.some(has)) return "v03";
-  if (PART_IDS.some(has)) return /-0\.([4-9]|\d\d)\./.test(r.schemaVersion || "") || !(r.schemaVersion) ? "v04" : "v03";
+  if (PART_IDS.some(has)) return /-0\.([4-9]|\d\d)\./.test(r.schemaVersion || "") || !(r.schemaVersion) ? "v05" : "v03";
   return "pair";
 }
 
@@ -249,14 +258,14 @@ function fold(r) {
     };
     return withAliases(d);
   }
-  const bands = shape === "v04" ? BANDS : BANDS_V03;
+  const bands = shape === "v05" ? BANDS : shape === "v04" ? BANDS_V04 : BANDS_V03;
   const g = (k) => num(r[k]) || 0;
   const kids = bands.filter((b) => b.child), adults = bands.filter((b) => !b.child);
   const s = (set, sex) => set.reduce((a, b) => a + g(b[sex]), 0);
   const d = {
     fLow: s(kids, "f"),    mLow: s(kids, "m"),    oLow: s(kids, "o"),
     fHigh: s(adults, "f"), mHigh: s(adults, "m"), oHigh: s(adults, "o"),
-    boundary: shape === "v04" ? FOLD_BOUNDARY : 18, banded: true, shape,
+    boundary: shape === "v05" ? FOLD_BOUNDARY : 18, banded: true, shape,
   };
   return withAliases(d);
 }
@@ -367,7 +376,11 @@ const CSV_COLUMNS = [
   "reachedTotal", "countBasis", "distinctPeople",
   /* the five groups as collected (0.4.0) and the four bands of 0.3.0, so a
      record of either vintage exports in full */
-  "f04", "m04", "o04", "f514", "m514", "o514", "f1549", "m1549", "o1549", "f5059", "m5059", "o5059", "f60", "m60", "o60",
+  /* 0.6.0: the Ministry's groups. The 0.4.0 middle ids stay listed so a
+     record filed under them still exports in full. */
+  "f04", "m04", "o04", "f5to9", "m5to9", "o5to9", "f10to19", "m10to19", "o10to19",
+  "f20to59", "m20to59", "o20to59", "f60", "m60", "o60",
+  "f514", "m514", "o514", "f1549", "m1549", "o1549", "f5059", "m5059", "o5059",
   "f517", "m517", "o517", "f1859", "m1859", "o1859",
   /* folded to two at export, never stored; foldBoundary says whether the
      split is at 15 (five groups) or 18 (earlier records) */
@@ -448,7 +461,7 @@ function donorsOf(r) {
 
 /* Global for the same reason as codes.js — see the note there. */
 window.STORE = {
-  SCHEMA_VERSION, CSV_COLUMNS, BANDS, BANDS_V03, PART_IDS, PART_IDS_V03, FOLD_BOUNDARY, OF_WHOM, OF_WHOM_LABEL, fold, ageShape, disaggTotal, donorsOf, todayLocal, registerBody, activityReadings,
+  SCHEMA_VERSION, CSV_COLUMNS, BANDS, BANDS_V04, BANDS_V03, PART_IDS, PART_IDS_V03, FOLD_BOUNDARY, OF_WHOM, OF_WHOM_LABEL, fold, ageShape, disaggTotal, donorsOf, todayLocal, registerBody, activityReadings,
   recordId, all, active, save, archive,
   validate, toCSV, download, stamp, clearAll
 };

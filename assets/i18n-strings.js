@@ -1089,31 +1089,14 @@ window.I18N_STRINGS = {
   },
 
   en: {
-    "clinical.phq9ValidatedTextWarning": "<b>The Nepali text is missing, and this form is not ready for field use without it.</b> The Nepali version validated by the PRIME consortium exists, but the copy available is typeset in a legacy non-Unicode Nepali font, so the characters cannot be transferred here without risking a corrupted questionnaire. <b>Nothing has been translated or approximated.</b> Before any real use, obtain the Unicode Nepali items from the PRIME / Kohrt source and have them checked by a Nepali-speaking clinician. Administering the English items to a Nepali speaker through an untrained interpreter is not the same instrument and the cut-off does not carry over.",
-    "consent.label": "Consent",
-    "consent.phq9": "The person was told what this is for and agreed to answer",
-    "phq9.item1": "Little interest or pleasure in doing things",
-    "phq9.item2": "Feeling down, depressed, or hopeless",
-    "phq9.item3": "Trouble falling or staying asleep, or sleeping too much",
-    "phq9.item4": "Feeling tired or having little energy",
-    "phq9.item5": "Poor appetite or overeating",
-    "phq9.item6": "Feeling bad about yourself — or that you are a failure or have let yourself or your family down",
-    "phq9.item7": "Trouble concentrating on things, such as reading the newspaper or watching television",
-    "phq9.item8": "Moving or speaking so slowly that other people could have noticed? Or the opposite — being so fidgety or restless that you have been moving around a lot more than usual",
-    "phq9.item9": "Thoughts that you would be better off dead or of hurting yourself in some way",
-    "phq9.item9Instruction": "<b>Item 9 is positive. Do not close this form and move on.</b> Stay with the person, ask directly about thoughts of suicide and about means and plan, and follow your organisation's referral pathway now — record it on the <a href=\"referral.html\">referral form</a>. If your organisation has no pathway for this, that is the gap to raise at the Technical Working Group, and it should be raised before this instrument is used in the field at all. The answer to item 9 is kept in the record so that a positive answer can be audited against whether a referral followed.",
-    "phq9.itemDifficulty": "If you checked off any problems, how difficult have these problems made it for you to do your work, take care of things at home, or get along with other people?",
-    "phq9.itemInstruction": "Over the last 2 weeks, how often have you been bothered by any of the following problems?",
-    "safeguard.checkLabel": "Safeguarding check",
-    "safeguard.confirmation": "This is not a GBV case, not an unaccompanied or separated child, and not an immediate risk to life",
-    "safeguard.consequence": "If you cannot tick this, close the form and use the specialised pathway.",
-    "safeguard.referralExclusion": "<b>Three kinds of case do not belong on this form. Stop and use the proper pathway.</b> <ul> <li><b>Gender-based violence.</b> GBV cases follow the specialised, survivor-centred pathway of the protection cluster, with its own consent and its own confidential system. Never record a GBV referral in a shared coordination form, not even coded.</li> <li><b>An unaccompanied or separated child.</b> These go to child-protection case management. Around 200 were reported in one area alone on 14 September; each one is a case file, not a row.</li> <li><b>Immediate risk to life.</b> Act first. Record afterwards, if at all.</li> </ul> Recording these here would put people at risk and would break the consent under which they spoke to you. The count of such referrals can be reported to coordination as a number, by the pathway that holds them — never as records here.",
+    "f4.rollU20": "aged 0\u201319",
+    "f4.roll20": "aged 20 and over",
+    "f4.provLab": "Province",
+    "f4.provHelp": "All seven provinces are listed. Choosing one shortens the district list; choosing nothing keeps every district available.",
     "sr.age.0to4": "0 to 4",
     "sr.age.5to9": "5 to 9",
     "sr.age.10to19": "10 to 19",
     "sr.age.20to59": "20 to 59",
-    "f4.provLab": "Province",
-    "f4.provHelp": "All seven provinces are listed. Choosing one shortens the district list; choosing nothing keeps every district available.",
 
     /* Added by the form lane, 227 keys; see LANGUAGE-COVERAGE.md */
     "phq9.cutoff.interpretation": "Bands are the standard PHQ-9 cut-points (Kroenke, Spitzer &amp; Williams, 2001): 0–4 minimal, 5–9 mild, 10–14 moderate, 15–19 moderately severe, 20–27 severe. The action threshold of <b>10 or more</b> is the one validated in Nepal (Kohrt et al., 2016; sensitivity 0.94, specificity 0.80, in 125 primary-care patients in Chitwan). A score is not a diagnosis and must not be recorded as one.",
@@ -2176,12 +2159,14 @@ window.I18N_STRINGS = {
      general translation engine cannot do that, and would invent its own
      vocabulary that then fails to match the national one. */
   ne: {
+    "f4.rollU20": "०–१९ वर्ष",
+    "f4.roll20": "२० वर्ष र माथि",
+    "f4.provLab": "प्रदेश",
+    "f4.provHelp": "सातै प्रदेश सूचीबद्ध छन्। एउटा छान्दा जिल्लाको सूची छोटो हुन्छ; नछान्दा सबै जिल्ला उपलब्ध रहन्छन्।",
     "sr.age.0to4": "० देखि ४",
     "sr.age.5to9": "५ देखि ९",
     "sr.age.10to19": "१० देखि १९",
     "sr.age.20to59": "२० देखि ५९",
-    "f4.provLab": "प्रदेश",
-    "f4.provHelp": "सातै प्रदेश सूचीबद्ध छन्। एउटा छान्दा जिल्लाको सूची छोटो हुन्छ; नछान्दा सबै जिल्ला उपलब्ध रहन्छन्।",
 
     /* Added by the form lane, 775 keys; machine-drafted, await human review */
     "phq9.p004": "तह १ · Rasuwa / Bhote Koshi",
