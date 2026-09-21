@@ -12,7 +12,7 @@
    ===================================================================== */
 
 const KEY = "mhpss-np-4ws-v1";
-const SCHEMA_VERSION = "5ws-np-0.6.0";  /* 0.2.0: four age bands · 0.3.0: donors list, partners, palika, iascSub, 16 Sep 2026 · 0.4.0: five age groups, settings, cadre list, "Other" text fields, funding source off the form — EDCD review 17 Sep 2026 · 0.5.0 (17 Sep 2026, afternoon): the instrument is the 5Ws; activity list v3 (layer.item codes, IASC terms in the backend only); one report per session with its attendance — countBasis no longer asked, always CONTACTS; sessionTime in the record id */
+const SCHEMA_VERSION = "5ws-np-0.7.0";  /* 0.2.0: four age bands · 0.3.0: donors list, partners, palika, iascSub, 16 Sep 2026 · 0.4.0: five age groups, settings, cadre list, "Other" text fields, funding source off the form — EDCD review 17 Sep 2026 · 0.5.0 (17 Sep 2026, afternoon): the instrument is the 5Ws; activity list v3 (layer.item codes, IASC terms in the backend only); one report per session with its attendance — countBasis no longer asked, always CONTACTS; sessionTime in the record id */
 
 /* ---------------------------------------------------------------------
    Deterministic record id.
@@ -216,6 +216,44 @@ const PART_IDS_V03 = BANDS_V03.reduce((a, b) => a.concat([b.f, b.m, b.o]), []);
    one or several of these. They never enter the sum check -- a pregnant
    woman counted once as 15-49 female and once here is one person, not
    two. All optional. */
+/* ---------------------------------------------------------------------
+   DISABILITY (21 Sep 2026) [CMC-Nepal]
+   Asked for by Laxman Nath, CMC-Nepal, so that reporting is inclusive of
+   persons with disabilities. Two distinct things, deliberately not merged:
+
+   `disAsked` is the ONE question each agency was asked to add -- the person
+   says whether they identify as a person with disability. Optional, and
+   blank is kept distinct from "No": a worker who judges that asking is
+   unsafe or inappropriate leaves it blank, and the data then says "not
+   asked" rather than inventing a refusal or a denial.
+
+   The four counts are what a provider OBSERVED, split by sex and by the 18
+   boundary, because a disability figure that is not age-and-sex split cannot
+   be reported against the rest of the attendance. They sit INSIDE the total:
+   a person in an age band above and here is one person, so they are checked
+   against the total and never added to it or to each other.
+
+   The TYPE of disability is deliberately not asked. CMC-Nepal said further
+   detail "seems difficult ... for now", and a guessed impairment list would
+   be worse than a gap -- the Washington Group Short Set is the instrument
+   for that and adopting it is its own decision.
+   ------------------------------------------------------------------- */
+const DISABILITY = ["disF0_17", "disM0_17", "disF18", "disM18"];
+const DISABILITY_ASKED = "disAsked";
+const DISABILITY_LABEL = {
+  disF0_17: "Female, under 18, person with disability",
+  disM0_17: "Male, under 18, person with disability",
+  disF18:   "Female, 18 and over, person with disability",
+  disM18:   "Male, 18 and over, person with disability",
+};
+
+/* The four counts, or null when none was entered -- null matters, because a
+   blank block and a block of zeros are different claims. */
+function disabilityTotal(r) {
+  const vals = DISABILITY.map((k) => num(r[k])).filter((v) => v !== null);
+  return vals.length ? vals.reduce((a, b) => a + b, 0) : null;
+}
+
 const OF_WHOM = ["ofChildAlone", "ofPreg", "ofPwd", "ofInjured", "ofDistress"];
 const OF_WHOM_LABEL = {
   ofChildAlone: "Children without an adult with them",
@@ -351,6 +389,12 @@ function validate(r) {
     const v = num(r[k]);
     if (v !== null && t !== null && v > t) p.push(`${OF_WHOM_LABEL[k]} (${v}) is more than the total of ${t}`);
   }
+  /* The disability counts sit inside the total, like the "of whom" block:
+     each at most the total, and never summed with each other or with it. */
+  for (const k of DISABILITY) {
+    const v = num(r[k]);
+    if (v !== null && t !== null && v > t) p.push(`${DISABILITY_LABEL[k]} (${v}) is more than the total of ${t}`);
+  }
   return p;
 }
 function num(v) {
@@ -387,6 +431,10 @@ const CSV_COLUMNS = [
   "fLow", "mLow", "oLow", "fHigh", "mHigh", "oHigh", "foldBoundary",
   /* seen at the session -- counted inside the figures above, never added to them */
   "ofChildAlone", "ofPreg", "ofPwd", "ofInjured", "ofDistress",
+  /* 0.7.0: disability, asked for by CMC-Nepal. The yes/no question comes
+     first so it reads as the question it is; the four counts are the
+     sex x 18-boundary split. Blank "not asked" is kept distinct from "No". */
+  "disAsked", "disF0_17", "disM0_17", "disF18", "disM18",
   "schemaVersion",
 ];
 
@@ -461,7 +509,7 @@ function donorsOf(r) {
 
 /* Global for the same reason as codes.js — see the note there. */
 window.STORE = {
-  SCHEMA_VERSION, CSV_COLUMNS, BANDS, BANDS_V04, BANDS_V03, PART_IDS, PART_IDS_V03, FOLD_BOUNDARY, OF_WHOM, OF_WHOM_LABEL, fold, ageShape, disaggTotal, donorsOf, todayLocal, registerBody, activityReadings,
+  SCHEMA_VERSION, CSV_COLUMNS, BANDS, BANDS_V04, BANDS_V03, PART_IDS, PART_IDS_V03, FOLD_BOUNDARY, OF_WHOM, OF_WHOM_LABEL, DISABILITY, DISABILITY_ASKED, DISABILITY_LABEL, disabilityTotal, fold, ageShape, disaggTotal, donorsOf, todayLocal, registerBody, activityReadings,
   recordId, all, active, save, archive,
   validate, toCSV, download, stamp, clearAll
 };
