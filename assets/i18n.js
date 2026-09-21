@@ -459,16 +459,23 @@
     if (MARKS) document.documentElement.setAttribute("data-i18n-marks", "on");
     else document.documentElement.removeAttribute("data-i18n-marks");
 
-    var kept = 0, machine = 0, human = 0;
+    var kept = 0, machine = 0, human = 0, validated = 0;
     root.querySelectorAll("[data-i18n]").forEach(function (el) {
-      var r = look(el.getAttribute("data-i18n"));
+      var key = el.getAttribute("data-i18n");
+      var r = look(key);
       if (r.kept) kept++;
       else if (r.prov === "machine") machine++;
-      else if (r.prov === "human") human++;
+      else if (r.prov === "human") {
+        human++;
+        /* The published instrument, as opposed to a translator's draft. The
+           notice must not call a validated questionnaire "translated
+           automatically". */
+        if (key.indexOf("phq9.item") === 0 || key.indexOf("phq9.scale") === 0) validated++;
+      }
     });
     return { total: total, missing: missing, untranslated: untranslated,
              translated: total - untranslated.length,
-             kept: kept, machine: machine, human: human };
+             kept: kept, machine: machine, human: human, validated: validated };
   }
 
   function setLang(next) {
@@ -692,10 +699,19 @@
          on a page with none is a promise with no mechanism behind it, and
          a Ministry reader who checks one claim and finds it hollow stops
          trusting the others. cov.kept is that count. */
+      /* `cov.validated` is the count of strings on THIS page that come from a
+         published instrument rather than a translator (the PHQ-9 items and the
+         four-level scale, from Kohrt et al. 2016). Saying "translated
+         automatically" on a page whose questionnaire is validated is false in
+         the direction that matters, so when such a string is present the notice
+         names it. Same mechanism as cov.kept below: never claim a thing the
+         page cannot show. */
       full:    [["mt.notice.ne", "mt.authoritative.ne"].concat(
-                  (cov && cov.kept) ? ["mt.clinicalKept.ne"] : []),
+                  (cov && cov.kept) ? ["mt.clinicalKept.ne"] : []).concat(
+                  (cov && cov.validated) ? ["mt.validated.ne"] : []),
                 ["mt.notice.en", "mt.authoritative.en"].concat(
-                  (cov && cov.kept) ? ["mt.clinicalKept.en"] : [])],
+                  (cov && cov.kept) ? ["mt.clinicalKept.en"] : []).concat(
+                  (cov && cov.validated) ? ["mt.validated.en"] : [])],
       partial: [["mt.partial.ne", "mt.partial.auth.ne"],
                 ["mt.partial.en", "mt.partial.auth.en"]],
       notyet:  [["mt.notyet.ne", "mt.notyet.auth.ne"],
