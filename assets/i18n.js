@@ -481,6 +481,7 @@
       window.history.replaceState({}, "", u);
     } catch (e) { /* ignore */ }
     var r = apply(document);
+    keepSkipFirst();
     paintToggle(r);
     if (lang === "en") { var nn = document.getElementById("mtnote"); if (nn) nn.remove(); }
     else mountNotice(r);
@@ -621,6 +622,38 @@
 
      Dismissal is remembered per revision: change the English and the
      notice returns, because the Nepali is now a draft of something older. */
+  /* The skip link must be the FIRST focusable element on the page. Several
+     things are injected into <body> at runtime -- this notice, and pwa.js's
+     connection bar -- and whichever runs last ends up in front. So the rule is
+     applied once at start-up AND after every injection, in EVERY language:
+     leaving it to the Nepali path alone left English users tabbing into a
+     dismiss button before they could skip anything. Verified by pressing Tab
+     once in both languages. */
+  function keepSkipFirst() {
+    var _skip = document.querySelector(".a11y-skip");
+    if (!_skip || _skip.parentNode !== document.body) return;
+    if (document.body.firstChild === _skip) return;
+    document.body.insertBefore(_skip, document.body.firstChild);
+  }
+
+  /* Other scripts inject into <body> too -- pwa.js mounts its connection bar at
+     DOMContentLoaded -- and whichever runs LAST ends up in front. pwa.js is a
+     locked file whose bytes are asserted by the contract tests, so the rule
+     cannot be enforced there and is re-applied here instead: once at start-up,
+     after a language change, and after any mutation of <body>'s child list.
+     A MutationObserver rather than a timer, so there is no window in which the
+     tab order is wrong. */
+  function watchBodyOrder() {
+    if (typeof MutationObserver !== "function") return;
+    try {
+      new MutationObserver(function (records) {
+        for (var i = 0; i < records.length; i++) {
+          if (records[i].target === document.body) { keepSkipFirst(); return; }
+        }
+      }).observe(document.body, { childList: true });
+    } catch (e) { /* non-fatal: the start-up call still runs */ }
+  }
+
   function mountNotice(cov) {
     if (lang === "en" || document.getElementById("mtnote")) return;
     var rev = (S._meta && S._meta.revision) || "0";
@@ -703,11 +736,7 @@
        hits "Read in English" before they can skip anything. The skip link must
        be first, because its whole job is to be the first thing a keyboard user
        reaches. Move it back in front after the injection. */
-    var _skip = document.querySelector(".a11y-skip");
-    if (_skip && _skip.parentNode === document.body
-        && document.body.firstChild !== _skip) {
-      document.body.insertBefore(_skip, document.body.firstChild);
-    }
+    keepSkipFirst();
 
     /* Keep a floating toggle clear of the notice. The notice is in flow at
        the top of the page; the toggle is fixed in the same corner, so on a
@@ -814,6 +843,10 @@
     mountToggle(cov);
     mountNotice(cov);
     mountReportMode();
+    /* Run LAST, in every language: the loops above inject <body> children, and
+       so does pwa.js (which may already have run). Only the skip link may be
+       first. */
+    keepSkipFirst();
     if (cov.missing.length) {
       console.warn("[i18n] keys used on this page with no English string:", cov.missing);
     }
