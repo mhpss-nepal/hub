@@ -36,7 +36,7 @@ window.I18N_STRINGS = {
     // Nepali) after the field landed on the 5Ws form; the rest of the form's
     // machine Nepali was deliberately NOT imported (see i18n gate + the
     // Layer 1→2 handoff).
-    revision: "2026-09-20",
+    revision: "2026-09-21",
 
     /* ---- strings that NO machine may translate --------------------------
        Matched as prefixes, so a PHQ-9 item added next month is protected
@@ -90,7 +90,12 @@ window.I18N_STRINGS = {
          these prefixes catch the instrument and consent wording before any
          translator sees it. A machine-rendered PHQ-9 is not the PHQ-9, and
          consent given to different words is not consent. */
-      "phq9.item", "phq9.scale", "phq9.cutoff",
+      /* phq9.item* and phq9.scale* were here. They are not any more: the
+         validated Nepali (Kohrt et al. 2016, Additional file 1) is now in the
+         `ne` table, converted and cross-checked by two independent converters.
+         The cut-off belongs to those words, so those words are what ships.
+         Everything below is still guarded. */
+      "phq9.item9Instruction", "phq9.cutoff",
       "consent.", "safeguard.", "clinical."
     ],
 
@@ -1085,7 +1090,21 @@ window.I18N_STRINGS = {
       "vid.p003",
       "vid.p004",
       "vid.p005"
-    ], human: [] }
+    ], human: [
+      "phq9.item1",
+      "phq9.item2",
+      "phq9.item3",
+      "phq9.item4",
+      "phq9.item5",
+      "phq9.item6",
+      "phq9.item7",
+      "phq9.item8",
+      "phq9.item9",
+      "phq9.scale0",
+      "phq9.scale1",
+      "phq9.scale2",
+      "phq9.scale3"
+    ] }
   },
 
   en: {
@@ -1096,7 +1115,7 @@ window.I18N_STRINGS = {
     "dis.personHelp": "Asked of the person, one answer per row. Only ask if they are able to answer, and leave it blank rather than guess — blank is recorded as \"not asked\", which is different from \"No\".",
     "f4.disSession": "Were the people at this session asked about disability?",
     "f4.disSessionHelp": "One answer for the whole session, because this report covers many people. The per-person question, \"Does the person identify themselves as a person with disability?\", is asked on the service-contact record, where one row is one person. Blank is recorded as \"not asked\", which is different from \"No\".",
-    "clinical.phq9ValidatedTextWarning": "<b>The Nepali text is missing, and this form is not ready for field use without it.</b> The Nepali version validated by the PRIME consortium exists, but the copy available is typeset in a legacy non-Unicode Nepali font, so the characters cannot be transferred here without risking a corrupted questionnaire. <b>Nothing has been translated or approximated.</b> Before any real use, obtain the Unicode Nepali items from the PRIME / Kohrt source and have them checked by a Nepali-speaking clinician. Administering the English items to a Nepali speaker through an untrained interpreter is not the same instrument and the cut-off does not carry over.",
+    "clinical.phq9ValidatedTextWarning": "<b>The Nepali items above are the validated instrument — do not re-word them.</b> They are the Nepali PHQ-9 validated by the PRIME consortium (Kohrt et al., 2016), recovered from the published source, converted out of a legacy non-Unicode font and cross-checked with a second independent converter; the nine items and the four-level scale reproduce the published wording. <b>No Nepali-speaking clinician has yet checked this copy, and the cut-off of 10 or more belongs to these exact words.</b> The item-9 crisis instruction, the cut-off notes and the consent sentence are deliberately still English because no verified Nepali exists for them, and the form marks them as untranslated. Administering the English items to a Nepali speaker through an untrained interpreter is not the same instrument and the cut-off does not carry over.",
     "consent.label": "Consent",
     "consent.phq9": "The person was told what this is for and agreed to answer",
     "phq9.item1": "Little interest or pleasure in doing things",
@@ -1140,7 +1159,7 @@ window.I18N_STRINGS = {
     "phq9.cutoff.interpretation": "Bands are the standard PHQ-9 cut-points (Kroenke, Spitzer &amp; Williams, 2001): 0–4 minimal, 5–9 mild, 10–14 moderate, 15–19 moderately severe, 20–27 severe. The action threshold of <b>10 or more</b> is the one validated in Nepal (Kohrt et al., 2016; sensitivity 0.94, specificity 0.80, in 125 primary-care patients in Chitwan). A score is not a diagnosis and must not be recorded as one.",
     "phq9.cutoff.useWarning": "<b>Do not use this to screen a shelter.</b> In the Nepali validation the cut-off of 10 or more had a positive predictive value of 0.42 — in that primary-care sample, fewer than half of the people who screened positive turned out to have a depressive episode. Run it across a displaced population and most positives will be wrong, while the people you flag will have been told something about themselves that is not true. Use it where someone has already been identified and referred.",
     "phq9.p001": "PHQ-9 follow-up measure — MHPSS Nepal",
-    "phq9.p002": "Revised draft <span>· English items only — the validated Nepali text has not been obtained · saved on this phone, sent to the coordination register when there is signal</span>",
+    "phq9.p002": "Validated Nepali instrument <span>· Kohrt et al., 2016 · items and scale in Nepali, English on switch · saved on this phone, sent to the coordination register when there is signal</span>",
     "phq9.p003": "PHQ-9 · follow-up measure",
     "phq9.p004": "Layer 1 · Rasuwa / Bhote Koshi",
     "phq9.p005": "← Forms",
@@ -2197,6 +2216,34 @@ window.I18N_STRINGS = {
      general translation engine cannot do that, and would invent its own
      vocabulary that then fails to match the national one. */
   ne: {
+
+    /* ---- PHQ-9 Nepali: the validated instrument, not a draft -------
+       Source: Kohrt et al., BMC Psychiatry 2016;16:58 (PMC4782581),
+       Additional file 1. Converted out of the legacy non-Unicode font with
+       npttf2utf and cross-checked with an independent converter; two mappers
+       agree on all nine items and on the four-level scale.
+       The nine items and the four response levels are the PUBLISHED wording
+       VERBATIM -- the cut-off of 10 or more belongs to these words, so not one
+       of them is re-worded here. The two instruction lines are plain drafts
+       carrying no scoring weight. The item-9 instruction, the cut-off notes,
+       consent and the clinical warnings stay ENGLISH on purpose: no verified
+       Nepali exists for them, and the form marks them as untranslated. ------ */
+    "phq9.item1": "गएको २ हप्तामा तपाईं अन्य व्यक्तिहरू जति रमाउँछन्, त्यत्तिको रमाउन नसक्ने/खुसीहुन नसक्ने वा काम गर्न मन नलाग्ने कत्तिको भएको थियो ?",
+    "phq9.item2": "गएको २ हप्तामा तपाईलार्ई, दिक्क लाग्ने, निरास हुने वा केहीगर्न सक्दिन जस्तो लाग्ने कत्तिको भएको थियो ?",
+    "phq9.item3": "गएको २ हप्तामा तपाईं राम्ररी सुत्न नसक्ने वा निन्द्रा मस्त नआउने वा अघिपछि भन्दा धेरै सुत्ने वा धेरै निन्द्रा लाग्ने कत्तिको भएको थियो ?",
+    "phq9.item4": "गएको २ हप्तामा तपाईंलाई थकान महशुस हुने, शक्ति वा तागत् कम हुने कत्तिको महशुस भएको थियो ?",
+    "phq9.item5": "गएको २ हप्तामा तपाईंलाई खानाखान मन नलाग्ने वा रुचि नहुने वा अघिपछि भन्दा धेरै खान मन लाग्ने कत्तिको भएको थियो ?",
+    "phq9.item6": "गएको २ हप्तामा तपाईं आफूले आफूलाई दोषी ठान्ने वा आफ्नो कारणले गर्दा आफू असफल भएको वा परिवार तल परेको कत्तिको महशुस गर्नु भएको थियो ? (जस्तैःआफ्नो कारणले गर्दा समुदायमा आफ्नो तथा आफ्नो परिवारको ईज्जत गुमेको महशुस गर्ने )",
+    "phq9.item7": "गएको २ हप्तामा तपाईंलाई ध्यान केन्द्रित गर्न वा एक चित्त हुन वा एक सुरले काम गर्न गाह्रो हुने कत्तिको भएको थियो ?(जस्तैः पत्रपत्रिका पढ्न वा टी.भी. हेर्न, चामल केलाउन, पात गााँस्न, तरकारी पकाउन, घाँस काट्न, ध्यान दिएर कुनै पनि काम गर्न आदि)",
+    "phq9.item8": "गएको २ हप्तामा अरू व्यक्तिले पनि याद गर्ने गरी तपार्इं बिस्तारै बोल्ने वाहिड्ने गर्नुभएको अथवा छट्पट्टीभएर चाहिने भन्दा बढी हिंडडुल गर्नर्े कत्तिको गर्नुभएको थियो ?",
+    "phq9.item9": "गएको २ हप्तामातपाईंलाई मरौं मरौं जस्तो लाग्ने, आफ्नो ज्यान आफैं लिने वा आत्महत्या गर्ने खालका विचारहरू कत्तिको आयो ? (जस्तैः हातकाट्ने, विष सेवनगर्ने, हामफाल्ने, भित्तामाटाउको ठोक्काउने आदि)",
+    "phq9.scale0": "कत्ति पनि भएन",
+    "phq9.scale1": "कहिलेकाहीं भयो",
+    "phq9.scale2": "धेरै जसो भयो",
+    "phq9.scale3": "सधै जसो भयो",
+    "phq9.itemInstruction": "गएको २ हप्तामा तलका समस्याहरूले तपाईंलाई कत्तिको सताएको थियो ?",
+    "phq9.itemDifficulty": "यदि कुनै समस्या छान्नुभयो भने, ती समस्याले तपाईंको काम गर्न, घरको काम सम्हाल्न वा अरू मानिससँग मिलेर बस्न कत्तिको गाह्रो बनाएको थियो ?",
+    "phq9.p002": "प्रमाणीकृत नेपाली संस्करण <span>· कोहर्त एवं अन्य, २०१६ · प्रश्न र उत्तर-विकल्प नेपालीमा, अंग्रेजीमा स्विच गर्न मिल्छ · यही फोनमा सुरक्षित, नेटवर्क भएपछि समन्वय रजिस्टरमा पठाइन्छ</span>",
     "dis.person": "के उहाँ/उनले आफूलाई अपाङ्गता भएको व्यक्ति भनी चिनाउनुहुन्छ?",
     "dis.blank": "— सोधिएको छैन —",
     "dis.yes": "हुन्छ",
@@ -2846,7 +2893,6 @@ window.I18N_STRINGS = {
     "phq9.cutoff.interpretation": "ब्यान्डहरू मानक PHQ-9 कट-पोइन्टहरू हुन् (Kroenke, Spitzer &amp; Williams, 2001): 04 न्यूनतम, 59 हल्का, 1014 मध्यम, 1519 मध्यम गम्भीर, 2027 गम्भीर। कार्य सीमा <b>10 वा अधिक </b> नेपालमा मान्य छ (Kohrt et al., 2016; संवेदनशीलता 0.94, विशिष्टता 0.80, Chitwan मा प्राथमिक हेरचाहका १२५ बिरामीहरूमा) । स्कोर निदान होइन र एकको रूपमा रेकर्ड गर्न सकिदैन।",
     "phq9.cutoff.useWarning": "<b>आश्रयस्थलको स्क्रीनिंगका लागि यो प्रयोग नगर्नुहोस्।</b>नेपाली प्रमाणीकरणमा १० वा बढीको कट-आउटको सकारात्मक भविष्यवाणी मान ०.४२ थियो। प्राथमिक हेरचाहको त्यो नमूनामा, सकारात्मक स्क्रीनिङ गर्ने आधा भन्दा कम व्यक्तिमा डिप्रेसिभ एपिसोड देखा पर्यो। यो विस्थापित जनसंख्यामा चलाउनुहोस् र धेरै सकारात्मकहरू गलत हुनेछन्, जबकि तपाईंले फ्याग गर्ने व्यक्तिहरूलाई उनीहरूको बारेमा केहि भनिएको हुनेछ जुन सत्य छैन। यसलाई प्रयोग गर्नुहोस् जहाँ कसैलाई पहिले नै पहिचान गरिएको छ र रेफर गरिएको छ।",
     "phq9.p001": "PHQ-9 अनुगमन उपाय MHPSS नेपाल",
-    "phq9.p002": "संशोधित मस्यौदा <span>· अंग्रेजी मात्र वस्तुहरू मान्य नेपाली पाठ प्राप्त भएको छैन · यस फोनमा सुरक्षित गरिएको, समन्वय रेजिष्टरमा पठाइएको जब त्यहाँ संकेत छ</span>",
     "phq9.p003": "PHQ-9 · अनुगमन उपाय",
     "phq9.p007": "समयको साथ एक व्यक्तिलाई पछ्याउँदा",
     "phq9.p008": "यो उपाय १४ सेप्टेम्बरको ब्रीफिंगमा सोधिने एउटा प्रश्नको जवाफ दिनको लागि रहेको छ: के व्यक्ति तीव्र तनावबाट नैदानिक विकारतिर जान्छ, वा त्यसबाट टाढा जान्छ ? <b>कसैले पहिले नै हेरचाहमा छ</b>, त्यसैले दोस्रो स्कोर पहिलो संग तुलना गर्न सकिन्छ।",
@@ -2866,10 +2912,6 @@ window.I18N_STRINGS = {
     "phq9.p037": "के पठाइनेछ, यदि त्यहाँ पठाउन को लागी कुनै ठाउँ थियो",
     "phq9.p038": "वस्तु-प्रति-item उत्तरहरू राखिएका छन् किनकि कुल मात्र पुनः जाँच गर्न सकिदैन, र किनभने वस्तु ९ लेखापरीक्षण योग्य हुनुपर्दछ। त्यहाँ कुनै नाम, कुनै फोन नम्बर र कुनै जन्म मिति छैन।",
     "phq9.p040": "PHQ-9 को विकास डाक्टर रोबर्ट एल. स्पिट्जर, जेनेट बीडब्ल्यू विलियम्स, कर्ट क्रोन्के र सहकर्मीहरूले Pfizer Inc. बाट शैक्षिक अनुदानको साथ गरेका थिए। यो उपकरणले निम्न कथन समावेश गर्दछः <i>प्रतिकृति, अनुवाद, प्रदर्शन वा वितरणको लागि कुनै अनुमति आवश्यक छैन।</i>उपरोक्त वस्तुहरू त्यस आधारमा शाब्दिक रूपमा पुनः प्रस्तुत गरिएका छन्। नेपाली अनुकूलन कार्यक्रमको माध्यमबाट गरिएको थियो र मानसिक स्वास्थ्य सेवा सुधार (PRIME) कन्सोर्टियम मार्फत प्रमाणित गरिएको थियो, जुन बेलायतको सहयोगबाट वित्त पोषित छ र <b>होइन</b>यहाँ समावेश गरिएको छ, यस पृष्ठको शीर्षमा दिइएका कारणहरूको लागि।",
-    "phq9.scale0": "होइन, बिल्कुलै होइन",
-    "phq9.scale1": "धेरै दिन",
-    "phq9.scale2": "आधाभन्दा बढी दिन",
-    "phq9.scale3": "लगभग हरेक दिन",
     "phq9.scaleDifficulty0": "कुनै पनि कठिनाई छैन",
     "phq9.scaleDifficulty1": "केही कठिन",
     "phq9.scaleDifficulty2": "धेरै गाह्रो",
