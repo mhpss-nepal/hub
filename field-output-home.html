@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Layer 2 · Where the field forms' output lands — MHPSS Nepal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Manrope:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="assets/design.css">
+<style>
+  /* STRUCTURE ONLY. This page deliberately carries no new visual design: it
+     reuses the hub's existing tokens, cards and tables so it cannot be mistaken
+     for a proposal about how Layer 2 should look. Every appearance decision
+     (layout, typography, colour, card style, navigation) is Adib's and waits for
+     him. The one rule below exists so the receipt block reads as a receipt. */
+  .rec{border:1px solid var(--line);border-left:4px solid var(--slate);border-radius:var(--r);
+       background:var(--paper);padding:12px 14px;margin:12px 0}
+  .rec .kv{display:grid;grid-template-columns:max-content 1fr;gap:2px 14px;font-size:12.5px}
+  .rec .kv b{color:var(--slate);font-weight:700}
+  .rec code{font-size:11.5px}
+  .notice{border:1px solid var(--warn);border-left:4px solid var(--warn);border-radius:var(--r);
+          background:var(--warn-t,#fff7e9);padding:12px 14px;margin:0 0 16px}
+</style>
+</head>
+<body class="hub">
+<div class="top">
+  <div>
+    <div class="brand">MHPSS Coordination Dashboard</div>
+    <div class="sub">Layer 2 · the field forms' output home</div>
+  </div>
+  <div class="spacer"></div>
+</div>
+
+<div class="wrap wide">
+
+  <h1>Where the field forms' output lands</h1>
+  <p class="lede">The field forms run on the phones (Layer 1) and are not repeated here. This is the
+  Layer 2 side of the same thing: the surface that <b>reads</b> what a form wrote. It answers one
+  question with something you can check — <i>a record made on the current field form arrives on
+  Layer 2, through the existing contract, and is read.</i></p>
+
+  <div class="notice">
+    <b>Structure only. No visual design is proposed on this page, and none is approved.</b>
+    The layout, typography, colour, card style and navigation shape of the Layer 2 home are Adib's
+    decision and are deliberately not made here. This page exists so the plumbing has an address
+    that can be tested. Anything that would present itself as "the Layer 2 look" is out of scope
+    until he confirms it. The questions he is being asked are listed at the foot of this page.
+  </div>
+
+  <div class="card">
+    <h2 style="margin:0 0 6px;font-size:18px">The receiving surface</h2>
+    <p class="secsay">This route is the home the forms' output lands in. It reads the register
+    through the same two shared files every Layer 2 screen uses — <code>assets/fb.js</code>
+    (the register bridge) and <code>assets/store.js</code> (the record model) — with
+    <b>neither of them modified</b>. It requests exactly one record kind, <code>activity</code>,
+    which is the instrument approved for the trial; asking for a kind is the read boundary, not a
+    display filter.</p>
+    <div class="rec">
+      <div class="kv">
+        <b>This page</b><span><code>field-output-home.html</code></span>
+        <b>Register project</b><span><code id="proj">—</code></span>
+        <b>Collection</b><span><code id="coll">—</code></span>
+        <b>Kinds asked for</b><span><code id="kinds">—</code></span>
+        <b>Bridge</b><span id="bridge">—</span>
+      </div>
+    </div>
+    <div class="btns" style="margin-top:4px">
+      <button type="button" class="btn" id="read">Read the register now</button>
+      <span class="xs" id="readMsg"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 style="margin:0 0 6px;font-size:18px">What it reads, and the shapes it expects</h2>
+    <p class="secsay">Every row below is a contract already in the frozen tree. This page reads them;
+    it defines none of them. A change to any row is an interface change, not a Layer 2 fix.</p>
+    <div class="tbl-wrap">
+      <table class="data">
+        <thead><tr><th>Contract</th><th>What the field form writes</th><th>Where Layer 2 reads it</th></tr></thead>
+        <tbody>
+          <tr><td><b>Kind</b></td><td><code>kind: "activity"</code>, written by
+            <code>registerBody()</code> in <code>assets/store.js</code></td>
+            <td><code>FB.watchKind("activity", …)</code> — the only kind this page asks for</td></tr>
+          <tr><td><b>Schema stamp</b></td><td><code>schema: "mhpss-np-5ws/" + SCHEMA_VERSION</code></td>
+            <td>carried on the row; read, never rewritten</td></tr>
+          <tr><td><b>Record identity</b></td><td><code>store.js recordId()</code> — FNV-1a over
+            org, orgOther, site, siteOther, palika, dateAD, activity, modality, sessionTime</td>
+            <td><code>id</code> on the row; the same report filed twice is one row</td></tr>
+          <tr><td><b>Register document id</b></td><td><code>fb.js rid()</code>, starting with the
+            record's own <code>id</code></td>
+            <td>the Firestore document key; a retry overwrites itself rather than adding a row</td></tr>
+          <tr><td><b>Queue entry id</b></td><td><code>_rid</code>, added by <code>FB.submit()</code></td>
+            <td>the device queue; a record leaves it only when the register acknowledges the write</td></tr>
+          <tr><td><b>Device storage key</b></td><td><code>mhpss-np-4ws-v1</code> (the device copy the
+            form saves before any network call)</td>
+            <td>not read by Layer 2; listed here because it is the record of truth on the handset</td></tr>
+          <tr><td><b>Queue storage key</b></td><td><code>mhpss-np-queue-v1</code></td>
+            <td>not read by Layer 2; the bridge's own retry ledger</td></tr>
+          <tr><td><b>Stripped before the network</b></td><td><code>focalName</code>,
+            <code>focalPhone</code>, <code>focalEmail</code> (<code>fb.js NEVER_SENT</code>)</td>
+            <td>never present in the register, so never on this page</td></tr>
+          <tr><td><b>Export allow-list</b></td><td><code>CSV_COLUMNS</code>, <span id="colCount">—</span>
+            columns incl. <code>ward</code></td>
+            <td>the Hub's export surfaces; not used by this read path</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="xs" style="margin-top:10px">Field <code>name</code>/<code>id</code>, the schema,
+    storage keys, <code>_rid</code>, event identity, de-duplication, revision, the queue/retry/
+    lease/ack behaviour, the Firestore behaviour, the submit handlers and the success/error
+    contracts are all unchanged by this page. It adds a reader.</p>
+  </div>
+
+  <div class="card">
+    <h2 style="margin:0 0 6px;font-size:18px">The last proof of life</h2>
+    <p class="secsay">Written by the page itself, from the values the bridge actually returned. It is
+    a receipt, not a dashboard: no analysis, no filters, no export. Each row shows the
+    deterministic id it read, so the identity can be recomputed independently.</p>
+    <div class="rec" id="receipt">
+      <div class="kv">
+        <b>Read at</b><span id="rAt">not yet</span>
+        <b>Outcome</b><span id="rOut">—</span>
+        <b>Rows read</b><span id="rN">—</span>
+        <b>Other kinds asked for</b><span id="rOther">—</span>
+        <b>Writes attempted</b><span id="rWrite">—</span>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="data">
+        <thead><tr><th>Date of activity</th><th>Site</th><th>Organisation</th><th>Activity</th><th class="n">Attendance</th><th>Report id</th><th>Register doc id</th></tr></thead>
+        <tbody id="rows"><tr><td colspan="7" class="xs">Nothing read yet — press “Read the register now”.</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 style="margin:0 0 6px;font-size:18px">What this page does not do</h2>
+    <ul style="margin:6px 0 0;padding-left:20px;font-size:13.5px">
+      <li><b>It never writes.</b> <code>FB.submit()</code> and <code>FB.publish()</code> are wrapped
+        so an attempt is recorded and refused; the counters above stay at zero.</li>
+      <li><b>It changes no contract.</b> No field name, no schema, no storage key, no id basis, no
+        queue behaviour, no rule. Both shared files are loaded as they are.</li>
+      <li><b>It touches no file in the form repository.</b> Layer 1 is frozen; any incompatibility
+        is solved here.</li>
+      <li><b>It is not a dashboard and proposes no layout.</b> It is the minimum surface that makes
+        the read path testable.</li>
+    </ul>
+  </div>
+
+  <div class="card" id="questions">
+    <h2 style="margin:0 0 6px;font-size:18px">Waiting for Adib — the questions he is being asked</h2>
+    <p class="secsay">Nothing on this list is decided. Until he answers, the appearance of the Layer 2
+    home is unchanged and this page carries no styling of its own.</p>
+    <ol style="margin:6px 0 0;padding-left:20px;font-size:13.5px">
+      <li><b>Does this become a fixed Layer 2 destination, and its own address?</b> Today it is
+        reachable by URL only. Putting it in the side rail is a navigation change and that is his call.</li>
+      <li><b>One home or two?</b> The activity report already has a home inside the dashboard
+        ("Reports received"). Should the register read-through live there, here, or both?</li>
+      <li><b>Should the four unapproved instruments' output homes be visible at all</b> during the
+        trial, or left reachable-but-unlisted as they are now?</li>
+      <li><b>What should a coordinator see first?</b> The five existing sections are unchanged; if
+        the home is to be reorganised, the shape is his decision.</li>
+      <li><b>Typography, colour, cards, layout</b> — not proposed here, deliberately. No look ships
+        until he confirms one.</li>
+    </ol>
+  </div>
+
+  <p class="xs" style="margin-top:24px">Draft instrument. Figures shown are only as good as the
+  register they are read from; nothing here is validated against any other source. The activity
+  report's attendance is <b>not unique people</b> — it is one session's attendance, and sessions
+  are never added into a people count by this page.</p>
+</div>
+
+<script src="assets/codes.js"></script>
+<script src="assets/store.js"></script>
+<script src="assets/fb-config.js"></script>
+<script src="assets/fb.js"></script>
+<script>
+/* =====================================================================
+   The Layer 2 read-through for the field forms' output. STRUCTURE ONLY.
+
+   It reads through the unmodified bridge. Everything it can be asked
+   about — which kinds it requested, whether it ever tried to write, which
+   ids it read — is exposed on window.OUTPUT_HOME so a test can check the
+   behaviour rather than the source text.
+
+   It asks for ONE kind: `activity`. That is the trial instrument, and
+   naming the kind is the read boundary under the Firestore rules, not a
+   display filter. Widening it would be an interface and access change.
+   ===================================================================== */
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var KINDS = ["activity"];
+  var esc = function (v) {
+    return String(v === undefined || v === null ? "" : v)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  };
+
+  var state = { asks: [], writes: [], rows: [], error: "", at: null, ok: false };
+
+  /* ---- the write guard -------------------------------------------------
+     This page must never write. Rather than trusting that no code path
+     calls a writer, the writers are wrapped: an attempt is recorded and
+     refused with a rejected promise. The receipt shows the count. */
+  if (window.FB) {
+    ["submit", "publish"].forEach(function (fn) {
+      if (typeof window.FB[fn] !== "function") return;
+      var orig = window.FB[fn];
+      window.FB[fn] = function () {
+        state.writes.push(fn);
+        return Promise.reject(new Error("this page is a reader; " + fn + "() is refused here"));
+      };
+    });
+    /* And the reads are instrumented so the kind set is measured, not read
+       off the source. fb.js itself is untouched on disk. */
+    if (typeof window.FB.watchKind === "function") {
+      var wk = window.FB.watchKind;
+      window.FB.watchKind = function (kind, ok, err) {
+        state.asks.push(kind);
+        return wk.call(window.FB, kind, ok, err);
+      };
+    }
+  }
+
+  var C = window.CODES, S = window.STORE;
+  var orgName = function (c) {
+    if (c === "OTHER") return "Other";
+    var o = C && C.orgByCode ? C.orgByCode[c] : null;
+    return o ? o.name : (c || "not stated");
+  };
+  var siteName = function (c) {
+    if (!c) return "not stated";
+    if (c === "PALIKA") return "palika level";
+    var s = C && C.siteByCode ? C.siteByCode[c] : null;
+    return s ? s.name : c;
+  };
+  var actName = function (r) {
+    var reading = S && S.activityReadings ? S.activityReadings(r) : {};
+    return reading.activityLabel || r.activity || "not stated";
+  };
+  var receivedAt = function (r) {
+    var t = r.server_ts || r.created_at || r.createdAt || "";
+    if (t && typeof t === "object" && typeof t.toDate === "function") t = t.toDate().toISOString();
+    if (t && typeof t === "object" && t.seconds) t = new Date(t.seconds * 1000).toISOString();
+    return typeof t === "string" ? t : "";
+  };
+
+  function paintStatus() {
+    $("proj").textContent = (window.FB_CONFIG && window.FB_CONFIG.projectId) || "no project configured";
+    $("coll").textContent = window.FB_COLLECTION || "submissions";
+    $("kinds").textContent = KINDS.join(", ");
+    var configured = !!(window.FB_CONFIG && window.FB_CONFIG.projectId && window.FB_CONFIG.apiKey);
+    $("bridge").textContent = window.FB
+      ? (configured ? "assets/fb.js loaded; " + (window.FB.status().ready ? "ready" : "not ready yet")
+                    : "assets/fb.js loaded; no project configured in this build")
+      : "assets/fb.js not present on this page";
+    var n = S && S.CSV_COLUMNS ? S.CSV_COLUMNS.length : 0;
+    $("colCount").textContent = n ? String(n) : "—";
+  }
+
+  function render() {
+    $("rAt").textContent = state.at ? state.at.toLocaleString("en-GB") : "not yet";
+    $("rOut").textContent = state.error ? "refused: " + state.error
+      : (state.ok ? "read succeeded" : "not yet");
+    $("rN").textContent = state.ok ? String(state.rows.length) : "—";
+    var other = state.asks.filter(function (k) { return k !== "activity"; });
+    $("rOther").textContent = state.asks.length ? (other.length ? other.join(", ") : "none") : "—";
+    $("rWrite").textContent = String(state.writes.length);
+    var body = $("rows");
+    if (!state.rows.length) {
+      body.innerHTML = "<tr><td colspan='7' class='xs'>" +
+        (state.ok ? "The register answered with no activity reports." : "Nothing read yet — press “Read the register now”.") +
+        "</td></tr>";
+      return;
+    }
+    body.innerHTML = state.rows.map(function (r) {
+      return "<tr><td>" + esc(r.dateAD || (r.dateBS ? "BS " + r.dateBS : "—")) +
+        (r.sessionTime ? " <span class='xs'>" + esc(r.sessionTime) + "</span>" : "") +
+        "</td><td>" + esc(siteName(r.site)) + "</td><td>" + esc(orgName(r.org)) +
+        "</td><td>" + esc(actName(r)) + "</td><td class='n'>" + esc(r.reachedTotal) +
+        "</td><td class='xs'><code>" + esc(r.id) + "</code></td><td class='xs'><code>" +
+        esc(r._id || "") + "</code></td></tr>";
+    }).join("");
+  }
+
+  function read() {
+    var msg = $("readMsg");
+    if (!window.FB || typeof window.FB.watchKind !== "function") {
+      state.error = "the bridge is not available on this page";
+      render();
+      msg.textContent = "No bridge. The contract above still applies.";
+      return;
+    }
+    msg.textContent = "Attaching the listener…";
+    var settled = false;
+    /* `asks` is cumulative and never cleared here: it is the page's record of
+       every kind it has ever asked the register for, which is exactly the thing
+       a reader should be able to check. Clearing it on each read would erase
+       the evidence of a widened query. */
+    state.error = ""; state.rows = []; state.ok = false;
+
+    window.FB.watchKind(KINDS[0], function (rows) {
+      state.rows = (rows || []).map(function (r) {
+        var o = JSON.parse(JSON.stringify(r));
+        o.id = o.id || o._id || "";
+        return o;
+      });
+      state.ok = true; state.error = ""; state.at = new Date();
+      render();
+      msg.textContent = state.rows.length + " activity report(s) read from the register.";
+      settled = true;
+    }, function (err) {
+      state.ok = false; state.error = String(err || "refused"); state.at = new Date();
+      render();
+      msg.textContent = "The register refused the read. Signing in proves who you are; it does not " +
+        "grant sight of the records. An admin adds the address on the Access page.";
+      settled = true;
+    });
+
+    /* A listener that neither answers nor refuses is a state of its own:
+       say so rather than leaving the reader guessing. */
+    setTimeout(function () {
+      if (!settled && !state.ok) {
+        state.error = "no answer from the register within 20s";
+        state.at = new Date();
+        render();
+        msg.textContent = "No answer yet. The listener is still attached.";
+      }
+    }, 20000);
+  }
+
+  $("read").addEventListener("click", read);
+
+  /* The whole truth for anything that wants to check behaviour rather than
+     read this source: the kinds asked for, the rows read, and whether a write
+     was ever attempted. */
+  window.OUTPUT_HOME = { kinds: KINDS, state: state, read: read, render: render };
+
+  paintStatus();
+  render();
+  if (window.FB && window.FB.onStatus) {
+    window.FB.onStatus(function () { paintStatus(); });
+  }
+})();
+</script>
+</body>
+</html>
