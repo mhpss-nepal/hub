@@ -352,7 +352,7 @@ def main(argv=None) -> int:
         res["wrote"] = not args.check
         print(json.dumps(res, sort_keys=True))
         return 0
-    except ContractError as e:
+    except (ContractError, OSError) as e:
         print(f"CONTRACT FAILURE: {e}", file=sys.stderr)
         return 2
 
