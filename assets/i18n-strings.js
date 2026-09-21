@@ -1089,6 +1089,13 @@ window.I18N_STRINGS = {
   },
 
   en: {
+    "dis.person": "Does the person identify themselves as a person with disability?",
+    "dis.blank": "— not asked —",
+    "dis.yes": "Yes",
+    "dis.no": "No",
+    "dis.personHelp": "Asked of the person, one answer per row. Only ask if they are able to answer, and leave it blank rather than guess — blank is recorded as \"not asked\", which is different from \"No\".",
+    "f4.disSession": "Were the people at this session asked about disability?",
+    "f4.disSessionHelp": "One answer for the whole session, because this report covers many people. The per-person question, \"Does the person identify themselves as a person with disability?\", is asked on the service-contact record, where one row is one person. Blank is recorded as \"not asked\", which is different from \"No\".",
     "clinical.phq9ValidatedTextWarning": "<b>The Nepali text is missing, and this form is not ready for field use without it.</b> The Nepali version validated by the PRIME consortium exists, but the copy available is typeset in a legacy non-Unicode Nepali font, so the characters cannot be transferred here without risking a corrupted questionnaire. <b>Nothing has been translated or approximated.</b> Before any real use, obtain the Unicode Nepali items from the PRIME / Kohrt source and have them checked by a Nepali-speaking clinician. Administering the English items to a Nepali speaker through an untrained interpreter is not the same instrument and the cut-off does not carry over.",
     "consent.label": "Consent",
     "consent.phq9": "The person was told what this is for and agreed to answer",
@@ -2190,6 +2197,13 @@ window.I18N_STRINGS = {
      general translation engine cannot do that, and would invent its own
      vocabulary that then fails to match the national one. */
   ne: {
+    "dis.person": "के उहाँ/उनले आफूलाई अपाङ्गता भएको व्यक्ति भनी चिनाउनुहुन्छ?",
+    "dis.blank": "— सोधिएको छैन —",
+    "dis.yes": "हुन्छ",
+    "dis.no": "हुँदैन",
+    "dis.personHelp": "व्यक्तिसँग सोधिन्छ, एक पङ्क्तिमा एक जवाफ। जवाफ दिन सक्ने अवस्थामा मात्र सोध्नुहोस्, अनुमान गर्नुभन्दा खाली छोड्नु राम्रो — खाली भनेको \"सोधिएको छैन\", जुन \"हुँदैन\" भन्दा फरक हो।",
+    "f4.disSession": "यस सत्रका मानिसहरूलाई अपाङ्गताबारे सोधियो?",
+    "f4.disSessionHelp": "यो प्रतिवेदन धेरै मानिसको हुनाले सत्रभरिको लागि एउटै जवाफ। व्यक्ति-व्यक्तिको प्रश्न, \"के उहाँ/उनले आफूलाई अपाङ्गता भएको व्यक्ति भनी चिनाउनुहुन्छ?\", सेवा सम्पर्क रेकर्डमा सोधिन्छ, जहाँ एक पङ्क्ति एक व्यक्ति हो। खाली भनेको \"सोधिएको छैन\", जुन \"हुँदैन\" भन्दा फरक हो।",
     "a11y.skip": "फारममा जानुहोस्",
     "f4.disHead": "अपाङ्गता भएका व्यक्तिहरू <span>&mdash; CMC-Nepal को अनुरोध, २१ सेप्टेम्बर २०२६</span>",
     "f4.disAsked": "के उहाँ/उनले आफूलाई अपाङ्गता भएको व्यक्ति भनी चिनाउनुहुन्छ?",
