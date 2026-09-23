@@ -12,6 +12,11 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Manrope:wght@400;600;700;800&display=swap">
 <link rel="stylesheet" href="assets/app.css">
 <link rel="stylesheet" href="assets/design.css">
+<!-- The Layer 2 shell. Loaded AFTER design.css so it wins the cascade, and
+     by the hub's pages only: design.css is loaded by every field form too,
+     so the rail and the masthead cannot be repainted there without
+     repainting Layer 1. Scoped to body.hub throughout. -->
+<link rel="stylesheet" href="assets/hub-shell.css">
 <style>
   .tabs{display:flex; gap:4px; border-bottom:2px solid var(--line); margin:22px 0 16px; flex-wrap:wrap}
   .tab{font:inherit; font-size:13px; font-weight:700; background:none; border:0; border-bottom:3px solid transparent;
@@ -212,6 +217,13 @@
 </style>
 </head>
 <body class="hub">
+
+<div class="topline"><div class="in">
+  <span class="tl">MHPSS Technical Working Group &middot; Nepal</span>
+  <span class="sp"></span>
+  <span class="tl" style="letter-spacing:.04em;text-transform:none;font-weight:500">Layer 2 &middot; coordination &middot; restricted</span>
+</div></div>
+
 <!--NAV:rail hubindex-->
 <aside class="rail" aria-label="Coordination hub">
   <a class="railid" href="./">
@@ -320,10 +332,13 @@
   <div class="spacer"></div>
 </div>
 
-<div class="wrap wide">
-
+<div class="phead"><div class="in">
+  <div class="eyebrow">Layer 2 &middot; coordination dashboard</div>
   <h1>Coordination dashboard</h1>
   <p class="lede">One screen for the flood response: what has been reported, who is where, what was done, every report received, and what the public website is given. It reads the live register — each figure is recomputed the moment a worker saves a report — or a file you choose, which is read in the page and never uploaded.</p>
+</div></div>
+
+<div class="wrap wide">
 
   <div class="card" id="loader">
     <div class="drop" id="drop">
