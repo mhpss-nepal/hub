@@ -28,16 +28,20 @@ FORM = HERE / "assets" / "form.css"
 SHELL = HERE / "assets" / "hub-shell.css"
 
 # The tokens hub-shell.css adopts, and the hub token each one is mapped onto.
-# Left: the name as form.css declares it. Right: how hub-shell.css spells it.
+# Left: the name as form.css declares it. Right: how hub-shell.css spells it --
+# a list, because one form token can land on more than one hub name. The radius
+# is the case in point: the hub's shared sheets ask for it as --r in most places
+# and as --r-md in design.css's .card rule, and both must carry the same value
+# or one surface sits at a different corner from its neighbours.
 ADOPTED = {
-    "--fx-bg": "--bg",
-    "--fx-line": "--line",
-    "--fx-line-s": "--line-s",
-    "--fx-r": "--r",
-    "--fx-rs": "--fx-rs",
-    "--fx-shadow": "--fx-shadow",
-    "--fx-blue-d": "--fx-blue-d",
-    "--fx-blue-dd": "--fx-blue-dd",
+    "--fx-bg": ["--bg"],
+    "--fx-line": ["--line"],
+    "--fx-line-s": ["--line-s"],
+    "--fx-r": ["--r", "--r-md"],
+    "--fx-rs": ["--fx-rs"],
+    "--fx-shadow": ["--fx-shadow"],
+    "--fx-blue-d": ["--fx-blue-d"],
+    "--fx-blue-dd": ["--fx-blue-dd"],
 }
 
 DECL = r"{name}\s*:\s*([^;}}]+)"
@@ -70,20 +74,23 @@ def main():
     print()
 
     bad = []
-    for fx_name, hub_name in sorted(ADOPTED.items()):
+    checked = 0
+    for fx_name, hub_names in sorted(ADOPTED.items()):
         want = value(form, fx_name)
-        got = value(shell, hub_name)
         if want is None:
             bad.append((fx_name, "not declared in form.css", "--"))
             continue
-        if got is None:
-            bad.append((hub_name, want, "not declared in hub-shell.css"))
-            continue
-        mark = "ok" if norm(want) == norm(got) else "DRIFTED"
-        shown = want if len(want) < 46 else want[:43] + "..."
-        print("  {:<16} -> {:<12} {:<48} {}".format(fx_name, hub_name, shown, mark))
-        if norm(want) != norm(got):
-            bad.append((hub_name, want, got))
+        for hub_name in hub_names:
+            checked += 1
+            got = value(shell, hub_name)
+            if got is None:
+                bad.append((hub_name, want, "not declared in hub-shell.css"))
+                continue
+            mark = "ok" if norm(want) == norm(got) else "DRIFTED"
+            shown = want if len(want) < 46 else want[:43] + "..."
+            print("  {:<16} -> {:<12} {:<48} {}".format(fx_name, hub_name, shown, mark))
+            if norm(want) != norm(got):
+                bad.append((hub_name, want, got))
 
     print()
     if bad:
@@ -98,7 +105,7 @@ def main():
         print("  token out of ADOPTED in this file and say in the commit why.")
         return 1
 
-    print("FX TOKEN PARITY: PASS ({} adopted tokens match)".format(len(ADOPTED)))
+    print("FX TOKEN PARITY: PASS ({} adopted declarations match)".format(checked))
     return 0
 
 

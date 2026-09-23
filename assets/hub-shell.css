@@ -44,6 +44,10 @@ body.hub{
   --line:#d5dde3;                   /* --fx-line */
   --line-s:#e8eef2;                 /* --fx-line-s */
   --r:14px;                         /* --fx-r */
+  --r-md:14px;                      /* --fx-r, again: design.css gives .card
+                                       border-radius:var(--r-md), not --r, so
+                                       remapping --r alone left one surface at
+                                       10px among 14s. */
   --fx-rs:12px;
   --fx-shadow:0 1px 2px rgba(18,38,52,.06), 0 10px 28px -20px rgba(18,38,52,.35);
   --fx-blue-d:#006996;
@@ -60,8 +64,8 @@ body.hub .card,
 body.hub .stat,
 body.hub .ovcol,
 body.hub .ovfig,
-body.hub .tbl-wrap{ border:0; box-shadow:var(--fx-shadow); }
-body.hub .filters, body.hub details.filters .fpanel{ box-shadow:var(--fx-shadow); }
+body.hub .tbl-wrap,
+body.hub .filters{ border:0; box-shadow:var(--fx-shadow); }
 body.hub select, body.hub input[type="date"], body.hub input[type="search"]{ border-radius:var(--fx-rs); }
 body.hub .chipf{ border-radius:999px; }
 
