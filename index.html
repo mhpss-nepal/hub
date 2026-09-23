@@ -120,6 +120,95 @@
   .nodate{color:var(--warn);font-weight:600}
   .sechead{margin:0 0 4px}
   .secsay{margin:0 0 14px;font-size:14px;color:var(--slate)}
+
+  /* ---- the scope line and the filter panel ----------------------------
+     The nine dropdowns used to stand above every figure, so the first thing
+     on the screen was a row of empty controls rather than the numbers. They
+     are the same controls, in a panel that is shut until it is wanted; what
+     is actually narrowed shows as a chip on the line above. The rule that
+     "Clear filters appears only when one is set" (claude/layer2-filters-and-matrix.md,
+     16 September) now governs the whole bar, not just that one button. */
+  .scope{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 10px;font-size:13.5px}
+  .scope #fSum{color:var(--ink)}
+  .chipf{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;
+    background:var(--who-t);border:1px solid #bcdcec;color:var(--who-d);border-radius:14px;padding:2px 6px 2px 11px}
+  .chipf b{font-weight:800}
+  .chipf button{font:inherit;font-size:14px;line-height:1;border:0;background:transparent;color:var(--who-d);
+    cursor:pointer;padding:2px 5px;border-radius:50%}
+  .chipf button:hover{background:#bcdcec}
+  details.filters{margin:0 0 18px}
+  details.filters > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;
+    flex-wrap:wrap;padding:7px 0}
+  details.filters > summary::-webkit-details-marker{display:none}
+  .fopenb{display:inline-block;font-size:12.5px;font-weight:700;padding:3px 11px;border-radius:13px;
+    background:transparent;color:var(--who-d);border:1px solid var(--who-d)}
+  details.filters[open] > summary .fopenb{background:var(--who-t)}
+  details.filters > summary .xs{flex:1 1 320px;min-width:0}
+
+  /* ---- the three columns, WHERE and WHEN --------------------------------
+     Class names are prefixed `ov` because app.css and design.css are shared
+     with the form repository and already own .cols, .units and .fig.
+
+     The ordinal ramp is claude/chart-rules.md's, unchanged: one hue, light
+     to dark, broadest support to most specialised. Re-checked as an ordinal
+     ramp on 22 September -- monotone lightness, every adjacent gap >= 0.08.
+     The residual is hatched, because "not yet placed" is a remainder and not
+     a sixth family. */
+  :root{ --a1:#6fc0e9; --a2:#22a3dd; --a3:#0079ae; --a4:#005a84; --a5:#003c59; --a0:#9a9a98; }
+  select.fset{border-color:var(--who-d); background:var(--who-t); color:var(--who-d); font-weight:700}
+  .ovcols{display:grid; gap:14px; grid-template-columns:1fr; margin-bottom:18px}
+  @media(min-width:920px){ .ovcols{grid-template-columns:repeat(3,1fr)} }
+  .ovcol{background:#fff; border:1px solid var(--line); border-radius:var(--r); display:flex;
+    flex-direction:column; min-width:0}
+  .ovcolh{display:flex; align-items:center; gap:10px; padding:8px 14px;
+    border-bottom:2px solid var(--who-d); min-height:45px}
+  .ovcolh h2{font-size:13px; letter-spacing:.11em; text-transform:uppercase; color:var(--who-d);
+    margin:0; flex:0 0 auto}
+  .ovsp{flex:1 1 auto}
+  .ovcolf{display:flex; gap:5px; justify-content:flex-end; min-width:0; flex:0 1 auto}
+  .ovcolf select{font:inherit; font-size:11.5px; padding:3px 5px; border:1px solid var(--line);
+    border-radius:3px; background:#fff; color:var(--mute); max-width:150px; min-width:0}
+  .ovcolb{padding:14px}
+  .ovhero{display:flex; align-items:center; gap:14px; flex-wrap:wrap}
+  .ovico{flex:0 0 auto; width:48px; height:48px; color:var(--who)}
+  .ovnum{display:flex; gap:20px; flex-wrap:wrap}
+  .ovnum .n{font-size:29px; font-weight:700; line-height:1; color:var(--who-d);
+    font-variant-numeric:tabular-nums}
+  .ovnum .l{display:block; font-size:12px; color:var(--mute); font-weight:600; line-height:1.35;
+    margin-top:4px; max-width:16ch; text-align:left}
+  .ovsubh{font-size:12px; letter-spacing:.07em; text-transform:uppercase; font-weight:700;
+    color:var(--who-d); margin:18px 0 9px; padding-top:12px; border-top:1px solid var(--line-s)}
+  .ovsubh:first-child{margin-top:0; padding-top:0; border-top:0}
+  .ovbars{display:flex; flex-direction:column; gap:7px}
+  .ovbrow{display:grid; grid-template-columns:1fr auto; gap:2px 10px; align-items:center}
+  .ovbl{font-size:13px; line-height:1.3; min-width:0; text-align:left}
+  .ovbl small{display:block; font-size:11px; color:var(--mute)}
+  .ovbv{font-size:14px; font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap}
+  .ovbt{grid-column:1/-1; height:12px; background:var(--line-s); border-radius:2px; overflow:hidden}
+  .ovbt i{display:block; height:100%; border-radius:0 3px 3px 0; min-width:2px}
+  .ovhatch{background-image:repeating-linear-gradient(45deg,transparent,transparent 3px,
+    rgba(255,255,255,.55) 3px,rgba(255,255,255,.55) 6px)}
+  .ovlegend{display:flex; flex-wrap:wrap; gap:6px 14px; margin-top:11px; font-size:11.5px; color:var(--mute)}
+  .ovlegend span{display:inline-flex; align-items:center; gap:5px}
+  .ovlegend i{width:11px; height:11px; border-radius:2px; flex:0 0 auto}
+  .ovlegend i.ovzero{background:#fff; border:1.5px solid var(--warn)}
+  .ovfig{background:#fff; border:1px solid var(--line); border-radius:var(--r); padding:16px; margin-bottom:18px}
+  .ovfigh{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:4px}
+  .ovfigh h3{margin:0; font-size:18px; color:var(--who-d)}
+  .ovfigf{margin-left:auto}
+  .ovfigf select{max-width:200px}
+  .ovwrap{display:grid; gap:20px; grid-template-columns:1fr}
+  @media(min-width:900px){ .ovwrap{grid-template-columns:1fr 1fr} }
+  .ovunits{display:flex; flex-wrap:wrap; gap:4px; margin:10px 0}
+  .ovunits .u{width:20px; height:20px; border-radius:2px; border:1px solid var(--line); background:#fff}
+  .ovunits .u.rep{background:var(--who-d); border-color:var(--who-d)}
+  .ovunits .u.zero{border-color:var(--warn); border-width:1.5px}
+  .ovpct{display:flex; height:34px; border-radius:3px; overflow:hidden; border:1px solid var(--line)}
+  .ovpct div{display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;
+    color:#fff; min-width:0; overflow:hidden; white-space:nowrap; border-right:2px solid #fff}
+  .ovpct div:last-child{border-right:0}
+  .ovso{border-left:3px solid var(--who-d); background:var(--who-t); padding:10px 13px;
+    border-radius:0 3px 3px 0; font-size:13.5px; margin:14px 0 0}
 </style>
 </head>
 <body class="hub">
@@ -276,7 +365,108 @@
       <div class="btns" style="margin-top:12px"><button type="button" class="btn grey sm" id="emptyOff">Change source</button></div>
     </div>
 
-    <div class="filters" id="filters">
+    <div class="stats" id="stats"></div>
+
+    <!-- The three columns of the 5Ws, in the order a coordinator asks them:
+         who is reporting, what they did, and for whom. Each column carries
+         the one filter that narrows it, in its own header, beside the number
+         it changes. Everything here is drawn from PUBSRC -- the same objects
+         the tables below were drawn from -- so a column can never disagree
+         with the section under it. -->
+    <div class="ovcols" id="ovcols">
+      <div class="ovcol">
+        <div class="ovcolh"><h2>Who</h2><span class="ovsp"></span>
+          <span class="ovcolf"><select data-dim="org" aria-label="Narrow to one organisation"></select></span></div>
+        <div class="ovcolb">
+          <div class="ovhero">
+            <svg class="ovico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 21V9l6-4 6 4v12M9 21v-5h3v5M18 21V12l3 2v7M3 21h18"/></svg>
+            <div class="ovnum" id="ovWho"></div></div>
+          <p class="ovsubh">Attendances by organisation</p>
+          <div class="ovbars" id="ovWhoBars"></div>
+        </div>
+      </div>
+      <div class="ovcol">
+        <div class="ovcolh"><h2>What</h2><span class="ovsp"></span>
+          <span class="ovcolf"><select data-dim="activity" aria-label="Narrow to one activity"></select></span></div>
+        <div class="ovcolb">
+          <div class="ovhero">
+            <svg class="ovico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="6" cy="18" r="2.4"/><circle cx="18" cy="18" r="2.4"/><circle cx="12" cy="6" r="2.4"/><path d="M12 8.4v4M10.2 14.6 7.6 16.4M13.8 14.6l2.6 1.8"/></svg>
+            <div class="ovnum" id="ovWhat"></div></div>
+          <p class="ovsubh">Attendances by IASC pyramid layer</p>
+          <div class="ovbars" id="ovFam"></div>
+          <div class="ovlegend" id="ovFamKey"></div>
+          <p class="ovsubh">Service setting</p>
+          <div class="ovbars" id="ovMod"></div>
+          <p class="xs" id="ovModNote"></p>
+        </div>
+      </div>
+      <div class="ovcol">
+        <div class="ovcolh"><h2>For whom</h2><span class="ovsp"></span>
+          <span class="ovcolf"><select data-dim="status" aria-label="Narrow to one implementation status"></select></span></div>
+        <div class="ovcolb">
+          <div class="ovhero">
+            <svg class="ovico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16.2 14.2c2.7.4 4.8 2.7 4.8 5.8"/></svg>
+            <div class="ovnum" id="ovWhom"></div></div>
+          <p class="ovsubh">Sex and age of those reached</p>
+          <div class="ovbars" id="ovSadd"></div>
+          <p class="xs" id="ovSaddNote"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- WHERE, at palika level. The roster coverage table below is at site
+         level; this is the palika reading the 4Ws matrix joins on, and the
+         gap-list item the map will eventually draw. -->
+    <div class="ovfig" id="ovWhere">
+      <div class="ovfigh"><h3>Where</h3>
+        <span class="ovcolf ovfigf">
+          <select data-dim="district" aria-label="Narrow to one district"></select>
+          <select data-dim="palika" aria-label="Narrow to one palika"></select></span></div>
+      <p class="secsay">Joined on the OCHA COD-AB P-code, never on a place name.</p>
+      <div class="ovhero" style="margin-bottom:12px"><div class="ovnum" id="ovWhereNums"></div></div>
+      <div class="ovwrap">
+        <div>
+          <p class="ovsubh">Attendances by palika</p>
+          <div class="ovbars" id="ovPal"></div>
+        </div>
+        <div>
+          <p class="ovsubh">Every palika of the roster districts — one square each</p>
+          <div class="ovunits" id="ovPalUnits"></div>
+          <div class="ovlegend">
+            <span><i style="background:var(--who-d)"></i>Has a report in this selection</span>
+            <span><i class="ovzero"></i>No report</span></div>
+        </div>
+      </div>
+      <p class="ovso" id="ovWhereSo"></p>
+      <details class="howcount"><summary>How this is counted</summary>
+        <p>The denominator is every palika of the districts that appear on the holding-centre roster, narrowed by the place filters and by nothing else — the same rule the roster coverage table follows. Narrowed to one organisation or one activity, a palika with no report from anyone is still a palika with no report. A site's palika comes from the site list; a palika-level report carries its own; a report whose palika is not established is shown as such rather than dropped.</p></details>
+    </div>
+
+    <!-- WHEN. Implementation status has been a filter since 16 September and
+         has never been a figure -- gap-list item 8 of
+         claude/layer2-filters-and-matrix.md. -->
+    <div class="ovfig" id="ovWhen">
+      <div class="ovfigh"><h3>When</h3></div>
+      <p class="secsay">Implementation status of what has been reported in this selection.</p>
+      <div class="ovpct" id="ovStatus"></div>
+      <div class="ovlegend" id="ovStatusKey"></div>
+      <div class="banner warn" style="margin-top:14px"><b>Three states, and ours are not the IASC three.</b> The 4Ws manual's states are: currently being implemented; funded but not yet implemented; unfunded and not yet implemented. Ongoing / Completed / Planned is a working rendering and does not carry the funded–unfunded distinction.</div>
+    </div>
+
+    <!-- The scope line replaces the wall of dropdowns that used to stand
+         between the reader and the figures. Nothing is offered until
+         something is narrowed: the line says what is in scope, an active
+         narrowing becomes a chip that can be dropped on its own, and the
+         thirteen controls are one tap away in the panel below. The controls
+         themselves are unchanged -- same ids, same data-dim, same engine. -->
+    <div class="scope" id="scope">
+      <span id="fSum"></span>
+      <span id="fChips"></span>
+      <button type="button" class="btn grey sm" id="fClear">Clear filters</button>
+    </div>
+
+    <details class="filters" id="filters">
+      <summary class="fopen"><span class="fopenb">All filters</span><span class="xs">nine dimensions and the period — every figure and table on this page follows them, and each list offers only the values that survive the others</span></summary>
       <div class="grid">
         <div><label for="fProv">Province</label><select id="fProv" data-dim="province"></select></div>
         <div><label for="fDist">District</label><select id="fDist" data-dim="district"></select></div>
@@ -292,14 +482,7 @@
         <div><label for="fFrom">From</label><input type="date" id="fFrom"></div>
         <div><label for="fTo">To</label><input type="date" id="fTo"></div>
       </div>
-      <div class="sum">
-        <span id="fSum"></span>
-        <button type="button" class="btn grey sm" id="fClear">Clear filters</button>
-        <span class="xs">Every figure and table on this page follows the filters. Each list offers only the values that survive the other filters.</span>
-      </div>
-    </div>
-
-    <div class="stats" id="stats"></div>
+    </details>
 
     <!-- The same five sections the rail lists, in the same order. Both
          controls write the same hash, so either can be used and a section
@@ -745,8 +928,11 @@
   }
 
   var DIMS = ["province", "district", "palika", "org", "donor", "group", "activity", "modality", "status"];
+  /* A dimension may now carry a control in two places at once -- the panel,
+     and the header of the column it narrows -- so FSEL holds every one of
+     them and they are filled and read together. */
   var FSEL = {};
-  DIMS.forEach(function (d) { FSEL[d] = document.querySelector('#filters select[data-dim="' + d + '"]'); });
+  DIMS.forEach(function (d) { FSEL[d] = [].slice.call(document.querySelectorAll('select[data-dim="' + d + '"]')); });
   var FILT = { province: "", district: "", palika: "", org: "", donor: "", group: "", activity: "", modality: "", status: "",
                from: "", to: "", period: "", basis: "activity" };
 
@@ -790,7 +976,7 @@
     return true;
   }
   function fillFilter(d) {
-    var sel = FSEL[d], counts = {};
+    var sels = FSEL[d], counts = {};
     ALL.forEach(function (r) {
       if (!passes(r, d)) return;
       DIM[d].of(r).forEach(function (v) { counts[v] = (counts[v] || 0) + 1; });
@@ -800,12 +986,60 @@
       return DIM[d].label(a).localeCompare(DIM[d].label(b));
     });
     var keep = FILT[d];
-    sel.innerHTML = '<option value="">All (' + vals.length + ")</option>" + vals.map(function (v) {
+    var html = '<option value="">All (' + vals.length + ")</option>" + vals.map(function (v) {
       /* an empty value cannot be an <option> value, so "not stated" travels as a sentinel */
       var val = v === "" ? "\u2205" : v;
       return '<option value="' + esc(val).replace(/"/g, "&quot;") + '">' + esc(DIM[d].label(v)) + " (" + counts[v] + ")</option>";
     }).join("");
-    if (keep && vals.indexOf(keep === "\u2205" ? "" : keep) >= 0) sel.value = keep; else { sel.value = ""; FILT[d] = ""; }
+    var ok = keep && vals.indexOf(keep === "\u2205" ? "" : keep) >= 0;
+    if (!ok) FILT[d] = "";
+    sels.forEach(function (sel) {
+      sel.innerHTML = html;
+      sel.value = ok ? keep : "";
+      sel.classList.toggle("fset", !!FILT[d]);
+    });
+  }
+  /* One chip per narrowing actually in force, each droppable on its own.
+     Built from FILT and the same DIM labels the lists use, so a chip can
+     never say something a list would not. */
+  var DIMNAME = { province: "Province", district: "District", palika: "Palika", org: "Organisation",
+    donor: "Funding source", group: "Activity layer", activity: "Activity",
+    modality: "Service setting", status: "Status" };
+  function paintChips() {
+    var box = $("fChips");
+    if (!box) return;
+    box.innerHTML = "";
+    DIMS.forEach(function (d) {
+      var v = FILT[d];
+      if (!v) return;
+      var raw = v === "\u2205" ? "" : v;
+      var chip = document.createElement("span");
+      chip.className = "chipf";
+      chip.innerHTML = "<span>" + esc(DIMNAME[d] || d) + " <b>" + esc(DIM[d].label(raw)) + "</b></span>";
+      var x = document.createElement("button");
+      x.type = "button";
+      x.setAttribute("aria-label", "Remove the " + (DIMNAME[d] || d) + " filter");
+      x.textContent = "\u00d7";
+      x.addEventListener("click", function () { FILT[d] = ""; applyFilters(); });
+      chip.appendChild(x);
+      box.appendChild(chip);
+    });
+    if (FILT.from || FILT.to) {
+      var c2 = document.createElement("span");
+      c2.className = "chipf";
+      c2.innerHTML = "<span>Period <b>" + esc(FILT.from || "any") + " \u2192 " + esc(FILT.to || "any") + "</b></span>";
+      var x2 = document.createElement("button");
+      x2.type = "button";
+      x2.setAttribute("aria-label", "Remove the period filter");
+      x2.textContent = "\u00d7";
+      x2.addEventListener("click", function () {
+        FILT.from = ""; FILT.to = ""; FILT.period = "";
+        $("fFrom").value = ""; $("fTo").value = ""; $("fPeriod").value = "";
+        applyFilters();
+      });
+      c2.appendChild(x2);
+      box.appendChild(c2);
+    }
   }
   function applyFilters() {
     DIMS.forEach(fillFilter);
@@ -827,11 +1061,14 @@
       }
     }
     $("fSum").innerHTML = say;
+    paintChips();
     $("fClear").hidden = !active;
     render();
   }
   DIMS.forEach(function (d) {
-    FSEL[d].addEventListener("change", function () { FILT[d] = this.value; applyFilters(); });
+    FSEL[d].forEach(function (sel) {
+      sel.addEventListener("change", function () { FILT[d] = this.value; applyFilters(); });
+    });
   });
   /* The two selects and the two date boxes are one control: choosing a
      period writes the dates, and editing a date makes the period custom. */
@@ -1212,6 +1449,176 @@
       return true;
     });
   }
+
+  /* ---------- the three columns, WHERE and WHEN -------------------------
+     Drawn from PUBSRC -- the same objects the tables below were drawn from,
+     after the coordinator's filters -- so a column can never disagree with
+     the section under it. Nothing here recomputes a figure that already
+     exists; it reads the ones render() has just built.
+
+     HTML bars, not SVG: an SVG with a fixed viewBox scales its own labels
+     down with the container, and a 12px label lands at about 5px on a phone.
+     These reflow instead (claude/hub-design.md, "why the unit chart is HTML").
+     Every value is direct-labelled outside its bar, which is also the relief
+     the contrast check asks for on the two palest steps of the ramp. */
+  var RAMP = ["--a1", "--a2", "--a3", "--a4", "--a5"];
+  function cvar(t) { return getComputedStyle(document.documentElement).getPropertyValue(t).trim(); }
+  function ovBar(host, label, sub, value, max, colour, hatch) {
+    var row = document.createElement("div"); row.className = "ovbrow";
+    row.title = label + " — " + value.toLocaleString();
+    var l = document.createElement("div"); l.className = "ovbl";
+    l.innerHTML = esc(label) + (sub ? "<small>" + esc(sub) + "</small>" : "");
+    var v = document.createElement("div"); v.className = "ovbv"; v.textContent = value.toLocaleString();
+    var t = document.createElement("div"); t.className = "ovbt";
+    var i = document.createElement("i"); if (hatch) i.className = "ovhatch";
+    i.style.width = Math.max(1.5, (value / (max || 1)) * 100) + "%";
+    i.style.background = colour;
+    t.appendChild(i); row.appendChild(l); row.appendChild(v); row.appendChild(t);
+    host.appendChild(row);
+  }
+  function ovNums(host, pairs) {
+    host.innerHTML = pairs.map(function (p) {
+      return '<div><div class="n">' + esc(p[0]) + '</div><span class="l">' + esc(p[1]) + "</span></div>";
+    }).join("");
+  }
+  function renderTop() {
+    var P = PUBSRC; if (!P) return;
+    var total = P.sadd.total;
+
+    /* --- WHO --- */
+    var orgKeys = Object.keys(P.byOrg).sort(function (a, b) { return P.byOrg[b].reach - P.byOrg[a].reach; });
+    var donors = new Set(); DATA.forEach(function (r) {
+      var d = r.donors && r.donors.length ? r.donors : [r.donor || ""];
+      d.forEach(function (x) { if (x) donors.add(x); });
+    });
+    ovNums($("ovWho"), [[orgKeys.length.toLocaleString(), "Organisations reporting"],
+                        [donors.size.toLocaleString(), "Funding tags"]]);
+    var wb = $("ovWhoBars"); wb.innerHTML = "";
+    var oMax = orgKeys.length ? P.byOrg[orgKeys[0]].reach : 1;
+    orgKeys.forEach(function (k) {
+      var b = P.byOrg[k];
+      ovBar(wb, k, b.reports + (b.reports === 1 ? " report" : " reports") + " · " + b.sites.size +
+        (b.sites.size === 1 ? " site" : " sites"), b.reach, oMax, cvar("--a3"));
+    });
+
+    /* --- WHAT: the IASC layers, and the residual that is not a family --- */
+    var fam = {}, famRep = {}, residual = 0, residualRep = 0, codes = new Set();
+    DATA.forEach(function (r) {
+      codes.add(r.activity);
+      var a = actRes(r.activity), v = n(r.reachedTotal);
+      if (a.placed) { fam[a.group] = (fam[a.group] || 0) + v; famRep[a.group] = (famRep[a.group] || 0) + 1; }
+      else { residual += v; residualRep++; }
+    });
+    ovNums($("ovWhat"), [[DATA.length.toLocaleString(), "Activity reports"],
+                         [codes.size.toLocaleString(), "Distinct activity codes"]]);
+    var groups = C.ACTIVITY_GROUPS || [];
+    var fMax = Math.max.apply(null, groups.map(function (g) { return fam[g.code] || 0; }).concat([residual, 1]));
+    var fb = $("ovFam"); fb.innerHTML = "";
+    groups.forEach(function (g, i) {
+      ovBar(fb, C.label ? C.label(g) : g.name, g.iasc_name || "", fam[g.code] || 0, fMax, cvar(RAMP[Math.min(i, 4)]));
+    });
+    ovBar(fb, "Not yet placed on a layer", residualRep ? residualRep + " report" + (residualRep === 1 ? "" : "s") +
+      " — a remainder, not a family" : "", residual, fMax, cvar("--a0"), true);
+    $("ovFamKey").innerHTML = groups.map(function (g, i) {
+      return '<span><i style="background:' + cvar(RAMP[Math.min(i, 4)]) + '"></i>' + esc(C.label ? C.label(g) : g.name) + "</span>";
+    }).join("") + '<span><i class="ovhatch" style="background:' + cvar("--a0") + '"></i>Not yet placed</span>';
+
+    /* --- service setting: a filter since 16 September, never a figure --- */
+    var mod = {}; DATA.forEach(function (r) { mod[r.modality || ""] = (mod[r.modality || ""] || 0) + n(r.reachedTotal); });
+    var mKeys = Object.keys(mod).sort(function (a, b) { return mod[b] - mod[a]; });
+    var mMax = mKeys.length ? mod[mKeys[0]] : 1, retired = false;
+    var mb = $("ovMod"); mb.innerHTML = "";
+    mKeys.forEach(function (k, i) {
+      var m = (C.MODALITIES || []).filter(function (x) { return x.code === k; })[0];
+      if (m && m.retired) retired = true;
+      var name = m ? (C.label ? C.label(m) : m.name) : (k || "not stated");
+      ovBar(mb, name + (m && m.retired ? " ⚠" : ""),
+        total ? (mod[k] / total * 100).toFixed(1) + "% of attendances" : "", mod[k], mMax, cvar(RAMP[Math.min(i + 1, 4)]));
+    });
+    $("ovModNote").textContent = retired
+      ? "⚠ These codes were retired on 17 September 2026. A record filed before that keeps the code it was filed with — shown as reported, never remapped."
+      : "";
+
+    /* --- FOR WHOM: the folds render() already computed, never re-derived --- */
+    var sd = P.sadd, u = sd.u15, a = sd.a15;
+    var uAll = u.f + u.m + u.o, aAll = a.f + a.m + a.o;
+    var notRec = Math.max(0, total - sd.dgTotal);
+    ovNums($("ovWhom"), [[total.toLocaleString(), "Attendances (service contacts)"],
+                         [(sd.ofPwd || 0).toLocaleString(), "Of whom, people with disabilities"]]);
+    var sb = $("ovSadd"); sb.innerHTML = "";
+    var sMax = Math.max(u.f, u.m, a.f, a.m, notRec, 1);
+    ovBar(sb, "Female, under 15", "", u.f, sMax, cvar("--a1"));
+    ovBar(sb, "Male, under 15", "", u.m, sMax, cvar("--a2"));
+    ovBar(sb, "Female, 15 and over", "", a.f, sMax, cvar("--a3"));
+    ovBar(sb, "Male, 15 and over", "", a.m, sMax, cvar("--a4"));
+    ovBar(sb, "Not recorded", "", notRec, sMax, cvar("--a0"), true);
+    $("ovSaddNote").textContent = total
+      ? "The bands account for " + sd.dgTotal.toLocaleString() + " of " + total.toLocaleString() +
+        " attendances; " + Math.round(notRec / total * 100) + "% carries no sex or age. The five EDCD groups fold at 15, not 18, because two of them cross 18 — the folds are never added together."
+      : "";
+
+    /* --- WHERE: palika level. Denominator follows the place filters only. --- */
+    var byPal = {};
+    DATA.forEach(function (r) {
+      var k = palikaOf(r) || "";
+      var b = byPal[k] = byPal[k] || { reach: 0, reports: 0 };
+      b.reach += n(r.reachedTotal); b.reports++;
+    });
+    var rosterDist = new Set((P.ROSTER || []).map(function (s) { return s.district; }));
+    var denom = (C.PALIKAS || []).filter(function (pk) {
+      if (!rosterDist.has(pk.district)) return false;
+      if (FILT.palika) return pk.pcode === FILT.palika;
+      if (FILT.district) return pk.district === distCode(FILT.district);
+      return true;
+    });
+    var pKeys = Object.keys(byPal).sort(function (x, y) { return byPal[y].reach - byPal[x].reach; });
+    var pMax = pKeys.length ? byPal[pKeys[0]].reach : 1;
+    var pb = $("ovPal"); pb.innerHTML = "";
+    pKeys.forEach(function (k) {
+      ovBar(pb, k ? (C.palikaName(k) || k) : "Palika not established", k || "",
+        byPal[k].reach, pMax, k ? cvar("--a3") : cvar("--a0"), !k);
+    });
+    var pu = $("ovPalUnits"); pu.innerHTML = "";
+    denom.forEach(function (pk) {
+      var hit = byPal[pk.pcode];
+      var d = document.createElement("div");
+      d.className = "u " + (hit ? "rep" : "zero");
+      d.title = pk.name + " · " + (hit ? hit.reach.toLocaleString() + " attendances" : "no report in this selection");
+      pu.appendChild(d);
+    });
+    var zero = denom.filter(function (pk) { return !byPal[pk.pcode]; }).length;
+    ovNums($("ovWhereNums"), [[String(denom.length - zero) + " / " + denom.length, "Palikas with a report"],
+                              [String(Object.keys(byPal).filter(Boolean).length), "Palikas reporting"],
+                              [String(P.ROSTER.length - P.GAPS.length) + " / " + P.ROSTER.length, "Roster sites reached"]]);
+    $("ovWhereSo").innerHTML = denom.length
+      ? "<b>" + zero + " of " + denom.length + " palikas in this place selection have no report.</b> " +
+        "That is the question a 5Ws exists to answer — not who is present, but which places are at zero. " +
+        "Narrowing by organisation or activity does not shrink this denominator."
+      : "No palika is in scope for this place selection.";
+
+    /* --- WHEN: status as a figure, gap-list item 8 --- */
+    var st = {}; DATA.forEach(function (r) { st[r.status || ""] = (st[r.status || ""] || 0) + 1; });
+    var list = (C.STATUS || []).filter(function (x) { return st[x.code]; });
+    var sTot = list.reduce(function (acc, x) { return acc + st[x.code]; }, 0) || 1;
+    var strip = $("ovStatus"); strip.innerHTML = "";
+    list.forEach(function (x, i) {
+      var pc = st[x.code] / sTot * 100;
+      var d = document.createElement("div");
+      d.style.width = pc + "%"; d.style.background = cvar(RAMP[Math.min(i + 2, 4)]);
+      d.textContent = pc > 11 ? Math.round(pc) + "%" : "";
+      d.title = (C.label ? C.label(x) : x.name) + " — " + st[x.code].toLocaleString() +
+        " reports (" + pc.toFixed(1) + "%)";
+      strip.appendChild(d);
+    });
+    $("ovStatusKey").innerHTML = list.map(function (x, i) {
+      return '<span><i style="background:' + cvar(RAMP[Math.min(i + 2, 4)]) + '"></i>' +
+        esc(C.label ? C.label(x) : x.name) + " — " + st[x.code].toLocaleString() + "</span>";
+    }).join("") + (C.STATUS || []).filter(function (x) { return !st[x.code]; }).map(function (x) {
+      return '<span><i style="background:var(--line-s);border:1px solid var(--line)"></i>' +
+        esc(C.label ? C.label(x) : x.name) + " — 0</span>";
+    }).join("");
+  }
+
   function render() {
     var ROSTER = rosterScope();
     var reach = DATA.reduce(function (a, r) { return a + n(r.reachedTotal); }, 0);
@@ -1500,6 +1907,7 @@
                        u18: { f: oF18, m: oM18, o: oO18 }, a18: { f: aF, m: aM, o: aO },
                        u15: { f: fold15.f, m: fold15.m, o: fold15.o }, a15: { f: fold15.F, m: fold15.M, o: fold15.O },
                        n: { v04: nBanded, v03: nBanded03, pair: nLegacy } } };
+    renderTop();
     if ($("p-pub").classList.contains("on")) { pubDocsPanel(); }
 
     /* --- over time ---------------------------------------------------
