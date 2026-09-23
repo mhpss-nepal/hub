@@ -75,7 +75,7 @@ FIXED = [("the demonstration banner", "#ffffff", "#a3201f", 4.5)]
 
 def main():
     rows, bad = [], 0
-    for path in ("assets/design.css", "assets/app.css", "assets/hub.css", "assets/brand.css"):
+    for path in ("assets/design.css", "assets/app.css", "assets/hub.css", "assets/brand.css", "assets/hub-shell.css"):
         for label, toks in blocks(path):
             surface = next((toks[s] for s in SURFACE if s in toks), "#ffffff")
             for t in TEXT:

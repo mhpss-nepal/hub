@@ -1,0 +1,117 @@
+/* =====================================================================
+   MHPSS Nepal — the Layer 2 shell
+   ---------------------------------------------------------------------
+   Loaded by the hub's own pages, AFTER app.css and design.css, and by no
+   page in the form repository. That is the whole reason this file exists:
+   the rail, the masthead and the banner are painted in design.css, and
+   design.css is loaded by every field form as well — restyling them there
+   would restyle Layer 1. Everything here is scoped to `body.hub`, so a
+   page that does not carry that class is untouched even if it loads this
+   sheet by accident.
+
+   No colour is invented. Every value is a token already declared in
+   design.css or app.css (the Health Cluster palette of
+   claude/hub-design.md), so the contrast work done on those tokens still
+   holds; tools/contrast-check.py reads this file too, added to its list
+   in the same change.
+
+   What changes, and why: the coordination dashboard had a dark rail, a
+   red band and a black masthead stacked above the first figure — three
+   heavy bars before any number. The rail stays a rail (the hub navigates
+   down the left, the website across the top: claude/hub-design.md), but
+   it is painted in the same light palette as everything else, and the
+   page head becomes one tinted band instead of two dark ones.
+   ===================================================================== */
+
+/* ---------- the rail: same shape, light ----------------------------
+   design.css paints the rail light-on-dark with hard-coded values
+   (#fff, #e2e2e0, #cfd3d6, rgba(255,255,255,.13) and so on). Every one of
+   them is answered here, because a half-converted rail is worse than
+   either: a pale grey meant to read on --hc-ink is invisible on white.
+   The rule of the original is kept — layer 2 is the one you are on, and
+   it is the only filled item. ------------------------------------------ */
+body.hub .rail{ background: var(--paper); border-right: 1px solid var(--line); }
+
+body.hub .rail .railid{ border-bottom: 1px solid var(--line); }
+body.hub .rail .railid b{ color: var(--wh-dd); }
+body.hub .rail .railid i{ color: var(--slate); }
+
+body.hub .rail .where{ border-bottom: 1px solid var(--line); }
+body.hub .rail .wlab{ color: var(--wh-d); }
+
+body.hub .rail .lyr{ color: var(--ink); border-color: transparent; }
+body.hub .rail .lyr b{ background: var(--wh-t); color: var(--wh-dd); }
+body.hub .rail .lyr span{ color: var(--ink); }
+body.hub .rail .lyr i{ color: var(--slate); }
+body.hub .rail .lyr:hover{ background: var(--wh-t); }
+body.hub .rail .lyr.on{ background: var(--wh-dd); }
+body.hub .rail .lyr.on span{ color: #fff; }
+body.hub .rail .lyr.on i{ color: #cfe4ee; }
+body.hub .rail .lyr.on b{ background: #fff; color: var(--wh-dd); }
+
+body.hub .rail .rgh{ color: var(--wh-dd); }
+body.hub .rail .rgh:hover{ background: var(--wh-t); }
+body.hub .rail .rgh em{ color: var(--slate); }
+body.hub .rail .rgh .chev{ border-color: var(--slate); }
+body.hub .rail .rgb a{ color: var(--ink); }
+body.hub .rail .rgb a:hover{ background: var(--wh-t); color: var(--wh-dd); }
+body.hub .rail .rgb a.on{ background: var(--wh-t); color: var(--wh-dd); }
+
+body.hub .rail .rmenu{ border: 1px solid var(--wh-d); color: var(--wh-dd); }
+body.hub .rail .rmenu span{ background: var(--wh-d); box-shadow: 0 -5px 0 var(--wh-d), 0 5px 0 var(--wh-d); }
+
+body.hub .rail .rfoot, body.hub .rail .foot, body.hub .rail p{ color: var(--slate); }
+
+/* ---------- the strip above everything ------------------------------ */
+body.hub .topline{ background: var(--who-dd, #004969); color: #fff; }
+body.hub .topline .in{
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  min-height: 38px; padding: 0 16px; max-width: 1480px; margin: 0 auto;
+}
+body.hub .topline .tl{
+  font-size: 12px; letter-spacing: .09em; text-transform: uppercase; font-weight: 600;
+}
+body.hub .topline .sp{ flex: 1 1 auto; }
+
+/* ---------- the masthead: white, the group's name in the deep blue --- */
+body.hub .top{
+  background: var(--paper, #fff);
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+}
+body.hub .top .brand{ color: var(--who-dd, #004969); }
+body.hub .top .sub{ color: var(--slate); text-transform: none; letter-spacing: 0; }
+
+/* ---------- the demonstration band ---------------------------------- */
+/* Its words are a governance notice and are not touched here. Only the
+   weight is: a full-bleed crimson bar was the loudest thing on a screen
+   whose loudest thing should be the coverage gap. */
+body.hub #band{
+  background: var(--warn-t, #fdf4e7) !important;
+  color: var(--warn, #a56208) !important;
+  text-align: left !important;
+  font-weight: 600 !important;
+  border-bottom: 1px solid var(--warn, #a56208);
+  padding: 9px 16px !important;
+}
+body.hub #band span{ color: var(--slate) !important; opacity: 1 !important; }
+
+/* ---------- the page head: one tinted band -------------------------- */
+body.hub .phead{
+  background: var(--who-t);
+  border-bottom: 1px solid #bcdcec;
+  padding: 26px 0 22px;
+  margin: 0 0 24px;
+}
+body.hub .phead .in{ max-width: 1480px; margin: 0 auto; padding: 0 16px; }
+body.hub .phead .eyebrow{
+  font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase;
+  font-weight: 700; color: var(--who-d); margin-bottom: 6px;
+}
+body.hub .phead h1{ font-size: clamp(27px, 3.6vw, 42px); color: var(--who-dd, #004969); margin: 0; }
+body.hub .phead .lede{ font-size: 17px; color: var(--slate); margin: 9px 0 0; max-width: 78ch; }
+
+@media (min-width: 900px){
+  body.hub .topline .in, body.hub .phead .in{ padding: 0 32px; }
+  body.hub .phead{ padding: 32px 0 26px; }
+}
