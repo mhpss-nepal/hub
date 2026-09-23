@@ -2,26 +2,68 @@
    MHPSS Nepal — the Layer 2 shell
    ---------------------------------------------------------------------
    Loaded by the hub's own pages, AFTER app.css and design.css, and by no
-   page in the form repository. That is the whole reason this file exists:
-   the rail, the masthead and the banner are painted in design.css, and
-   design.css is loaded by every field form as well — restyling them there
-   would restyle Layer 1. Everything here is scoped to `body.hub`, so a
-   page that does not carry that class is untouched even if it loads this
-   sheet by accident.
+   page in the form repository. Everything is scoped to `body.hub`.
 
-   No colour is invented. Every value is a token already declared in
-   design.css or app.css (the Health Cluster palette of
-   claude/hub-design.md), so the contrast work done on those tokens still
-   holds; tools/contrast-check.py reads this file too, added to its list
-   in the same change.
+   23 September 2026, the Coordinator: the dashboard follows the FIELD
+   FORMS, not the other way round. The forms are built, reviewed and in
+   people's hands; the coordination screen is the one that should move.
+   So this sheet does not invent a look — it adopts `assets/form.css`,
+   which is already a scoped design system of its own (`body.fx`, the
+   `--fx-*` tokens).
 
-   What changes, and why: the coordination dashboard had a dark rail, a
-   red band and a black masthead stacked above the first figure — three
-   heavy bars before any number. The rail stays a rail (the hub navigates
-   down the left, the website across the top: claude/hub-design.md), but
-   it is painted in the same light palette as everything else, and the
-   page head becomes one tinted band instead of two dark ones.
+   The two were closer than they looked. Measured, not assumed:
+     --ink   #20313b   identical in both
+     --slate #5b6b76   identical
+     --warn  #b4541f   identical
+     --ok    #2f6b53   identical
+     the four brand blues  #009fe3 / #006996 / #004969 / #eaf7fd  identical
+     body type  15px / 1.55  identical
+   Four things differed, and only those four are changed here: the page
+   wash, the corner radius, the card shadow, and the first font family.
+   Plus two hairlines a shade apart.
+
+   THE TOKEN VALUES BELOW ARE A COPY of the ones declared in form.css.
+   A copy is how the form and the coordination view come to disagree, so
+   it is not left to discipline: tools/fx-token-parity-check.py reads both
+   files and refuses the deploy if any of them drifts. Change form.css and
+   this file will fail the gate until it follows.
+
+   Light only, by the Coordinator's decision of 23 September — no dark
+   mode and no toggle. The hub's shared stylesheets declare no
+   prefers-color-scheme at all, so there is nothing to switch to.
    ===================================================================== */
+
+/* ---------- the field forms' tokens, adopted --------------------------
+   Redeclared on body.hub rather than :root, so nothing here can reach a
+   page that is not the hub. Every component already reads --bg, --line,
+   --line-s and --r, so remapping the tokens moves the cards, the tables,
+   the stat tiles and the filter panel together, without restyling one of
+   them by hand. */
+body.hub{
+  --bg:#eef3f6;                     /* --fx-bg */
+  --line:#d5dde3;                   /* --fx-line */
+  --line-s:#e8eef2;                 /* --fx-line-s */
+  --r:14px;                         /* --fx-r */
+  --fx-rs:12px;
+  --fx-shadow:0 1px 2px rgba(18,38,52,.06), 0 10px 28px -20px rgba(18,38,52,.35);
+  --fx-blue-d:#006996;
+  --fx-blue-dd:#004969;
+  font-family:"Manrope","Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+/* design.css sets body{background:var(--paper)} and loads after app.css, so
+   remapping --bg alone leaves the page white. --paper is the card surface and
+   must stay white, so the wash is stated here instead. */
+body.hub{ background:var(--bg); }
+
+/* the forms carry their surfaces on a shadow, not a hairline */
+body.hub .card,
+body.hub .stat,
+body.hub .ovcol,
+body.hub .ovfig,
+body.hub .tbl-wrap{ border:0; box-shadow:var(--fx-shadow); }
+body.hub .filters, body.hub details.filters .fpanel{ box-shadow:var(--fx-shadow); }
+body.hub select, body.hub input[type="date"], body.hub input[type="search"]{ border-radius:var(--fx-rs); }
+body.hub .chipf{ border-radius:999px; }
 
 /* ---------- the rail: same shape, light ----------------------------
    design.css paints the rail light-on-dark with hard-coded values
@@ -63,7 +105,8 @@ body.hub .rail .rmenu span{ background: var(--wh-d); box-shadow: 0 -5px 0 var(--
 body.hub .rail .rfoot, body.hub .rail .foot, body.hub .rail p{ color: var(--slate); }
 
 /* ---------- the strip above everything ------------------------------ */
-body.hub .topline{ background: var(--who-dd, #004969); color: #fff; }
+/* the forms open with a ribbon in --fx-blue-dd; this is the same bar */
+body.hub .topline{ background: var(--fx-blue-dd); color: #fff; }
 body.hub .topline .in{
   display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
   min-height: 38px; padding: 0 16px; max-width: 1480px; margin: 0 auto;
@@ -73,14 +116,23 @@ body.hub .topline .tl{
 }
 body.hub .topline .sp{ flex: 1 1 auto; }
 
-/* ---------- the masthead: white, the group's name in the deep blue --- */
+/* ---------- the masthead: the field forms’ own bar ------------------
+   body.fx .top is a 150deg gradient from --fx-blue-d to --fx-blue-dd with
+   the name in Lora. This is that bar, on the dashboard. */
 body.hub .top{
-  background: var(--paper, #fff);
-  border-bottom: 1px solid var(--line);
-  color: var(--ink);
+  background:linear-gradient(150deg, var(--fx-blue-d), var(--fx-blue-dd));
+  color:#fff;
+  border-bottom:0;
+  box-shadow:0 6px 18px -14px rgba(0,0,0,.6);
 }
-body.hub .top .brand{ color: var(--who-dd, #004969); }
-body.hub .top .sub{ color: var(--slate); text-transform: none; letter-spacing: 0; }
+body.hub .top .brand{
+  font-family:"Lora",Georgia,serif; font-weight:700; font-size:19px;
+  letter-spacing:0; line-height:1.2; color:#fff;
+}
+body.hub .top .sub{
+  font-size:10.5px; color:#cfe6f2; letter-spacing:.08em;
+  text-transform:uppercase; font-weight:700; margin-top:3px;
+}
 
 /* ---------- the demonstration band ---------------------------------- */
 /* Its words are a governance notice and are not touched here. Only the
