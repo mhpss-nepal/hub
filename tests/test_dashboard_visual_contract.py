@@ -19,7 +19,21 @@ class Contract(unittest.TestCase):
   a,b=parse(self.old),parse(self.new)
   self.assertCountEqual(a.controls,b.controls);self.assertEqual(a.assets,b.assets)
   self.assertEqual(len(b.ids),len(set(b.ids)))
- def test_scripts_byte_exact(self):self.assertEqual(re.findall(r'<script>(.*?)</script>',self.old,re.S),re.findall(r'<script>(.*?)</script>',self.new,re.S))
+ def assert_scripts_contract(self,new):
+  a=re.findall(r'<script>(.*?)</script>',self.old,re.S);b=re.findall(r'<script>(.*?)</script>',new,re.S)
+  old_guard='if (done || !st || !st.ready) return;'
+  new_guard='if (done || !st || !st.ready || !st.user) return;'
+  self.assertEqual(len(a),2);self.assertEqual(len(b),3)
+  self.assertEqual(a[0],b[0]);self.assertEqual(a[1].count(old_guard),1)
+  self.assertEqual(b[1],a[1].replace(old_guard,new_guard))
+  self.assertEqual(hashlib.sha256(b[2].encode()).hexdigest(),'85a7cfca5e4d8fb42822015a90fd65b443a816efeec4379fb3de6d67e9910ed0')
+ def test_scripts_byte_exact(self):self.assert_scripts_contract(self.new)
+ def test_restored_unsigned_autoconnect_rejected(self):
+  with self.assertRaises(AssertionError):self.assert_scripts_contract(self.new.replace('if (done || !st || !st.ready || !st.user) return;','if (done || !st || !st.ready) return;'))
+ def test_changed_observer_rejected(self):
+  with self.assertRaises(AssertionError):self.assert_scripts_contract(self.new.replace('shell.hidden=!app.hidden;','shell.hidden=false;'))
+ def test_widened_kind_rejected(self):
+  with self.assertRaises(AssertionError):self.assert_scripts_contract(self.new.replace('Q_KINDS = ["activity"];','Q_KINDS = ["phq9"];',1))
  def test_all_existing_runtime_assets_exact(self):
   inv=json.loads((ROOT/'design-preview/PRESERVATION-INVENTORY.json').read_text())
   for f,d in inv['assets'].items():self.assertEqual(hashlib.sha256((ROOT/f).read_bytes()).hexdigest(),d['sha256'],f)

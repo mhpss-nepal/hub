@@ -1,0 +1,72 @@
+{
+  "base": "b02e14a73edc7c0061bdeeaab652c66dd7224883",
+  "candidate_index_sha256": "f99862488b99054898c4fbb3637f90cfeedcb6bcfbf50c6e041275f63108c4ea",
+  "origin": "http://127.0.0.1:33193",
+  "firstscreen": [
+    {
+      "route": "/",
+      "width": 1280,
+      "geometry": {
+        "root": [
+          1280,
+          1280
+        ],
+        "left": 250,
+        "shell": null,
+        "accessOpen": false,
+        "kpis": [],
+        "reads": [
+          "activity"
+        ],
+        "writes": [],
+        "appHidden": true,
+        "connectedClaim": true
+      },
+      "checks": {
+        "no_sidebar": false,
+        "shell_visible": false,
+        "access_collapsed": true,
+        "unknown_kpis": false,
+        "no_data": true,
+        "no_implicit_read": false,
+        "no_write": true,
+        "no_delivery_claim": false,
+        "no_overflow": true,
+        "analysis_in_firstscreen": false
+      }
+    },
+    {
+      "route": "/index.html?source=choose&design=20261010",
+      "width": 1280,
+      "geometry": {
+        "root": [
+          1280,
+          1280
+        ],
+        "left": 250,
+        "shell": null,
+        "accessOpen": false,
+        "kpis": [],
+        "reads": [],
+        "writes": [],
+        "appHidden": true,
+        "connectedClaim": true
+      },
+      "checks": {
+        "no_sidebar": false,
+        "shell_visible": false,
+        "access_collapsed": true,
+        "unknown_kpis": false,
+        "no_data": true,
+        "no_implicit_read": true,
+        "no_write": true,
+        "no_delivery_claim": false,
+        "no_overflow": true,
+        "analysis_in_firstscreen": false
+      }
+    }
+  ],
+  "runs": [],
+  "parity": {},
+  "network": "All non-local requests blocked. fb.js replaced only at request boundary. Synthetic input only."
+}

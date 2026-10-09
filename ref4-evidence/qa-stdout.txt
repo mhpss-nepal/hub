@@ -1,0 +1,1312 @@
+{
+  "report": "/root/mhpss-nepal-final-forms/2026-10-06/39-overnight-readiness/03-dashboard-final/hub/ref4-evidence/qa-report.json",
+  "firstscreen": [
+    {
+      "route": "/",
+      "width": 320,
+      "geometry": {
+        "root": [
+          320,
+          320
+        ],
+        "left": 0,
+        "shell": {
+          "x": 12,
+          "y": 539.5,
+          "width": 296,
+          "height": 1753.015625,
+          "top": 539.5,
+          "right": 308,
+          "bottom": 2292.515625,
+          "left": 12
+        },
+        "accessOpen": false,
+        "kpis": [
+          "\u2014",
+          "\u2014",
+          "\u2014",
+          "\u2014",
+          "\u2014"
+        ],
+        "reads": [],
+        "writes": [],
+        "appHidden": true,
+        "connectedClaim": false
+      },
+      "checks": {
+        "no_sidebar": true,
+        "shell_visible": true,
+        "access_collapsed": true,
+        "unknown_kpis": true,
+        "no_data": true,
+        "no_implicit_read": true,
+        "no_write": true,
+        "no_delivery_claim": true,
+        "no_overflow": true
+      },
+      "overflow": [],
+      "axe": [],
+      "keyboardAccessOpen": true,
+      "keyboardAccessClosed": true,
+      "warningPreserved": true,
+      "pendingPreserved": true,
+      "errorPreserved": true,
+      "explicitDemoLoaded": true,
+      "shellHiddenAfterDemo": true,
+      "noRemoteWriteAfterDemo": true
+    },
+    {
+      "route": "/",
+      "width": 390,
+      "geometry": {
+        "root": [
+          390,
+          390
+        ],
+        "left": 0,
+        "shell": {
+          "x": 12,
+          "y": 532.5,
+          "width": 366,
+          "height": 1690.625,
+          "top": 532.5,
+          "right": 378,
+          "bottom": 2223.125,
+          "left": 12
+        },
+        "accessOpen": false,
+        "kpis": [
+          "\u2014",
+          "\u2014",
+          "\u2014",
+          "\u2014",
+          "\u2014"
+        ],
+        "reads": [],
+        "writes": [],
+        "appHidden": true,
+        "connectedClaim": false
+      },
+      "checks": {
+        "no_sidebar": true,
+        "shell_visible": true,
+        "access_collapsed": true,
+        "unknown_kpis": true,
+        "no_data": true,
+        "no_implicit_read": true,
+        "no_write": true,
+        "no_delivery_claim": true,
+        "no_overflow": true
+      },
+      "overflow": [],
+      "axe": [],
+      "keyboardAccessOpen": true,
+      "keyboardAccessClosed": true,
+      "warningPreserved": true,
+      "pendingPreserved": true,
+      "errorPreserved": true,
+      "explicitDemoLoaded": true,
+      "shellHiddenAfterDemo": true,
+      "noRemoteWriteAfterDemo": true
+    },
+    {
+      "route": "/",
+      "width": 1280,
+      "geometry": {
+        "root": [
+          1280,
+          1280
+        ],
+        "left": 0,
+        "shell": {
+          "x": 28,
+          "y": 292.75,
+          "width": 1224,
+          "height": 706,
+          "top": 292.75,
+          "right": 1252,
+          "bottom": 998.75,
+          "left": 28
+        },
+        "accessOpen": false,
+        "kpis": [
+          "\u2014",
+          "\u2014",
+          "\u2014",
+          "\u2014",
+          "\u2014"
+        ],
+        "reads": [],
+        "writes": [],
+        "appHidden": true,
+        "connectedClaim": false
+      },
+      "checks": {
+        "no_sidebar": true,
+        "shell_visible": true,
+        "access_collapsed": true,
+        "unknown_kpis": true,
+        "no_data": true,
+        "no_implicit_read": true,
+        "no_write": true,
+        "no_delivery_claim": true,
+        "no_overflow": true,
+        "analysis_in_firstscreen": true
+      },
+      "overflow": [],
+      "axe": [],
+      "keyboardAccessOpen": true,
+      "keyboardAccessClosed": true,
+      "warningPreserved": true,
+      "pendingPreserved": true,
+      "errorPreserved": true,
+      "explicitDemoLoaded": true,
+      "shellHiddenAfterDemo": true,
+      "noRemoteWriteAfterDemo": true
+    },
+    {
+      "route": "/index.html?source=choose&design=20261010",
+      "width": 320,
+      "geometry": {
+        "root": [
+          320,
+          320
+        ],
+        "left": 0,
+        "shell": {
+          "x": 12,
+          "y": 539.5,
+          "width": 296,
+          "height": 1753.015625,
+          "top": 539.5,
+          "right": 308,
+          "bottom": 2292.515625,
+          "left": 12
+        },
+        "accessOpen": false,
+        "kpis": [
+          "\u2014",
+          "\u2014",
+          "\u2014",
+          "\u2014",
+          "\u2014"
+        ],
+        "reads": [],
+        "writes": [],
+        "appHidden": true,
+        "connectedClaim": false
+      },
+      "checks": {
+        "no_sidebar": true,
+        "shell_visible": true,
+        "access_collapsed": true,
+        "unknown_kpis": true,
+        "no_data": true,
+        "no_implicit_read": true,
+        "no_write": true,
+        "no_delivery_claim": true,
+        "no_overflow": true
+      },
+      "overflow": [],
+      "axe": [],
+      "keyboardAccessOpen": true,
+      "keyboardAccessClosed": true,
+      "warningPreserved": true,
+      "pendingPreserved": true,
+      "errorPreserved": true,
+      "explicitDemoLoaded": true,
+      "shellHiddenAfterDemo": true,
+      "noRemoteWriteAfterDemo": true
+    },
+    {
+      "route": "/index.html?source=choose&design=20261010",
+      "width": 390,
+      "geometry": {
+        "root": [
+          390,
+          390
+        ],
+        "left": 0,
+        "shell": {
+          "x": 12,
+          "y": 532.5,
+          "width": 366,
+          "height": 1690.625,
+          "top": 532.5,
+          "right": 378,
+          "bottom": 2223.125,
+          "left": 12
+        },
+        "accessOpen": false,
+        "kpis": [
+          "\u2014",
+          "\u2014",
+          "\u2014",
+          "\u2014",
+          "\u2014"
+        ],
+        "reads": [],
+        "writes": [],
+        "appHidden": true,
+        "connectedClaim": false
+      },
+      "checks": {
+        "no_sidebar": true,
+        "shell_visible": true,
+        "access_collapsed": true,
+        "unknown_kpis": true,
+        "no_data": true,
+        "no_implicit_read": true,
+        "no_write": true,
+        "no_delivery_claim": true,
+        "no_overflow": true
+      },
+      "overflow": [],
+      "axe": [],
+      "keyboardAccessOpen": true,
+      "keyboardAccessClosed": true,
+      "warningPreserved": true,
+      "pendingPreserved": true,
+      "errorPreserved": true,
+      "explicitDemoLoaded": true,
+      "shellHiddenAfterDemo": true,
+      "noRemoteWriteAfterDemo": true
+    },
+    {
+      "route": "/index.html?source=choose&design=20261010",
+      "width": 1280,
+      "geometry": {
+        "root": [
+          1280,
+          1280
+        ],
+        "left": 0,
+        "shell": {
+          "x": 28,
+          "y": 292.75,
+          "width": 1224,
+          "height": 706,
+          "top": 292.75,
+          "right": 1252,
+          "bottom": 998.75,
+          "left": 28
+        },
+        "accessOpen": false,
+        "kpis": [
+          "\u2014",
+          "\u2014",
+          "\u2014",
+          "\u2014",
+          "\u2014"
+        ],
+        "reads": [],
+        "writes": [],
+        "appHidden": true,
+        "connectedClaim": false
+      },
+      "checks": {
+        "no_sidebar": true,
+        "shell_visible": true,
+        "access_collapsed": true,
+        "unknown_kpis": true,
+        "no_data": true,
+        "no_implicit_read": true,
+        "no_write": true,
+        "no_delivery_claim": true,
+        "no_overflow": true,
+        "analysis_in_firstscreen": true
+      },
+      "overflow": [],
+      "axe": [],
+      "keyboardAccessOpen": true,
+      "keyboardAccessClosed": true,
+      "warningPreserved": true,
+      "pendingPreserved": true,
+      "errorPreserved": true,
+      "explicitDemoLoaded": true,
+      "shellHiddenAfterDemo": true,
+      "noRemoteWriteAfterDemo": true
+    }
+  ],
+  "parity": {
+    "320": {
+      "stats": true,
+      "covBody": true,
+      "dupBody": true,
+      "pxBody": true,
+      "actBody": true,
+      "disBody": true,
+      "dayWrap": true,
+      "rawBody": true,
+      "ovWho": true,
+      "ovWhat": true,
+      "ovWhom": true,
+      "ovFam": true,
+      "ovMod": true,
+      "ovSadd": true,
+      "ovPal": true,
+      "ovStatus": true,
+      "filteredStats": true,
+      "filterSummary": true,
+      "filteredRows": true,
+      "periodStats": true,
+      "periodRows": true,
+      "csv": true,
+      "find": true,
+      "importStats": true,
+      "importRows": true,
+      "importDaily": true,
+      "matrixCSV": true
+    },
+    "390": {
+      "stats": true,
+      "covBody": true,
+      "dupBody": true,
+      "pxBody": true,
+      "actBody": true,
+      "disBody": true,
+      "dayWrap": true,
+      "rawBody": true,
+      "ovWho": true,
+      "ovWhat": true,
+      "ovWhom": true,
+      "ovFam": true,
+      "ovMod": true,
+      "ovSadd": true,
+      "ovPal": true,
+      "ovStatus": true,
+      "filteredStats": true,
+      "filterSummary": true,
+      "filteredRows": true,
+      "periodStats": true,
+      "periodRows": true,
+      "csv": true,
+      "find": true,
+      "importStats": true,
+      "importRows": true,
+      "importDaily": true,
+      "matrixCSV": true
+    },
+    "1280": {
+      "stats": true,
+      "covBody": true,
+      "dupBody": true,
+      "pxBody": true,
+      "actBody": true,
+      "disBody": true,
+      "dayWrap": true,
+      "rawBody": true,
+      "ovWho": true,
+      "ovWhat": true,
+      "ovWhom": true,
+      "ovFam": true,
+      "ovMod": true,
+      "ovSadd": true,
+      "ovPal": true,
+      "ovStatus": true,
+      "filteredStats": true,
+      "filterSummary": true,
+      "filteredRows": true,
+      "periodStats": true,
+      "periodRows": true,
+      "csv": true,
+      "find": true,
+      "importStats": true,
+      "importRows": true,
+      "importDaily": true,
+      "matrixCSV": true
+    }
+  },
+  "runs": [
+    {
+      "base": true,
+      "width": 320,
+      "errors": [],
+      "axe": {
+        "overview": [],
+        "reports": [],
+        "matrix": [],
+        "activities": [],
+        "expanded": [],
+        "ne": []
+      },
+      "geometry": {
+        "overview": {
+          "scroll": 320,
+          "client": 320
+        },
+        "reports": {
+          "scroll": 320,
+          "client": 320
+        },
+        "matrix": {
+          "scroll": 320,
+          "client": 320
+        },
+        "expanded": {
+          "scroll": 320,
+          "client": 320
+        }
+      },
+      "storageBefore": "{}",
+      "lang": "ne",
+      "storageAfter": "{\"mhpss-np-lang\":\"en\"}",
+      "remoteWrites": [],
+      "reads": [],
+      "blockedRequestCount": 7,
+      "snapshotProof": {
+        "stats": {
+          "sha256": "07315c1b24cf9091472ba1b4a19d495a94da9b6a11bd23f33d4bc8a65c0d6b4e",
+          "characters": 248
+        },
+        "covBody": {
+          "sha256": "63994f818125fc438ac486e85f45739caf68d56386d1fbfe6bdf2c67b1c29aff",
+          "characters": 2558
+        },
+        "dupBody": {
+          "sha256": "084e80765bb777a3a6430a69174d3a0c2ffa23dedf460de2e3e3585811103b8f",
+          "characters": 1074
+        },
+        "pxBody": {
+          "sha256": "ead4af353da44af25ab5ee56a557318e85c1383fee53af0b9cd7e85b1bdd2299",
+          "characters": 290
+        },
+        "actBody": {
+          "sha256": "db16cd6cf93af2ff81a56f27ee8adbe7a592b1a3723964758f86c4ec943cb5ab",
+          "characters": 1286
+        },
+        "disBody": {
+          "sha256": "11d19205c965897fb96a2ef59fbba54c926f57a34e61ab53bae1cbd671390b69",
+          "characters": 405
+        },
+        "dayWrap": {
+          "sha256": "ea2e07cc8b8a3fa225ca21813cee0a89beb7577be61ceeb5b3831573107cd600",
+          "characters": 302
+        },
+        "rawBody": {
+          "sha256": "20391034a51b889b2a45fb784652fa3258d00d23de83d1ecf5a3cfdeaa2bd558",
+          "characters": 7240
+        },
+        "ovWho": {
+          "sha256": "3b23f2194144ceddc036a0029bbc34ddb02a5f4bee6dc4214a94fd8a6311fd7f",
+          "characters": 37
+        },
+        "ovWhat": {
+          "sha256": "14baec85bb064bb89361308005eb4d7cd17db84528daa3ea4bd705c064e509ee",
+          "characters": 42
+        },
+        "ovWhom": {
+          "sha256": "16733adb10d460f41af3ab0c06d69b1b2ffe31c4ba36dbaed550e229f3e28fc5",
+          "characters": 70
+        },
+        "ovFam": {
+          "sha256": "15fb254923bf519f8658fe95460a041cdfd8559484b79e5e8d22ed18345709db",
+          "characters": 286
+        },
+        "ovMod": {
+          "sha256": "300a967cf46eecb4e9db289c806f974b7d3d25bb822d2de20172150fabb7a06d",
+          "characters": 221
+        },
+        "ovSadd": {
+          "sha256": "c35750a53a450bebdf948c31c81387e17d918b0b63d74d139d49ff8ac5b01f94",
+          "characters": 91
+        },
+        "ovPal": {
+          "sha256": "fbe19efc6f054524697898c5f43cfe201bc363852edfb52332450182c8a4ae46",
+          "characters": 186
+        },
+        "ovStatus": {
+          "sha256": "32e48995f98ce3b76f2d3f5e2d2acddfeff6650b7b18628cfa739bfef4a03312",
+          "characters": 4
+        },
+        "filteredStats": {
+          "sha256": "43616ddaad101979fb02d768ba00ba0d8cf0fda9d07e0abea9f5e7e65b3c6cb3",
+          "characters": 247
+        },
+        "filterSummary": {
+          "sha256": "92bffaabf90380f8d1b79c2d9ef533ab35d06bc0a30e98c38ee2610340a07a54",
+          "characters": 42
+        },
+        "filteredRows": {
+          "sha256": "7bf72b8efd2a1782f85849e1bd8407c53f005dc9d471300c5146d2b13548470c",
+          "characters": 1806
+        },
+        "periodStats": {
+          "sha256": "2a953fcec302e011c821a00aef0393f632c6ce6c66092f0dce10bf516b762296",
+          "characters": 247
+        },
+        "periodRows": {
+          "sha256": "5adf23de135e5c746fcd19f757ee7e5a845a04a120be3e32c78305ffbdb9c5c9",
+          "characters": 3260
+        },
+        "csv": {
+          "sha256": "b589c5e53d6dba6d136fe94915bb323675a227b38334e65aabe65cd6ff21b322",
+          "characters": 28266
+        },
+        "find": {
+          "sha256": "f35c1ad6d92b978290df8d514c948d37be8c711c4fa5a4c9c3cc7d406f4e7251",
+          "characters": 112
+        },
+        "importStats": {
+          "sha256": "07315c1b24cf9091472ba1b4a19d495a94da9b6a11bd23f33d4bc8a65c0d6b4e",
+          "characters": 248
+        },
+        "importRows": {
+          "sha256": "20391034a51b889b2a45fb784652fa3258d00d23de83d1ecf5a3cfdeaa2bd558",
+          "characters": 7240
+        },
+        "importDaily": {
+          "sha256": "ea2e07cc8b8a3fa225ca21813cee0a89beb7577be61ceeb5b3831573107cd600",
+          "characters": 302
+        },
+        "matrixCSV": {
+          "sha256": "c44505a2857215470cd3d5123a6cba22436189452be259f7afdc1e5f45c51126",
+          "characters": 3873
+        }
+      }
+    },
+    {
+      "base": false,
+      "width": 320,
+      "errors": [],
+      "axe": {
+        "overview": [],
+        "reports": [],
+        "matrix": [],
+        "activities": [],
+        "expanded": [],
+        "ne": []
+      },
+      "geometry": {
+        "overview": {
+          "scroll": 320,
+          "client": 320
+        },
+        "reports": {
+          "scroll": 320,
+          "client": 320
+        },
+        "matrix": {
+          "scroll": 320,
+          "client": 320
+        },
+        "expanded": {
+          "scroll": 320,
+          "client": 320
+        }
+      },
+      "storageBefore": "{}",
+      "primaryOrder": [
+        {
+          "id": "filters",
+          "y": 506.0625
+        },
+        {
+          "id": "stats",
+          "y": 1116.0625
+        },
+        {
+          "id": "analysis-primary",
+          "y": 1545.59375
+        },
+        {
+          "id": "ovcols",
+          "y": 3217.984375
+        },
+        {
+          "id": "ovWhere",
+          "y": 4301.625
+        }
+      ],
+      "inputLabels": [
+        {
+          "id": "fPeriod",
+          "hasLabel": true
+        },
+        {
+          "id": "fProv",
+          "hasLabel": true
+        },
+        {
+          "id": "fDist",
+          "hasLabel": true
+        },
+        {
+          "id": "fPal",
+          "hasLabel": true
+        },
+        {
+          "id": "fOrg",
+          "hasLabel": true
+        },
+        {
+          "id": "fGrp",
+          "hasLabel": true
+        },
+        {
+          "id": "fMod",
+          "hasLabel": true
+        },
+        {
+          "id": "fDon",
+          "hasLabel": true
+        },
+        {
+          "id": "fAct",
+          "hasLabel": true
+        },
+        {
+          "id": "fSta",
+          "hasLabel": true
+        },
+        {
+          "id": "fBasis",
+          "hasLabel": true
+        },
+        {
+          "id": "fFrom",
+          "hasLabel": true
+        },
+        {
+          "id": "fTo",
+          "hasLabel": true
+        },
+        {
+          "id": "",
+          "hasLabel": true
+        },
+        {
+          "id": "",
+          "hasLabel": true
+        },
+        {
+          "id": "",
+          "hasLabel": true
+        },
+        {
+          "id": "",
+          "hasLabel": true
+        },
+        {
+          "id": "",
+          "hasLabel": true
+        }
+      ],
+      "lang": "ne",
+      "storageAfter": "{\"mhpss-np-lang\":\"en\"}",
+      "remoteWrites": [],
+      "reads": [],
+      "blockedRequestCount": 7,
+      "snapshotProof": {
+        "stats": {
+          "sha256": "07315c1b24cf9091472ba1b4a19d495a94da9b6a11bd23f33d4bc8a65c0d6b4e",
+          "characters": 248
+        },
+        "covBody": {
+          "sha256": "63994f818125fc438ac486e85f45739caf68d56386d1fbfe6bdf2c67b1c29aff",
+          "characters": 2558
+        },
+        "dupBody": {
+          "sha256": "084e80765bb777a3a6430a69174d3a0c2ffa23dedf460de2e3e3585811103b8f",
+          "characters": 1074
+        },
+        "pxBody": {
+          "sha256": "ead4af353da44af25ab5ee56a557318e85c1383fee53af0b9cd7e85b1bdd2299",
+          "characters": 290
+        },
+        "actBody": {
+          "sha256": "db16cd6cf93af2ff81a56f27ee8adbe7a592b1a3723964758f86c4ec943cb5ab",
+          "characters": 1286
+        },
+        "disBody": {
+          "sha256": "11d19205c965897fb96a2ef59fbba54c926f57a34e61ab53bae1cbd671390b69",
+          "characters": 405
+        },
+        "dayWrap": {
+          "sha256": "ea2e07cc8b8a3fa225ca21813cee0a89beb7577be61ceeb5b3831573107cd600",
+          "characters": 302
+        },
+        "rawBody": {
+          "sha256": "20391034a51b889b2a45fb784652fa3258d00d23de83d1ecf5a3cfdeaa2bd558",
+          "characters": 7240
+        },
+        "ovWho": {
+          "sha256": "3b23f2194144ceddc036a0029bbc34ddb02a5f4bee6dc4214a94fd8a6311fd7f",
+          "characters": 37
+        },
+        "ovWhat": {
+          "sha256": "14baec85bb064bb89361308005eb4d7cd17db84528daa3ea4bd705c064e509ee",
+          "characters": 42
+        },
+        "ovWhom": {
+          "sha256": "16733adb10d460f41af3ab0c06d69b1b2ffe31c4ba36dbaed550e229f3e28fc5",
+          "characters": 70
+        },
+        "ovFam": {
+          "sha256": "15fb254923bf519f8658fe95460a041cdfd8559484b79e5e8d22ed18345709db",
+          "characters": 286
+        },
+        "ovMod": {
+          "sha256": "300a967cf46eecb4e9db289c806f974b7d3d25bb822d2de20172150fabb7a06d",
+          "characters": 221
+        },
+        "ovSadd": {
+          "sha256": "c35750a53a450bebdf948c31c81387e17d918b0b63d74d139d49ff8ac5b01f94",
+          "characters": 91
+        },
+        "ovPal": {
+          "sha256": "fbe19efc6f054524697898c5f43cfe201bc363852edfb52332450182c8a4ae46",
+          "characters": 186
+        },
+        "ovStatus": {
+          "sha256": "32e48995f98ce3b76f2d3f5e2d2acddfeff6650b7b18628cfa739bfef4a03312",
+          "characters": 4
+        },
+        "filteredStats": {
+          "sha256": "43616ddaad101979fb02d768ba00ba0d8cf0fda9d07e0abea9f5e7e65b3c6cb3",
+          "characters": 247
+        },
+        "filterSummary": {
+          "sha256": "92bffaabf90380f8d1b79c2d9ef533ab35d06bc0a30e98c38ee2610340a07a54",
+          "characters": 42
+        },
+        "filteredRows": {
+          "sha256": "7bf72b8efd2a1782f85849e1bd8407c53f005dc9d471300c5146d2b13548470c",
+          "characters": 1806
+        },
+        "periodStats": {
+          "sha256": "2a953fcec302e011c821a00aef0393f632c6ce6c66092f0dce10bf516b762296",
+          "characters": 247
+        },
+        "periodRows": {
+          "sha256": "5adf23de135e5c746fcd19f757ee7e5a845a04a120be3e32c78305ffbdb9c5c9",
+          "characters": 3260
+        },
+        "csv": {
+          "sha256": "b589c5e53d6dba6d136fe94915bb323675a227b38334e65aabe65cd6ff21b322",
+          "characters": 28266
+        },
+        "find": {
+          "sha256": "f35c1ad6d92b978290df8d514c948d37be8c711c4fa5a4c9c3cc7d406f4e7251",
+          "characters": 112
+        },
+        "importStats": {
+          "sha256": "07315c1b24cf9091472ba1b4a19d495a94da9b6a11bd23f33d4bc8a65c0d6b4e",
+          "characters": 248
+        },
+        "importRows": {
+          "sha256": "20391034a51b889b2a45fb784652fa3258d00d23de83d1ecf5a3cfdeaa2bd558",
+          "characters": 7240
+        },
+        "importDaily": {
+          "sha256": "ea2e07cc8b8a3fa225ca21813cee0a89beb7577be61ceeb5b3831573107cd600",
+          "characters": 302
+        },
+        "matrixCSV": {
+          "sha256": "c44505a2857215470cd3d5123a6cba22436189452be259f7afdc1e5f45c51126",
+          "characters": 3873
+        }
+      }
+    },
+    {
+      "base": false,
+      "width": 390,
+      "errors": [],
+      "axe": {
+        "overview": [],
+        "reports": [],
+        "matrix": [],
+        "activities": [],
+        "expanded": [],
+        "ne": []
+      },
+      "geometry": {
+        "overview": {
+          "scroll": 390,
+          "client": 390
+        },
+        "reports": {
+          "scroll": 390,
+          "client": 390
+        },
+        "matrix": {
+          "scroll": 390,
+          "client": 390
+        },
+        "expanded": {
+          "scroll": 390,
+          "client": 390
+        }
+      },
+      "storageBefore": "{}",
+      "primaryOrder": [
+        {
+          "id": "filters",
+          "y": 479.875
+        },
+        {
+          "id": "stats",
+          "y": 1089.875
+        },
+        {
+          "id": "analysis-primary",
+          "y": 1503.21875
+        },
+        {
+          "id": "ovcols",
+          "y": 3141.328125
+        },
+        {
+          "id": "ovWhere",
+          "y": 4207.578125
+        }
+      ],
+      "inputLabels": [
+        {
+          "id": "fPeriod",
+          "hasLabel": true
+        },
+        {
+          "id": "fProv",
+          "hasLabel": true
+        },
+        {
+          "id": "fDist",
+          "hasLabel": true
+        },
+        {
+          "id": "fPal",
+          "hasLabel": true
+        },
+        {
+          "id": "fOrg",
+          "hasLabel": true
+        },
+        {
+          "id": "fGrp",
+          "hasLabel": true
+        },
+        {
+          "id": "fMod",
+          "hasLabel": true
+        },
+        {
+          "id": "fDon",
+          "hasLabel": true
+        },
+        {
+          "id": "fAct",
+          "hasLabel": true
+        },
+        {
+          "id": "fSta",
+          "hasLabel": true
+        },
+        {
+          "id": "fBasis",
+          "hasLabel": true
+        },
+        {
+          "id": "fFrom",
+          "hasLabel": true
+        },
+        {
+          "id": "fTo",
+          "hasLabel": true
+        },
+        {
+          "id": "",
+          "hasLabel": true
+        },
+        {
+          "id": "",
+          "hasLabel": true
+        },
+        {
+          "id": "",
+          "hasLabel": true
+        },
+        {
+          "id": "",
+          "hasLabel": true
+        },
+        {
+          "id": "",
+          "hasLabel": true
+        }
+      ],
+      "lang": "ne",
+      "storageAfter": "{\"mhpss-np-lang\":\"en\"}",
+      "remoteWrites": [],
+      "reads": [],
+      "blockedRequestCount": 7,
+      "snapshotProof": {
+        "stats": {
+          "sha256": "07315c1b24cf9091472ba1b4a19d495a94da9b6a11bd23f33d4bc8a65c0d6b4e",
+          "characters": 248
+        },
+        "covBody": {
+          "sha256": "63994f818125fc438ac486e85f45739caf68d56386d1fbfe6bdf2c67b1c29aff",
+          "characters": 2558
+        },
+        "dupBody": {
+          "sha256": "084e80765bb777a3a6430a69174d3a0c2ffa23dedf460de2e3e3585811103b8f",
+          "characters": 1074
+        },
+        "pxBody": {
+          "sha256": "ead4af353da44af25ab5ee56a557318e85c1383fee53af0b9cd7e85b1bdd2299",
+          "characters": 290
+        },
+        "actBody": {
+          "sha256": "db16cd6cf93af2ff81a56f27ee8adbe7a592b1a3723964758f86c4ec943cb5ab",
+          "characters": 1286
+        },
+        "disBody": {
+          "sha256": "11d19205c965897fb96a2ef59fbba54c926f57a34e61ab53bae1cbd671390b69",
+          "characters": 405
+        },
+        "dayWrap": {
+          "sha256": "ea2e07cc8b8a3fa225ca21813cee0a89beb7577be61ceeb5b3831573107cd600",
+          "characters": 302
+        },
+        "rawBody": {
+          "sha256": "20391034a51b889b2a45fb784652fa3258d00d23de83d1ecf5a3cfdeaa2bd558",
+          "characters": 7240
+        },
+        "ovWho": {
+          "sha256": "3b23f2194144ceddc036a0029bbc34ddb02a5f4bee6dc4214a94fd8a6311fd7f",
+          "characters": 37
+        },
+        "ovWhat": {
+          "sha256": "14baec85bb064bb89361308005eb4d7cd17db84528daa3ea4bd705c064e509ee",
+          "characters": 42
+        },
+        "ovWhom": {
+          "sha256": "16733adb10d460f41af3ab0c06d69b1b2ffe31c4ba36dbaed550e229f3e28fc5",
+          "characters": 70
+        },
+        "ovFam": {
+          "sha256": "15fb254923bf519f8658fe95460a041cdfd8559484b79e5e8d22ed18345709db",
+          "characters": 286
+        },
+        "ovMod": {
+          "sha256": "300a967cf46eecb4e9db289c806f974b7d3d25bb822d2de20172150fabb7a06d",
+          "characters": 221
+        },
+        "ovSadd": {
+          "sha256": "c35750a53a450bebdf948c31c81387e17d918b0b63d74d139d49ff8ac5b01f94",
+          "characters": 91
+        },
+        "ovPal": {
+          "sha256": "fbe19efc6f054524697898c5f43cfe201bc363852edfb52332450182c8a4ae46",
+          "characters": 186
+        },
+        "ovStatus": {
+          "sha256": "32e48995f98ce3b76f2d3f5e2d2acddfeff6650b7b18628cfa739bfef4a03312",
+          "characters": 4
+        },
+        "filteredStats": {
+          "sha256": "43616ddaad101979fb02d768ba00ba0d8cf0fda9d07e0abea9f5e7e65b3c6cb3",
+          "characters": 247
+        },
+        "filterSummary": {
+          "sha256": "92bffaabf90380f8d1b79c2d9ef533ab35d06bc0a30e98c38ee2610340a07a54",
+          "characters": 42
+        },
+        "filteredRows": {
+          "sha256": "7bf72b8efd2a1782f85849e1bd8407c53f005dc9d471300c5146d2b13548470c",
+          "characters": 1806
+        },
+        "periodStats": {
+          "sha256": "2a953fcec302e011c821a00aef0393f632c6ce6c66092f0dce10bf516b762296",
+          "characters": 247
+        },
+        "periodRows": {
+          "sha256": "5adf23de135e5c746fcd19f757ee7e5a845a04a120be3e32c78305ffbdb9c5c9",
+          "characters": 3260
+        },
+        "csv": {
+          "sha256": "b589c5e53d6dba6d136fe94915bb323675a227b38334e65aabe65cd6ff21b322",
+          "characters": 28266
+        },
+        "find": {
+          "sha256": "f35c1ad6d92b978290df8d514c948d37be8c711c4fa5a4c9c3cc7d406f4e7251",
+          "characters": 112
+        },
+        "importStats": {
+          "sha256": "07315c1b24cf9091472ba1b4a19d495a94da9b6a11bd23f33d4bc8a65c0d6b4e",
+          "characters": 248
+        },
+        "importRows": {
+          "sha256": "20391034a51b889b2a45fb784652fa3258d00d23de83d1ecf5a3cfdeaa2bd558",
+          "characters": 7240
+        },
+        "importDaily": {
+          "sha256": "ea2e07cc8b8a3fa225ca21813cee0a89beb7577be61ceeb5b3831573107cd600",
+          "characters": 302
+        },
+        "matrixCSV": {
+          "sha256": "c44505a2857215470cd3d5123a6cba22436189452be259f7afdc1e5f45c51126",
+          "characters": 3873
+        }
+      }
+    },
+    {
+      "base": false,
+      "width": 1280,
+      "errors": [],
+      "axe": {
+        "overview": [],
+        "reports": [],
+        "matrix": [],
+        "activities": [],
+        "expanded": [],
+        "ne": []
+      },
+      "geometry": {
+        "overview": {
+          "scroll": 1280,
+          "client": 1280
+        },
+        "reports": {
+          "scroll": 1280,
+          "client": 1280
+        },
+        "matrix": {
+          "scroll": 1280,
+          "client": 1280
+        },
+        "expanded": {
+          "scroll": 1280,
+          "client": 1280
+        }
+      },
+      "storageBefore": "{}",
+      "primaryOrder": [
+        {
+          "id": "filters",
+          "y": 264.9375
+        },
+        {
+          "id": "stats",
+          "y": 524.9375
+        },
+        {
+          "id": "analysis-primary",
+          "y": 690.09375
+        },
+        {
+          "id": "ovcols",
+          "y": 1569.53125
+        },
+        {
+          "id": "ovWhere",
+          "y": 2126.84375
+        }
+      ],
+      "inputLabels": [
+        {
+          "id": "fPeriod",
+          "hasLabel": true
+        },
+        {
+          "id": "fProv",
+          "hasLabel": true
+        },
+        {
+          "id": "fDist",
+          "hasLabel": true
+        },
+        {
+          "id": "fPal",
+          "hasLabel": true
+        },
+        {
+          "id": "fOrg",
+          "hasLabel": true
+        },
+        {
+          "id": "fGrp",
+          "hasLabel": true
+        },
+        {
+          "id": "fMod",
+          "hasLabel": true
+        },
+        {
+          "id": "fDon",
+          "hasLabel": true
+        },
+        {
+          "id": "fAct",
+          "hasLabel": true
+        },
+        {
+          "id": "fSta",
+          "hasLabel": true
+        },
+        {
+          "id": "fBasis",
+          "hasLabel": true
+        },
+        {
+          "id": "fFrom",
+          "hasLabel": true
+        },
+        {
+          "id": "fTo",
+          "hasLabel": true
+        },
+        {
+          "id": "",
+          "hasLabel": true
+        },
+        {
+          "id": "",
+          "hasLabel": true
+        },
+        {
+          "id": "",
+          "hasLabel": true
+        },
+        {
+          "id": "",
+          "hasLabel": true
+        },
+        {
+          "id": "",
+          "hasLabel": true
+        }
+      ],
+      "lang": "ne",
+      "storageAfter": "{\"mhpss-np-lang\":\"en\"}",
+      "remoteWrites": [],
+      "reads": [],
+      "blockedRequestCount": 7,
+      "snapshotProof": {
+        "stats": {
+          "sha256": "07315c1b24cf9091472ba1b4a19d495a94da9b6a11bd23f33d4bc8a65c0d6b4e",
+          "characters": 248
+        },
+        "covBody": {
+          "sha256": "63994f818125fc438ac486e85f45739caf68d56386d1fbfe6bdf2c67b1c29aff",
+          "characters": 2558
+        },
+        "dupBody": {
+          "sha256": "084e80765bb777a3a6430a69174d3a0c2ffa23dedf460de2e3e3585811103b8f",
+          "characters": 1074
+        },
+        "pxBody": {
+          "sha256": "ead4af353da44af25ab5ee56a557318e85c1383fee53af0b9cd7e85b1bdd2299",
+          "characters": 290
+        },
+        "actBody": {
+          "sha256": "db16cd6cf93af2ff81a56f27ee8adbe7a592b1a3723964758f86c4ec943cb5ab",
+          "characters": 1286
+        },
+        "disBody": {
+          "sha256": "11d19205c965897fb96a2ef59fbba54c926f57a34e61ab53bae1cbd671390b69",
+          "characters": 405
+        },
+        "dayWrap": {
+          "sha256": "ea2e07cc8b8a3fa225ca21813cee0a89beb7577be61ceeb5b3831573107cd600",
+          "characters": 302
+        },
+        "rawBody": {
+          "sha256": "20391034a51b889b2a45fb784652fa3258d00d23de83d1ecf5a3cfdeaa2bd558",
+          "characters": 7240
+        },
+        "ovWho": {
+          "sha256": "3b23f2194144ceddc036a0029bbc34ddb02a5f4bee6dc4214a94fd8a6311fd7f",
+          "characters": 37
+        },
+        "ovWhat": {
+          "sha256": "14baec85bb064bb89361308005eb4d7cd17db84528daa3ea4bd705c064e509ee",
+          "characters": 42
+        },
+        "ovWhom": {
+          "sha256": "16733adb10d460f41af3ab0c06d69b1b2ffe31c4ba36dbaed550e229f3e28fc5",
+          "characters": 70
+        },
+        "ovFam": {
+          "sha256": "15fb254923bf519f8658fe95460a041cdfd8559484b79e5e8d22ed18345709db",
+          "characters": 286
+        },
+        "ovMod": {
+          "sha256": "300a967cf46eecb4e9db289c806f974b7d3d25bb822d2de20172150fabb7a06d",
+          "characters": 221
+        },
+        "ovSadd": {
+          "sha256": "c35750a53a450bebdf948c31c81387e17d918b0b63d74d139d49ff8ac5b01f94",
+          "characters": 91
+        },
+        "ovPal": {
+          "sha256": "fbe19efc6f054524697898c5f43cfe201bc363852edfb52332450182c8a4ae46",
+          "characters": 186
+        },
+        "ovStatus": {
+          "sha256": "32e48995f98ce3b76f2d3f5e2d2acddfeff6650b7b18628cfa739bfef4a03312",
+          "characters": 4
+        },
+        "filteredStats": {
+          "sha256": "43616ddaad101979fb02d768ba00ba0d8cf0fda9d07e0abea9f5e7e65b3c6cb3",
+          "characters": 247
+        },
+        "filterSummary": {
+          "sha256": "92bffaabf90380f8d1b79c2d9ef533ab35d06bc0a30e98c38ee2610340a07a54",
+          "characters": 42
+        },
+        "filteredRows": {
+          "sha256": "7bf72b8efd2a1782f85849e1bd8407c53f005dc9d471300c5146d2b13548470c",
+          "characters": 1806
+        },
+        "periodStats": {
+          "sha256": "2a953fcec302e011c821a00aef0393f632c6ce6c66092f0dce10bf516b762296",
+          "characters": 247
+        },
+        "periodRows": {
+          "sha256": "5adf23de135e5c746fcd19f757ee7e5a845a04a120be3e32c78305ffbdb9c5c9",
+          "characters": 3260
+        },
+        "csv": {
+          "sha256": "b589c5e53d6dba6d136fe94915bb323675a227b38334e65aabe65cd6ff21b322",
+          "characters": 28266
+        },
+        "find": {
+          "sha256": "f35c1ad6d92b978290df8d514c948d37be8c711c4fa5a4c9c3cc7d406f4e7251",
+          "characters": 112
+        },
+        "importStats": {
+          "sha256": "07315c1b24cf9091472ba1b4a19d495a94da9b6a11bd23f33d4bc8a65c0d6b4e",
+          "characters": 248
+        },
+        "importRows": {
+          "sha256": "20391034a51b889b2a45fb784652fa3258d00d23de83d1ecf5a3cfdeaa2bd558",
+          "characters": 7240
+        },
+        "importDaily": {
+          "sha256": "ea2e07cc8b8a3fa225ca21813cee0a89beb7577be61ceeb5b3831573107cd600",
+          "characters": 302
+        },
+        "matrixCSV": {
+          "sha256": "c44505a2857215470cd3d5123a6cba22436189452be259f7afdc1e5f45c51126",
+          "characters": 3873
+        }
+      }
+    }
+  ],
+  "mutation": {
+    "checks": {
+      "no_sidebar": false,
+      "shell_visible": true,
+      "access_collapsed": true,
+      "unknown_kpis": true,
+      "no_data": true,
+      "no_implicit_read": true,
+      "no_write": true,
+      "no_delivery_claim": true,
+      "no_overflow": true
+    },
+    "killed": true
+  }
+}

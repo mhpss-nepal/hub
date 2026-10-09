@@ -1,0 +1,65 @@
+test_all_existing_runtime_assets_exact (test_dashboard_visual_contract.Contract.test_all_existing_runtime_assets_exact) ... ok
+test_control_loss_is_detectable (test_dashboard_visual_contract.Contract.test_control_loss_is_detectable) ... ok
+test_controls_and_assets_exact (test_dashboard_visual_contract.Contract.test_controls_and_assets_exact) ... ok
+test_scripts_byte_exact (test_dashboard_visual_contract.Contract.test_scripts_byte_exact) ... FAIL
+test_selected_reference_structure (test_dashboard_visual_contract.Contract.test_selected_reference_structure) ... ok
+test_basis_must_state_non_additivity (test_exchange_contract.ExchangeContract.test_basis_must_state_non_additivity) ... ok
+test_below_floor_value_is_refused (test_exchange_contract.ExchangeContract.test_below_floor_value_is_refused) ... ok
+test_build_emits_dated_latest_and_schema (test_exchange_contract.ExchangeContract.test_build_emits_dated_latest_and_schema) ... ok
+test_check_writes_nothing (test_exchange_contract.ExchangeContract.test_check_writes_nothing) ... ok
+test_csv_has_hxl_header_and_pcodes (test_exchange_contract.ExchangeContract.test_csv_has_hxl_header_and_pcodes) ... ok
+test_every_row_has_a_child_pcode_hierarchy (test_exchange_contract.ExchangeContract.test_every_row_has_a_child_pcode_hierarchy) ... ok
+test_identity_key_in_source_is_refused (test_exchange_contract.ExchangeContract.test_identity_key_in_source_is_refused) ... ok
+test_missing_source_is_a_clean_failure_not_a_traceback (test_exchange_contract.ExchangeContract.test_missing_source_is_a_clean_failure_not_a_traceback) ... CONTRACT FAILURE: [Errno 2] No such file or directory: '/root/.hermes/cache/scratch/exchange-src-l5_s18i8/nope/baseline.json'
+ok
+test_single_row_feed_is_refused (test_exchange_contract.ExchangeContract.test_single_row_feed_is_refused) ... ok
+test_unknown_palika_pcode_is_refused (test_exchange_contract.ExchangeContract.test_unknown_palika_pcode_is_refused) ... ok
+test_verify_accepts_a_good_build (test_exchange_contract.ExchangeContract.test_verify_accepts_a_good_build) ... ok
+test_verify_catches_a_schema_drift (test_exchange_contract.ExchangeContract.test_verify_catches_a_schema_drift) ... ok
+test_verify_catches_a_tampered_committed_file (test_exchange_contract.ExchangeContract.test_verify_catches_a_tampered_committed_file) ... ok
+test_a_missing_bridge_is_stated_not_silently_blank (test_field_output_home.ReadPathBrowserTest.test_a_missing_bridge_is_stated_not_silently_blank) ... ok
+test_a_record_of_another_kind_is_not_shown (test_field_output_home.ReadPathBrowserTest.test_a_record_of_another_kind_is_not_shown)
+The kind scope is the boundary, not a display filter. ... skipped 'no Firestore emulator on http://127.0.0.1:8081'
+test_round_trip_a_record_written_by_the_current_form_is_read_on_layer_two (test_field_output_home.ReadPathBrowserTest.test_round_trip_a_record_written_by_the_current_form_is_read_on_layer_two)
+The proof. Same synthetic report, through the unmodified contract. ... skipped 'no Firestore emulator on http://127.0.0.1:8081'
+test_the_page_asks_for_one_kind_and_never_writes (test_field_output_home.ReadPathBrowserTest.test_the_page_asks_for_one_kind_and_never_writes) ... /usr/local/share/uv/python/cpython-3.11.16-linux-x86_64-gnu/lib/python3.11/traceback.py:425: ResourceWarning: unclosed <socket.socket fd=3, family=2, type=1, proto=0, laddr=('127.0.0.1', 46469)>
+  result.append(FrameSummary(
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_it_asks_for_exactly_one_kind_and_it_is_the_trial_instrument (test_field_output_home.ReceivingSurfaceTest.test_it_asks_for_exactly_one_kind_and_it_is_the_trial_instrument) ... ok
+test_it_changes_no_contract (test_field_output_home.ReceivingSurfaceTest.test_it_changes_no_contract)
+A reader adds no column, no key, no id rule and no schema. ... ok
+test_it_is_not_in_the_navigation (test_field_output_home.ReceivingSurfaceTest.test_it_is_not_in_the_navigation)
+Adding it to the rail is a navigation change, and that is Adib's call. ... ok
+test_the_frozen_base_is_quoted_and_measured (test_field_output_home.ReceivingSurfaceTest.test_the_frozen_base_is_quoted_and_measured)
+The card's evidence 1, as a check: both frozen heads, quoted, and the ... ok
+test_the_page_loads_the_frozen_shared_files_rather_than_reimplementing_them (test_field_output_home.ReceivingSurfaceTest.test_the_page_loads_the_frozen_shared_files_rather_than_reimplementing_them) ... ok
+test_the_read_scoping_guard_still_passes (test_field_output_home.ReceivingSurfaceTest.test_the_read_scoping_guard_still_passes)
+A new reader must not become an unfiltered listen, and the guard must agree. ... ok
+test_the_route_is_addressable (test_field_output_home.ReceivingSurfaceTest.test_the_route_is_addressable) ... ok
+test_guard_bites_when_the_defect_is_reintroduced (test_hub_read_scoping.HubReadScoping.test_guard_bites_when_the_defect_is_reintroduced) ... ok
+test_guard_passes_on_the_current_tree (test_hub_read_scoping.HubReadScoping.test_guard_passes_on_the_current_tree) ... ok
+
+======================================================================
+FAIL: test_scripts_byte_exact (test_dashboard_visual_contract.Contract.test_scripts_byte_exact)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/root/mhpss-nepal-final-forms/2026-10-06/39-overnight-readiness/03-dashboard-final/hub/tests/test_dashboard_visual_contract.py", line 22, in test_scripts_byte_exact
+    def test_scripts_byte_exact(self):self.assertEqual(re.findall(r'<script>(.*?)</script>',self.old,re.S),re.findall(r'<script>(.*?)</script>',self.new,re.S))
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Lists differ: ["(fu[38734 chars]ready) return;\n      done = true;\n      if ([63848 chars];\n'] != ["(fu[38734 chars]ready || !st.user) return;\n      done = true;[65133 chars];\n"]
+
+First differing element 1:
+'\n(f[36036 chars]ready) return;\n      done = true;\n      if ([63847 chars]);\n'
+'\n(f[36036 chars]ready || !st.user) return;\n      done = true;[63859 chars]);\n'
+
+Second list contains 1 additional elements.
+First extra element 2:
+"\n/* Page-local presentation observer. Never changes FB state or handlers. */\n(function () {\n  var app=document.getElementById('app'), shell=document.getElementById('entry-shell');\n  function syncEntry(){shell.hidden=!app.hidden;}\n  new MutationObserver(syncEntry).observe(app,{attributes:true,attributeFilter:['hidden']});\n  syncEntry();\n  function observeBridge(){\n    var bar=document.getElementById('fbbar'); if(!bar)return;\n    var m=bar.querySelector('.m'); if(!m)return;\n    /* Replace only the exact healthy delivery assertion. Every warning,\n       pending indicator, error and bridge action remains visible unchanged. */\n    if(!bar.classList.contains('warn') && !bar.classList.contains('off') && m.textContent.indexOf('Connected. Records reach coordination as you save them.')===0){\n      m.textContent='Database service reachable · dashboard source and access are shown below.';\n      bar.setAttribute('data-observational','true');\n    } else if(m.textContent!=='Database service reachable · dashboard source and access are shown below.') {\n      bar.removeAttribute('data-observational');\n    }\n  }\n  new MutationObserver(observeBridge).observe(document.body,{childList:true,subtree:true,characterData:true});\n  observeBridge();\n})();\n"
+
+Diff is 117749 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 31 tests in 6.187s
+
+FAILED (failures=1, skipped=2)

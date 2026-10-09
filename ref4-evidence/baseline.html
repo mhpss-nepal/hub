@@ -283,111 +283,16 @@ body.hub.dashboard-selected .time-card table.data{min-width:530px;font-size:12px
 body.hub.dashboard-selected .time-card th{white-space:normal}
 body.hub.dashboard-selected .ovcols .ovcol:last-child{grid-column:auto}
 @media(max-width:650px){body.hub.dashboard-selected .primary-grid,body.hub.dashboard-selected .ovcols{grid-template-columns:minmax(0,1fr)}}
-
-/* Reference4 entry correction: page-local horizontal shell, no shared CSS. */
-body.hub.dashboard-selected{padding-left:0;--who:#2d79d7;--who-d:#1d3d60;--who-dd:#1d3d60}
-body.hub.dashboard-selected .top{padding:18px 28px;background:#1d3d60;display:flex;align-items:center}
-body.hub.dashboard-selected .top h1{margin:0;font:700 25px/1.25 Arial,sans-serif;color:#fff}
-body.hub.dashboard-selected .top .sub{margin-top:5px;font-size:13px;letter-spacing:0;text-transform:none;font-weight:400}
-body.hub.dashboard-selected .rail{position:static;inset:auto;width:auto;overflow:visible;display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:0 28px;background:white;border:0;border-bottom:1px solid #d8e1ec}
-body.hub.dashboard-selected .rail :is(.railid,.where,.rmenu,.rfoot){display:none}
-body.hub.dashboard-selected .rail nav{display:flex;flex:1 1 auto;flex-direction:row;align-items:center;flex-wrap:wrap;padding:0;max-height:none;overflow:visible;gap:4px}
-body.hub.dashboard-selected .rail .rg{margin:0;position:relative}
-body.hub.dashboard-selected .rail .rg[data-g=coord]>.rgh{display:none}
-body.hub.dashboard-selected .rail .rgb{border:0;margin:0;padding:0}
-body.hub.dashboard-selected .rail .rg.open>.rgb{display:flex;flex-wrap:wrap;gap:2px}
-body.hub.dashboard-selected .rail .rgb>a{padding:11px 10px;font-size:12px;min-height:44px;display:inline-flex;align-items:center;border-radius:0;box-shadow:none;white-space:normal}
-body.hub.dashboard-selected .rail .rgb>a.on{background:#edf4fa;box-shadow:inset 0 -3px #2d79d7}
-body.hub.dashboard-selected .rail .rgh{min-height:44px;padding:8px 10px;font-size:12px}
-body.hub.dashboard-selected .rail .rgh :is(em,.dot){display:none}
-body.hub.dashboard-selected .rail .rg:not([data-g=coord]).open>.rgb{position:absolute;right:0;top:100%;z-index:45;width:200px;background:#fff;border:1px solid #d8e1ec;border-radius:8px;padding:8px;box-shadow:0 5px 12px #1d3d6020}
-body.hub.dashboard-selected .rail .railtoggle{padding:0;margin:0;display:inline-flex}
-body.hub.dashboard-selected #band{background:transparent!important;color:#455569!important;border:0;padding:0!important;text-align:left;font-size:12px;margin:0}
-body.hub.dashboard-selected #band span{color:#455569!important}
-body.hub.dashboard-selected .wrap.wide{max-width:1600px;margin:0 auto;padding:16px 28px 48px}
-body.hub.dashboard-selected #loader{padding:0;border:0;background:transparent;margin-bottom:14px}
-body.hub.dashboard-selected .source-start{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px}
-body.hub.dashboard-selected .source-start .btn{background:#1d3d60;color:#fff;font-size:13px}
-body.hub.dashboard-selected #access-options{border:1px solid #d8e1ec;background:#fff;border-radius:8px;padding:0 14px}
-body.hub.dashboard-selected #access-options>summary{font-size:13px;padding:10px 0;min-height:44px}
-body.hub.dashboard-selected #drop{padding:12px 0;border:0;border-radius:0;text-align:left;background:transparent}
-body.hub.dashboard-selected #drop .btns{justify-content:flex-start!important}
-body.hub.dashboard-selected #drop hr{margin:12px 0!important}
-body.hub.dashboard-selected #drop p{max-width:95ch;font-size:13px}
-body.hub.dashboard-selected #drop .row{gap:12px}
-body.hub.dashboard-selected #drop .row input{max-width:100%}
-body.hub.dashboard-selected .entry-filters{display:flex;gap:8px;flex-wrap:wrap;padding:12px;background:white;border:1px solid #d8e1ec;border-radius:10px;font-size:12px;color:#455569}
-body.hub.dashboard-selected .entry-filters span{border:1px solid #d8e1ec;border-radius:6px;padding:9px 12px}
-body.hub.dashboard-selected .entry-filters p{margin:0;align-self:center}
-body.hub.dashboard-selected .entry-note{font-size:12px;color:#455569;margin:0 0 12px}
-body.hub.dashboard-selected .entry-row{display:grid;grid-template-columns:210px 1fr 22px;gap:12px;align-items:center;margin:18px 0;font-size:13px;color:#455569}
-body.hub.dashboard-selected .entry-track{height:14px;border-radius:2px;background:#f3f6f9}
-body.hub.dashboard-selected .entry-time{display:flex;align-items:center;justify-content:center;min-height:160px;background:#f8fafc;border-radius:6px;color:#455569;font-size:13px}
-body.hub.dashboard-selected .entry-secondary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-body.hub.dashboard-selected .entry-secondary .ovcolb{min-height:100px}
-body.hub.dashboard-selected .stats{margin:14px 0;gap:12px}
-body.hub.dashboard-selected .stat{min-height:130px;padding:16px 18px}
-body.hub.dashboard-selected .stat .v{font-size:34px;color:#20313b}
-body.hub.dashboard-selected .stat .k{font-size:11px;text-transform:uppercase;letter-spacing:.04em;font-weight:700}
-body.hub.dashboard-selected .primary-grid{align-items:stretch}
-body.hub.dashboard-selected .primary-grid>.ovcol{min-height:285px}
-body.hub.dashboard-selected .ovcolh{border:0;padding:18px 20px 6px}
-body.hub.dashboard-selected .ovcolh h2{font-size:18px;color:#20313b}
-body.hub.dashboard-selected .ovcolb{padding:10px 20px 20px}
-body.hub.dashboard-selected #ovFam .ovbt i{background:#2d79d7!important}
-body.hub.dashboard-selected #ovFam .ovbt{height:18px}
-body.hub.dashboard-selected #srcNote{margin-bottom:10px;padding:8px 12px;border:1px solid #d8e1ec;border-radius:8px;background:#fff;color:#455569;font-size:12px}
-body.hub.dashboard-selected #srcNote::before{content:'Draft · ';font-weight:700}
-body.hub.dashboard-selected .filters .grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:8px 10px}
-body.hub.dashboard-selected .filters .grid>.w2{grid-column:span 1}
-body.hub.dashboard-selected .filters>summary{min-height:44px;padding:0}
-body.hub.dashboard-selected .filters>summary .xs{display:none}
-body.hub.dashboard-selected .filters label{color:#455569;font-size:10px}
-body.hub.dashboard-selected .filters .grid input,body.hub.dashboard-selected .filters .grid select{min-width:0;width:100%;font-size:12px}
-body.hub.dashboard-selected .analysis-detail{margin:16px 0}
-body.hub.dashboard-selected #fbbar{position:static!important;margin:0 auto;font-size:12px!important}
-body.hub.dashboard-selected #fbbar[data-observational=true]{background:#f3f6f9!important;color:#455569!important;border:0!important;padding:4px 28px!important;font-weight:400!important}
-body.hub.dashboard-selected #fbbar:not([data-observational=true]){padding:8px 28px!important}
-@media(max-width:1100px){body.hub.dashboard-selected .filters .grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media(max-width:650px){
- body.hub.dashboard-selected .top{padding:16px 12px}body.hub.dashboard-selected .top h1{font-size:21px}
- body.hub.dashboard-selected .rail{padding:0 12px;gap:0}body.hub.dashboard-selected .rail nav{flex-basis:100%;gap:0}
- body.hub.dashboard-selected .rail .rgb>a{font-size:11px;padding:9px 7px}
- body.hub.dashboard-selected .rail .rg[data-g=coord]{flex-basis:100%}
- body.hub.dashboard-selected .rail .railtoggle{margin-left:auto}
- body.hub.dashboard-selected .wrap.wide{padding:12px}
- body.hub.dashboard-selected .source-start{align-items:flex-start;gap:8px}
- body.hub.dashboard-selected .source-start .btn{width:100%}
- body.hub.dashboard-selected .filters .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
- body.hub.dashboard-selected .entry-filters{gap:6px;padding:10px}.entry-filters span{flex:1 1 auto}
- body.hub.dashboard-selected .entry-row{grid-template-columns:1fr 24px;gap:4px;font-size:12px;margin:14px 0}
- body.hub.dashboard-selected .entry-track{grid-column:1;grid-row:auto;height:8px}.entry-row b{grid-column:2;grid-row:span 2}
- body.hub.dashboard-selected .entry-secondary{grid-template-columns:1fr}
- body.hub.dashboard-selected .stat{min-height:108px;padding:12px}
- body.hub.dashboard-selected .primary-grid>.ovcol{min-height:240px}
- body.hub.dashboard-selected .ovcolh{padding:14px 14px 6px}body.hub.dashboard-selected .ovcolb{padding:10px 14px 14px}
- body.hub.dashboard-selected #fbbar[data-observational=true]{padding:4px 12px!important}
-}
-
-body.hub.dashboard-selected .filters .grid{grid-template-columns:repeat(7,minmax(0,1fr))}
-body.hub.dashboard-selected .filter-more>summary{font-size:12px;min-height:44px;padding:10px 0 0}
-body.hub.dashboard-selected .filter-more .grid{grid-template-columns:repeat(6,minmax(0,1fr));padding-top:8px}
-body.hub.dashboard-selected .rail .rgb>a{min-width:0}
-body.hub.dashboard-selected .top>div{min-width:0}
-body.hub.dashboard-selected .entry-filters span{color:#657386;background:#f8fafc;border-style:dashed}
-@media(max-width:1100px){body.hub.dashboard-selected .filters .grid,body.hub.dashboard-selected .filter-more .grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media(max-width:650px){body.hub.dashboard-selected .filters .grid,body.hub.dashboard-selected .filter-more .grid{grid-template-columns:repeat(2,minmax(0,1fr))}body.hub.dashboard-selected .rail .rg[data-g=coord]>.rgb{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%}body.hub.dashboard-selected .rail .rg[data-g=coord]{width:100%;min-width:0}}
-
-body.hub.dashboard-selected p{text-align:left}
-body.hub.dashboard-selected .ovcolh h2{flex-shrink:1;min-width:0;max-width:100%;white-space:normal;overflow-wrap:break-word}
-body.hub.dashboard-selected input[type=file]{display:block;width:100%;max-width:100%;font:inherit;font-size:12px;padding:8px 0;min-height:44px}
-body.hub.dashboard-selected .file-choice{display:block;font-size:13px;font-weight:700;color:#1d3d60;max-width:100%}
 </style>
 </head>
 <body class="hub dashboard-selected">
 <a class="skip" href="#dashboard-main">Skip to dashboard</a>
 
-<header class="top"><div><h1>MHPSS 5Ws — coordination dashboard</h1><div class="sub">Nepal · Rasuwa / Bhote Koshi flood response · restricted coordination</div></div></header>
+<div class="topline"><div class="in">
+  <span class="tl">MHPSS Technical Working Group &middot; Nepal</span>
+  <span class="sp"></span>
+  <span class="tl" style="letter-spacing:.04em;text-transform:none;font-weight:500">Layer 2 &middot; coordination &middot; restricted</span>
+</div></div>
 
 <!--NAV:rail hubindex-->
 <aside class="rail" aria-label="Coordination hub">
@@ -486,17 +391,29 @@ body.hub.dashboard-selected .file-choice{display:block;font-size:13px;font-weigh
 </aside>
 <!--/NAV-->
 
+<div id="band" style="background:#d03b3b;color:#fff;font:700 12.5px/1.45 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;letter-spacing:.02em;text-align:center;padding:7px 16px;padding-top:calc(7px + env(safe-area-inset-top,0px))">DEMONSTRATION — FIGURES SHOWN HERE COME FROM WHATEVER FILE YOU LOAD <span style="font-weight:400;opacity:.92">· draft, not agreed with EDCD or the MHPSS Technical Working Group · a file is read in the page and never uploaded; the live path reads the register and writes nothing</span></div>
+
+
+<div class="top">
+  <div>
+    <div class="brand">MHPSS Coordination Dashboard</div>
+    <div class="sub">Rasuwa / Bhote Koshi flood response</div>
+  </div>
+  <div class="spacer"></div>
+</div>
+
+<div class="phead"><div class="in">
+  <div class="eyebrow">Layer 2 &middot; coordination dashboard</div>
+  <h1>Coordination dashboard</h1>
+  <details class="intro-details"><summary>About this dashboard</summary><p class="lede">One screen for the flood response: what has been reported, who is where, what was done, every report received, and what the public website is given. It reads the live register — each figure is recomputed the moment a worker saves a report — or a file you choose, which is read in the page and never uploaded.</p></details>
+</div></div>
+
 <main class="wrap wide" id="dashboard-main">
 
   <div class="card" id="loader">
-    <div class="source-start">
-      <div id="band">Draft · No source loaded. Choose a source or explore the explicitly synthetic demo.</div>
-      <button type="button" class="btn" id="useDemo">Explore synthetic demo</button>
-    </div>
-    <details id="access-options"><summary>Access live register or import a file</summary>
     <div class="drop" id="drop">
-      <p style="margin:0 0 8px"><b>Read the live register</b> — access is checked by the existing register service.</p>
-      <p class="xs" style="margin:0 0 12px">Sign-in alone does not grant record access. The register enforces the account and role requirements. Files are read in this page, never uploaded.</p>
+      <p style="margin:0 0 4px"><b>Read the live register</b> — every figure on the dashboard updates as reports arrive.</p>
+      <p class="xs" style="margin:0 0 12px">A Firestore listener, not a refresh schedule: the page recomputes on the change itself. <b>Until 30 September 2026 the activity reports open without an account</b>, so the dashboard can be tried without credentials being issued; service contacts, PHQ-9 follow-ups and referrals stay behind an account throughout, because those carry a per-person code.</p>
       <div class="btns" style="justify-content:center">
         <button type="button" class="btn" id="useLive">Connect to the live register</button>
       </div>
@@ -507,22 +424,14 @@ body.hub.dashboard-selected .file-choice{display:block;font-size:13px;font-weigh
 
       <p style="margin:0 0 12px"><b>Or load an export from the report form</b> — a <code>.json</code> or <code>.csv</code> file.</p>
       <div class="btns" style="justify-content:center">
-        <label class="file-choice">Choose a file<input type="file" id="file" accept=".json,.csv"></label>
+        <label class="btn ghost" style="cursor:pointer">Choose a file<input type="file" id="file" accept=".json,.csv" hidden></label>
         <button type="button" class="btn ghost" id="useLocal">Use reports saved in this browser</button>
+        <button type="button" class="btn grey" id="useDemo">Load synthetic demonstration data</button>
       </div>
-      <p class="xs" style="margin:12px 0 0">The synthetic demo is generated locally and is not operational data. Coverage denominators use the holding-centre roster; loaded figures are not independently validated.</p>
-    </div></details>
-  </div>
-  <section id="entry-shell" aria-label="Dashboard awaiting a data source">
-    <div class="entry-filters" aria-label="Filters available after loading a source"><span>Period —</span><span>Province —</span><span>District —</span><span>Palika —</span><span>Organisation —</span><span>Activity layer —</span><span>Service setting —</span></div>
-    <div class="stats"><div class="stat"><div class="k">Reports</div><div class="v">—</div><div class="s">Awaiting a source</div></div><div class="stat"><div class="k">Attendances</div><div class="v">—</div><div class="s">Awaiting a source</div></div><div class="stat"><div class="k">Organisations reporting</div><div class="v">—</div><div class="s">Awaiting a source</div></div><div class="stat"><div class="k">Roster sites reached</div><div class="v">—</div><div class="s">Awaiting a source</div></div><div class="stat"><div class="k">Roster sites with no report</div><div class="v">—</div><div class="s">Awaiting a source</div></div></div>
-    <p class="entry-note">No figures have been loaded. A dash means unavailable, not zero. Filters and analysis become available after you choose a source.</p>
-    <div class="primary-grid">
-      <section class="ovcol"><div class="ovcolh"><h2>What — attendances by IASC layer</h2></div><div class="ovcolb"><p class="xs">Reported activity, without an inferred unique-person count.</p><div class="entry-row"><span>Layer 1 · Basic services</span><span class="entry-track" aria-hidden="true"></span><b>—</b></div><div class="entry-row"><span>Layer 2 · Community & family</span><span class="entry-track" aria-hidden="true"></span><b>—</b></div><div class="entry-row"><span>Layer 3 · Focused support</span><span class="entry-track" aria-hidden="true"></span><b>—</b></div><div class="entry-row"><span>Layer 4 · Specialist care</span><span class="entry-track" aria-hidden="true"></span><b>—</b></div></div></section>
-      <section class="ovcol"><div class="ovcolh"><h2>When — reports by day</h2></div><div class="ovcolb"><p class="xs">Dates follow the chosen period and date basis.</p><div class="entry-time">— &nbsp; No reports loaded</div></div></section>
+      <p class="xs" style="margin:14px 0 0">Synthetic data is generated in the page and is not real. It exists so the dashboard can be shown before any operational data has been collected — which is also the position agreed while the three governance questions are open.</p>
     </div>
-    <div class="entry-secondary"><section class="ovcol"><div class="ovcolh"><h2>Who</h2></div><div class="ovcolb"><p class="xs">— Organisations reporting in the selection</p></div></section><section class="ovcol"><div class="ovcolh"><h2>For whom</h2></div><div class="ovcolb"><p class="xs">— Existing sex and age breakdowns</p></div></section><section class="ovcol"><div class="ovcolh"><h2>Where</h2></div><div class="ovcolb"><p class="xs">— Reported activity by palika</p></div></section></div>
-  </section>
+  </div>
+
   <div id="app" hidden>
 
     <div class="banner" id="srcNote"></div>
@@ -547,25 +456,23 @@ body.hub.dashboard-selected .file-choice{display:block;font-size:13px;font-weigh
       <button type="button" class="btn grey sm" id="fClear">Clear filters</button>
     </div>
 
-    <details class="filters" id="filters" open>
+    <details class="filters" id="filters">
       <summary class="fopen"><span class="fopenb">All filters</span><span class="xs">nine dimensions and the period — every figure and table on this page follows them, and each list offers only the values that survive the others</span></summary>
       <div class="grid">
-        <div class="w2"><label for="fPeriod">Period</label><select id="fPeriod"></select></div>
         <div><label for="fProv">Province</label><select id="fProv" data-dim="province"></select></div>
         <div><label for="fDist">District</label><select id="fDist" data-dim="district"></select></div>
         <div><label for="fPal">Palika</label><select id="fPal" data-dim="palika"></select></div>
         <div><label for="fOrg">Organisation</label><select id="fOrg" data-dim="org"></select></div>
-        <div><label for="fGrp">Activity layer</label><select id="fGrp" data-dim="group"></select></div>
-        <div><label for="fMod">Service setting</label><select id="fMod" data-dim="modality"></select></div>
-      </div>
-      <details class="filter-more"><summary>More filters and custom dates</summary><div class="grid">
         <div><label for="fDon">Funding source</label><select id="fDon" data-dim="donor"></select></div>
+        <div><label for="fGrp">Activity layer</label><select id="fGrp" data-dim="group"></select></div>
         <div><label for="fAct">Activity</label><select id="fAct" data-dim="activity"></select></div>
+        <div><label for="fMod">Service setting</label><select id="fMod" data-dim="modality"></select></div>
         <div><label for="fSta">Status</label><select id="fSta" data-dim="status"></select></div>
+        <div class="w2"><label for="fPeriod">Period</label><select id="fPeriod"></select></div>
         <div class="w2"><label for="fBasis">Period reads</label><select id="fBasis"></select></div>
         <div><label for="fFrom">From</label><input type="date" id="fFrom"></div>
         <div><label for="fTo">To</label><input type="date" id="fTo"></div>
-      </div></details>
+      </div>
     </details>
     <div class="stats" id="stats"></div>
 
@@ -590,7 +497,7 @@ body.hub.dashboard-selected .file-choice{display:block;font-size:13px;font-weigh
           <p class="xs" id="ovModNote"></p>
         </div>
       </div>
-<section class="ovcol time-card"><div class="ovcolh"><h2>When — reports by day</h2></div><div class="ovcolb"><p class="xs">Follows the selected period and date basis. Daily reports and attendances; no epidemiological-week inference.</p><div id="dayWrap" tabindex="0" role="region" aria-label="Reports by day, scroll horizontally if needed"></div></div></section></div>
+<section class="ovcol time-card"><div class="ovcolh"><h2>When — reports by day</h2></div><div class="ovcolb"><p class="xs">Follows the selected period and date basis. Existing daily attendance table; no weekly conversion.</p><div id="dayWrap" tabindex="0" role="region" aria-label="Reports by day, scroll horizontally if needed"></div></div></section></div>
 <div class="ovcols" id="ovcols">      <div class="ovcol">
         <div class="ovcolh"><h2>Who</h2><span class="ovsp"></span>
           <span class="ovcolf"><select data-dim="org" aria-label="Narrow to one organisation"></select></span></div>
@@ -618,7 +525,7 @@ body.hub.dashboard-selected .file-choice{display:block;font-size:13px;font-weigh
     <!-- WHERE, at palika level. The roster coverage table below is at site
          level; this is the palika reading the 4Ws matrix joins on, and the
          gap-list item the map will eventually draw. -->
-<details class="analysis-detail" open><summary>Where and delivery status</summary>
+<details class="analysis-detail"><summary>Where and delivery status</summary>
     <div class="ovfig" id="ovWhere">
       <div class="ovfigh"><h3>Where</h3>
         <span class="ovcolf ovfigf">
@@ -783,7 +690,7 @@ body.hub.dashboard-selected .file-choice{display:block;font-size:13px;font-weigh
         <input type="search" id="rawFind" aria-label="Find reports" placeholder="Find — organisation, site, activity, date, id" style="flex:1 1 260px;min-width:200px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;font:inherit;font-size:13px">
         <span class="xs" id="rawCount"></span>
         <button type="button" class="btn ghost sm" id="expAll">Export everything loaded as CSV</button>
-        <label class="file-choice">Import a file<input type="file" id="file2" accept=".json,.csv"></label>
+        <label class="btn ghost sm" style="cursor:pointer">Import a file<input type="file" id="file2" accept=".json,.csv" hidden></label>
         <button type="button" class="btn grey sm" id="reload">Change source</button>
       </div>
       <div class="tbl-wrap" tabindex="0" role="region" aria-label="Data table, scroll horizontally if needed">
@@ -1516,7 +1423,7 @@ body.hub.dashboard-selected .file-choice{display:block;font-size:13px;font-weigh
     if (/[?&]source=choose\b/.test(location.search) || !window.FB || !window.FB.onStatus) return;
     var done = false;
     window.FB.onStatus(function (st) {
-      if (done || !st || !st.ready || !st.user) return;
+      if (done || !st || !st.ready) return;
       done = true;
       if ($("loader").hidden) return;          /* a file was loaded first */
       $("useLive").click();
@@ -2453,35 +2360,6 @@ body.hub.dashboard-selected .file-choice{display:block;font-size:13px;font-weigh
     var body = MX_LONG.map(function (r) { return r.map(q).join(","); }).join("\n");
     S.download("mhpss_np_5ws_matrix_" + S.stamp() + ".csv", "\ufeff" + head + body + "\n", "text/csv");
   });
-})();
-</script>
-
-<script>
-/* Page-local presentation observer. Never changes FB state or handlers. */
-(function () {
-  var app=document.getElementById('app'), shell=document.getElementById('entry-shell');
-  function syncEntry(){shell.hidden=!app.hidden;}
-  new MutationObserver(syncEntry).observe(app,{attributes:true,attributeFilter:['hidden']});
-  syncEntry();
-  /* A live access result must not disappear inside the compact disclosure. */
-  var livePanel=document.getElementById('livePanel');
-  function revealAccess(){if(!livePanel.hidden && !document.getElementById('loader').hidden)document.getElementById('access-options').open=true;}
-  new MutationObserver(revealAccess).observe(livePanel,{attributes:true,attributeFilter:['hidden'],childList:true,subtree:true});
-  revealAccess();
-  function observeBridge(){
-    var bar=document.getElementById('fbbar'); if(!bar)return;
-    var m=bar.querySelector('.m'); if(!m)return;
-    /* Replace only the exact healthy delivery assertion. Every warning,
-       pending indicator, error and bridge action remains visible unchanged. */
-    if(bar.className==='' && m.textContent.indexOf('Connected. Records reach coordination as you save them.')===0){
-      m.textContent='Database service reachable · dashboard source and access are shown below.';
-      bar.setAttribute('data-observational','true');
-    } else if(m.textContent!=='Database service reachable · dashboard source and access are shown below.') {
-      bar.removeAttribute('data-observational');
-    }
-  }
-  new MutationObserver(observeBridge).observe(document.body,{childList:true,subtree:true,characterData:true});
-  observeBridge();
 })();
 </script>
 </body>

@@ -1,0 +1,26 @@
+[
+  {
+    "name": "baseline",
+    "suite": "discover",
+    "returncode": 0,
+    "log": "existing-baseline-discover.txt"
+  },
+  {
+    "name": "baseline",
+    "suite": "root",
+    "returncode": 0,
+    "log": "existing-baseline-root.txt"
+  },
+  {
+    "name": "candidate",
+    "suite": "discover",
+    "returncode": 1,
+    "log": "existing-candidate-discover.txt"
+  },
+  {
+    "name": "candidate",
+    "suite": "root",
+    "returncode": 0,
+    "log": "existing-candidate-root.txt"
+  }
+]

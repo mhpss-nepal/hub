@@ -1,0 +1,31 @@
+{
+  "passed": 13,
+  "tests": 13,
+  "failures": 0,
+  "errors": 0,
+  "firstscreen_cases": 6,
+  "firstscreen_assertions": 56,
+  "parity_comparisons": 81,
+  "axe_candidate_states": 24,
+  "index_sha256": "519d59ec654159a8742247bed11278d94519e00694c867cac481cd8ca6cd012b",
+  "head": "b02e14a73edc7c0061bdeeaab652c66dd7224883",
+  "tree": "4c17b5e320e252d333127f23478389bf61d91c84",
+  "screenshots": {
+    "demo-390.png": "4c0a27a3d819ed585e3c3ad2b64467cf5bc2f2e7c1e0e110ab60215e08ba1e4d",
+    "red-root-1280.png": "ddf5878df302a1e3af98c542d5968a1305aa206e2672307a04f9dcc06b715c71",
+    "demo-320.png": "ef17c7d3da04da67c4840802a6ac4d2b6dc163872f48db93e8945145817a0a8f",
+    "access-signedout.png": "12913407084814e4862ce64e2298957243991382b69a9714883562640461ff9f",
+    "signedout-root-1280.png": "110a783872385fd2356c81a749d93bc43a85e92089c2640a5dd1641dca63e01d",
+    "signedout-exact-390.png": "66fb00fcd7238ea169c74db5eff7256f997193f4ad9755291e89f62e6f9afbaa",
+    "access-signedin.png": "72e909d74f587c7d34c5ac62f6b3bd0ab9854d67140d5a06eff9005009a6c863",
+    "signedout-exact-320.png": "9dcfb8bfa8fe088f79ea7a4defd687372d9fafddca7a559aa5a1f0c616b6ce52",
+    "expanded-390.png": "c47f6692a590feeb88459e45aaa5425a02e57e063bf6000968a674e97820af46",
+    "expanded-1280.png": "c390b1b7f5f6381c283a9253dbf02495dd797106ab347e0f2adb970813feaa41",
+    "signedout-root-320.png": "9dcfb8bfa8fe088f79ea7a4defd687372d9fafddca7a559aa5a1f0c616b6ce52",
+    "signedout-exact-1280.png": "110a783872385fd2356c81a749d93bc43a85e92089c2640a5dd1641dca63e01d",
+    "red-exact-1280.png": "6e9437d373e6be43b83eaaf3622c565e0154b7e18dab60386091c9b7ff80a02a",
+    "demo-1280.png": "6055aa3d4c1c4eadde76b472cb088d148d9dfbc3b37873f7d0ed6e63958eca8b",
+    "signedout-root-390.png": "66fb00fcd7238ea169c74db5eff7256f997193f4ad9755291e89f62e6f9afbaa",
+    "expanded-320.png": "83536eb714c319c9b27efa374109f6e662a441dd08e93081fbddf1dcfe9c9a22"
+  }
+}
