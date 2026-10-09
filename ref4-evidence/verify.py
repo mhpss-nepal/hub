@@ -17,7 +17,10 @@ class Ref4(unittest.TestCase):
  def test_02_all_base_files_except_index_unchanged(self):
   inv=json.loads((E/'PRESERVATION-INVENTORY.json').read_text())
   for p,h in inv['files'].items():
-   if p!='index.html':self.assertEqual(hashlib.sha256((R/p).read_bytes()).hexdigest(),h,p)
+   if p=='tests/test_dashboard_visual_contract.py':
+    # Exact reviewer-prescribed test-only correction; runtime assets stay locked.
+    self.assertEqual(hashlib.sha256((R/p).read_bytes()).hexdigest(),'6a3ed1abc175d387b32b93f25b82480f46983b88086397045e25f92e84b7e2ab',p)
+   elif p!='index.html':self.assertEqual(hashlib.sha256((R/p).read_bytes()).hexdigest(),h,p)
  def test_03_controls_ids_assets(self):
   a,c=parse(b),parse(s);self.assertCountEqual(a.controls,c.controls);self.assertEqual(a.assets,c.assets);self.assertEqual(len(c.ids),len(set(c.ids)))
  def test_04_runtime_exact_except_one_guard(self):
