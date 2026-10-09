@@ -1,0 +1,30 @@
+{
+  "timestamp_wib": "2026-10-09T22:30:56.495879+07:00",
+  "base": "180a64e8ccb077e26d0905adffa320e107ffb45f",
+  "candidate_index_sha256": "f99862488b99054898c4fbb3637f90cfeedcb6bcfbf50c6e041275f63108c4ea",
+  "contract_tests": 5,
+  "viewports": [
+    320,
+    390,
+    1280
+  ],
+  "parity_checks_per_viewport": {
+    "320": 13,
+    "390": 13,
+    "1280": 13
+  },
+  "axe_A_AA_violations": 0,
+  "page_errors": 0,
+  "overflow": 0,
+  "small_targets": 0,
+  "actual_language_journey": "ENG initial \u2192 NEP click \u2192 ne resolved \u2192 English reset",
+  "storage_unchanged": true,
+  "mock_remote_writes": 0,
+  "unchanged_assets": 11,
+  "limitations": [
+    "Synthetic fixture only; no operational API/store reconciliation",
+    "Nepali choice operates but dashboard translation remains incomplete",
+    "Existing source/cloud initialization behavior unchanged; no claim of whole-system no-write safety",
+    "No installed-client service-worker test; root has no worker/manifest call site"
+  ]
+}
