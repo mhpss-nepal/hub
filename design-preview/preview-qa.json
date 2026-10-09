@@ -1,0 +1,229 @@
+{
+  "checks": [
+    {
+      "name": "320 preview warning",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "320 three cards",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "320 actual source read",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "320 source period per card",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "320 no nonstatic requests",
+      "passed": true,
+      "detail": [
+        "http://127.0.0.1:37199/dashboard-preview.html"
+      ]
+    },
+    {
+      "name": "320 geometry detects planted defect",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "320 geometry restored",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "320 Nepali state",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "320 honest English fallback",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "320 Nepali axe",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "320 skip link first",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "320 skip main",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "320 keyboard no covering overlays",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "320 page errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "390 preview warning",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "390 three cards",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "390 actual source read",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "390 source period per card",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "390 no nonstatic requests",
+      "passed": true,
+      "detail": [
+        "http://127.0.0.1:37199/dashboard-preview.html"
+      ]
+    },
+    {
+      "name": "390 geometry detects planted defect",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "390 geometry restored",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "390 Nepali state",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "390 honest English fallback",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "390 Nepali axe",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "390 skip link first",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "390 skip main",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "390 keyboard no covering overlays",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "390 page errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "1280 preview warning",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "1280 three cards",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "1280 actual source read",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "1280 source period per card",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "1280 no nonstatic requests",
+      "passed": true,
+      "detail": [
+        "http://127.0.0.1:37199/dashboard-preview.html"
+      ]
+    },
+    {
+      "name": "1280 geometry detects planted defect",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "1280 geometry restored",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "1280 Nepali state",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "1280 honest English fallback",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "1280 Nepali axe",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "1280 skip link first",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "1280 skip main",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "1280 keyboard no covering overlays",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "1280 page errors",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "listener cleanup",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "passed": 43,
+  "failed": 0,
+  "preview_sha256": "e7bb356dca2a03f4221047dbd98e0c1dbd710dd46a58f1d8a66b30866c25bc42",
+  "cleanup": true
+}

@@ -1,0 +1,1 @@
+HUB READ-SCOPING GUARD: PASS (every register read is kind-scoped)

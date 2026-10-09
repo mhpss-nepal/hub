@@ -1,0 +1,70 @@
+[
+  {
+    "command": [
+      "/usr/local/lib/hermes-agent/venv/bin/python",
+      "/root/mhpss-nepal-final-forms/2026-10-06/35-noon-stabilisation/dashboard/03-contract.py"
+    ],
+    "exit_code": 0,
+    "output": "{\n  \"passed\": 9,\n  \"failed\": 0,\n  \"controls\": 46,\n  \"runtime_scripts\": 8,\n  \"ids\": 93,\n  \"base\": \"1775af56d9be12e2f76d8d9a4e45631f6933cd58\",\n  \"source_sha256\": \"1612abab0689283046ada075594afbf36b5e29d6e04991bd977ccb00171c2fe3\",\n  \"controls_inventory\": [\n    [\n      \"button\",\n      \"button\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"button\",\n      \"button\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"button\",\n      \"button\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"button\",\n      \"button\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"button\",\n      \"button\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"button\",\n      \"button\",\n      \"useLive\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"input\",\n      \"file\",\n      \"file\",\n      \"\",\n      \"\",\n      \"\",\n      \".json,.csv\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"button\",\n      \"button\",\n      \"useLocal\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"button\",\n      \"button\",\n      \"useDemo\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"button\",\n      \"button\",\n      \"emptyOff\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"button\",\n      \"button\",\n      \"expAll\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"button\",\n      \"button\",\n      \"fClear\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"select\",\n      \"\",\n      \"fProv\",\n      \"\",\n      \"province\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"select\",\n      \"\",\n      \"fDist\",\n      \"\",\n      \"district\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"select\",\n      \"\",\n      \"fPal\",\n      \"\",\n      \"palika\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"select\",\n      \"\",\n      \"fOrg\",\n      \"\",\n      \"org\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"select\",\n      \"\",\n      \"fPeriod\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"select\",\n      \"\",\n      \"fBasis\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"input\",\n      \"date\",\n      \"fFrom\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"input\",\n      \"date\",\n      \"fTo\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"select\",\n      \"\",\n      \"fDon\",\n      \"\",\n      \"donor\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"select\",\n      \"\",\n      \"fGrp\",\n      \"\",\n      \"group\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"select\",\n      \"\",\n      \"fAct\",\n      \"\",\n      \"activity\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"select\",\n      \"\",\n      \"fMod\",\n      \"\",\n      \"modality\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"select\",\n      \"\",\n      \"fSta\",\n      \"\",\n      \"status\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"select\",\n      \"\",\n      \"\",\n      \"\",\n      \"org\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"select\",\n      \"\",\n      \"\",\n      \"\",\n      \"activity\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"select\",\n      \"\",\n      \"\",\n      \"\",\n      \"status\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"select\",\n      \"\",\n      \"\",\n      \"\",\n      \"district\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"select\",\n      \"\",\n      \"\",\n      \"\",\n      \"palika\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"button\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"ov\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"button\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"raw\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"button\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"who\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"button\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"act\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"button\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"pub\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"button\",\n      \"button\",\n      \"expGap\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"button\",\n      \"button\",\n      \"expMx\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"input\",\n      \"search\",\n      \"rawFind\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"input\",\n      \"file\",\n      \"file2\",\n      \"\",\n      \"\",\n      \"\",\n      \".json,.csv\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"button\",\n      \"button\",\n      \"reload\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"textarea\",\n      \"\",\n      \"pubBasis\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"input\",\n      \"checkbox\",\n      \"pubFlood\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      null,\n      \"\",\n      \"\"\n    ],\n    [\n      \"input\",\n      \"checkbox\",\n      \"pubDir\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      null,\n      \"\",\n      \"\"\n    ],\n    [\n      \"input\",\n      \"checkbox\",\n      \"pubFull\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      null,\n      \"\",\n      \"\"\n    ],\n    [\n      \"button\",\n      \"button\",\n      \"pubPreview\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\"\n    ],\n    [\n      \"button\",\n      \"button\",\n      \"pubGo\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      \"\",\n      null,\n      \"\"\n    ]\n  ],\n  \"asset_hashes\": {\n    \"assets/codes.js\": \"846aec4e5f980d9a97e8a9ddddc3cd348700ecd10f03887d07f5adf24760d90c\",\n    \"assets/store.js\": \"ffeee988efc0d961777aaee6df3a2ee2153a457dad78e3d7890c94dc3e9f3e7f\",\n    \"assets/fb-config.js\": \"7756103cabd291ee4322a4c9fe63f6bfb4239cebabeba1eb702a5b0321051034\",\n    \"assets/fb.js\": \"159f606f26a3811ec380b42a52995b67339a34980695602cfed22f01b5121dec\",\n    \"assets/mark.js\": \"841956be39c55f95099a3b1e2727ac067541beaf2eab9717a654048dad1b52da\",\n    \"assets/icons.js\": \"d53f0ff421da3fcd003253674970d9288ee51c806df17ea5ef3e1d34148585b7\",\n    \"assets/i18n-strings.js\": \"feb9241604dafc18a5ad5d9fdd3b089188b9840579e3e9cd5bcceac3cb7d0cc1\",\n    \"assets/i18n.js\": \"7fde722dded90401f0d7f74c5568811d367c00077fa507e9609070953ddff93b\",\n    \"assets/app.css\": \"474e45bce8fb969093f4ae46bcb9c2f7044032f1e78923cc30090a3c2deebae5\",\n    \"assets/design.css\": \"6b317fc300c8c395fc429ac9ecebe3c4e3624997d4a14a487767350e652b2a7e\",\n    \"assets/hub-shell.css\": \"6e19b855baaa23c2705500cf1829adb39bc2de6a24cbd282e17dff29dc551f31\",\n    \"assets/form.css\": \"d15c5a17e97b1228adb5870238c8a177676db1d7f19a7941750378099663c4ab\"\n  }\n}\n"
+  },
+  {
+    "command": [
+      "python3",
+      "tools/fx-token-parity-check.py"
+    ],
+    "exit_code": 0,
+    "output": "The dashboard follows the field forms -- token parity\n  source  assets/form.css        (body.fx)\n  adopter assets/hub-shell.css   (body.hub)\n\n  --fx-bg          -> --bg         #eef3f6                                          ok\n  --fx-blue-d      -> --fx-blue-d  #006996                                          ok\n  --fx-blue-dd     -> --fx-blue-dd #004969                                          ok\n  --fx-line        -> --line       #d5dde3                                          ok\n  --fx-line-s      -> --line-s     #e8eef2                                          ok\n  --fx-r           -> --r          14px                                             ok\n  --fx-r           -> --r-md       14px                                             ok\n  --fx-rs          -> --fx-rs      12px                                             ok\n  --fx-shadow      -> --fx-shadow  0 1px 2px rgba(18,38,52,.06), 0 10px 28px -...   ok\n\nFX TOKEN PARITY: PASS (9 adopted declarations match)\n"
+  },
+  {
+    "command": [
+      "python3",
+      "tools/hub-live-read-scoping-check.py"
+    ],
+    "exit_code": 0,
+    "output": "HUB READ-SCOPING GUARD: PASS (every register read is kind-scoped)\n"
+  },
+  {
+    "command": [
+      "python3",
+      "tools/hub-live-read-scoping-check.py",
+      "--break"
+    ],
+    "exit_code": 0,
+    "output": "HUB READ-SCOPING GUARD: FAIL\n  - index.html: an UNFILTERED register listen (.watch() with no kind) is present\n  - index.html: no kind-scoped register listen (watchKind) found\n  - index.html: Q_KINDS declares ['activity'] but no watchKind asks for them -- a declared kind is never read\n  - forms.html: an UNFILTERED register listen (.watch() with no kind) is present\n  - forms.html: no kind-scoped register listen (watchKind) found\n  - forms.html: LIVE_KINDS declares ['phq9', 'referral', 'self_report', 'service_contact'] but no watchKind asks for them -- a declared kind is never read\n  - field-output-home.html: an UNFILTERED register listen (.watch() with no kind) is present\nSELF-TEST OK: the guard went red exactly as it must.\n"
+  },
+  {
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "test_store_data_path_contract",
+      "-v"
+    ],
+    "exit_code": 0,
+    "output": "test_focal_point_is_stripped_from_network_but_kept_in_export (test_store_data_path_contract.StoreDataPathContractTests.test_focal_point_is_stripped_from_network_but_kept_in_export) ... ok\ntest_header_describes_the_register_bridge_not_a_local_only_store (test_store_data_path_contract.StoreDataPathContractTests.test_header_describes_the_register_bridge_not_a_local_only_store) ... ok\ntest_save_writes_the_device_copy_before_syncing (test_store_data_path_contract.StoreDataPathContractTests.test_save_writes_the_device_copy_before_syncing) ... ok\n\n----------------------------------------------------------------------\nRan 3 tests in 0.003s\n\nOK\n"
+  },
+  {
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-p",
+      "test_hub_read_scoping.py",
+      "-v"
+    ],
+    "exit_code": 0,
+    "output": "test_guard_bites_when_the_defect_is_reintroduced (test_hub_read_scoping.HubReadScoping.test_guard_bites_when_the_defect_is_reintroduced) ... ok\ntest_guard_passes_on_the_current_tree (test_hub_read_scoping.HubReadScoping.test_guard_passes_on_the_current_tree) ... ok\n\n----------------------------------------------------------------------\nRan 2 tests in 0.393s\n\nOK\n"
+  },
+  {
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "output": ""
+  }
+]

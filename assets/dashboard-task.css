@@ -1,0 +1,67 @@
+/* Dashboard-only task hierarchy. Existing Hub/form brand tokens remain authoritative. */
+body.hub.dashboard-simplified .skip-link{position:fixed;left:8px;top:-100px;z-index:100;background:#fff;color:#004969;padding:12px;border:2px solid #004969;border-radius:12px}
+body.hub.dashboard-simplified .skip-link:focus{top:8px}
+body.hub.dashboard-simplified main{min-width:0}
+body.hub.dashboard-simplified .phead{padding:18px 0;margin-bottom:18px}
+body.hub.dashboard-simplified .phead .lede{font-size:15px;max-width:72ch;text-align:left}
+body.hub.dashboard-simplified .stat .s{font-size:12px;text-align:left}
+body.hub.dashboard-simplified .filter-heading{font-size:16px;margin:0 0 10px;color:var(--who-dd)}
+body.hub.dashboard-simplified .stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+body.hub.dashboard-simplified .stats .stat{min-width:0}
+body.hub.dashboard-simplified .stats .s{overflow-wrap:break-word;white-space:normal}
+body.hub.dashboard-simplified .tabs{align-items:flex-start;margin-top:16px;gap:8px}
+body.hub.dashboard-simplified .tabs .tab{min-height:44px;font-size:14px}
+body.hub.dashboard-simplified .tabs details{margin-left:auto}
+body.hub.dashboard-simplified .advanced-actions{display:flex;flex-wrap:wrap;gap:6px}
+body.hub.dashboard-simplified summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font-weight:700;color:#004969;line-height:1.4;padding:8px 0;white-space:normal}
+body.hub.dashboard-simplified .secondary-analysis{background:#fff;border-radius:14px;padding:6px 16px;margin:16px 0;box-shadow:var(--fx-shadow)}
+body.hub.dashboard-simplified .secondary-filters{margin-top:8px;border-top:1px solid var(--line)}
+body.hub.dashboard-simplified .rail-advanced{padding:0 13px}
+body.hub.dashboard-simplified .rail-advanced a{display:block;padding:12px 8px;min-height:44px;color:var(--ink);text-decoration:none}
+body.hub.dashboard-simplified .rail-advanced a.on{background:var(--who-t)}
+body.hub.dashboard-simplified .overview-guide{font-size:14px;color:var(--ink);max-width:70ch}
+body.hub.dashboard-simplified .filters .grid{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+body.hub.dashboard-simplified .filters select,
+body.hub.dashboard-simplified .filters input,
+body.hub.dashboard-simplified .ovcolf select{min-height:44px;width:100%;min-width:0;max-width:100%;color:var(--ink)}
+body.hub.dashboard-simplified .filters label{color:#435761;font-size:12px;letter-spacing:0;text-transform:none}
+body.hub.dashboard-simplified .btn,
+body.hub.dashboard-simplified .rgh,
+body.hub.dashboard-simplified .rmenu,
+body.hub.dashboard-simplified .i18ntoggle button,
+body.hub.dashboard-simplified .chipf button{min-height:44px;min-width:44px;white-space:normal}
+body.hub.dashboard-simplified a:focus,
+body.hub.dashboard-simplified button:focus,
+body.hub.dashboard-simplified select:focus,
+body.hub.dashboard-simplified input:focus,
+body.hub.dashboard-simplified textarea:focus,
+body.hub.dashboard-simplified summary:focus{outline:3px solid #006996;outline-offset:3px}
+body.hub.dashboard-simplified .tbl-wrap{max-width:100%;overflow:auto;overscroll-behavior-x:contain}
+body.hub.dashboard-simplified .tbl-wrap:focus{outline:3px solid #006996;outline-offset:3px}
+body.hub.dashboard-simplified .rail .lyr,
+body.hub.dashboard-simplified .rail .rgb > a{min-height:44px}
+body.hub.dashboard-simplified #i18nbar button{min-height:44px;min-width:44px}
+body.hub.dashboard-simplified input:not([type="checkbox"]){min-height:44px}
+body.hub.dashboard-simplified .chk{min-height:44px;min-width:44px;display:flex;align-items:center}
+body.hub.dashboard-simplified .mx th.pal .xs{color:#d9eaf3}
+body.hub.dashboard-simplified caption{text-align:left;padding:10px 12px;color:var(--ink);font-weight:700}
+body.hub.dashboard-simplified #rawFind{min-width:0!important;min-height:44px}
+body.hub.dashboard-simplified #toast:not(.show){display:none}
+/* Empty reads must not expose figures or an export retained from the previous source. */
+body.hub.dashboard-simplified #app:has(#emptyReg:not([hidden])) #scope,
+body.hub.dashboard-simplified #app:has(#emptyReg:not([hidden])) #analysisDetails{display:none}
+body.hub.dashboard-simplified .ovcolh{flex-wrap:wrap}
+body.hub.dashboard-simplified .ovcolf{flex-wrap:wrap}
+body.hub.dashboard-simplified .pub .docs{grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
+@media(max-width:620px){
+ body.hub.dashboard-simplified .stats{grid-template-columns:1fr}
+ body.hub.dashboard-simplified .filters .grid{grid-template-columns:1fr}
+ body.hub.dashboard-simplified .scope{align-items:stretch;gap:8px}
+ body.hub.dashboard-simplified .scope #fSum{flex-basis:100%}
+ body.hub.dashboard-simplified .secondary-analysis{padding:4px 12px}
+ body.hub.dashboard-simplified .tabs details{margin-left:0}
+ body.hub.dashboard-simplified .btns{gap:8px}
+ body.hub.dashboard-simplified .ovcolf{flex-basis:100%}
+ body.hub.dashboard-simplified #fChips{display:flex;flex-wrap:wrap;gap:6px;min-width:0;max-width:100%}
+ body.hub.dashboard-simplified .chipf{max-width:100%;white-space:normal}
+}

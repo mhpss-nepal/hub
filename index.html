@@ -17,6 +17,7 @@
      so the rail and the masthead cannot be repainted there without
      repainting Layer 1. Scoped to body.hub throughout. -->
 <link rel="stylesheet" href="assets/hub-shell.css">
+<link rel="stylesheet" href="assets/dashboard-task.css">
 <style>
   .tabs{display:flex; gap:4px; border-bottom:2px solid var(--line); margin:22px 0 16px; flex-wrap:wrap}
   .tab{font:inherit; font-size:13px; font-weight:700; background:none; border:0; border-bottom:3px solid transparent;
@@ -216,7 +217,8 @@
     border-radius:0 3px 3px 0; font-size:13.5px; margin:14px 0 0}
 </style>
 </head>
-<body class="hub">
+<body class="hub dashboard-simplified">
+<a class="skip-link a11y-skip" href="#main">Skip to dashboard</a>
 
 <div class="topline"><div class="in">
   <span class="tl">MHPSS Technical Working Group &middot; Nepal</span>
@@ -242,10 +244,12 @@
       <button class="rgh" type="button"><span class="dot l2"></span>Coordination<em>layer 2</em><i class="chev"></i></button>
       <div class="rgb">
         <a class="on" aria-current="page" data-default href="./#overview">Dashboard &middot; overview</a>
-        <a href="./#who-is-where">Who is where</a>
-        <a href="./#activities">Activities</a>
-        <a href="./#reports">Reports received</a>
-        <a href="./#publish">Publish</a>
+        <a href="./#reports">Reports</a>
+        <details class="rail-advanced"><summary>Advanced</summary>
+          <a href="./#who-is-where">Who is where</a>
+          <a href="./#activities">Activities</a>
+          <a href="./#publish">Publish</a>
+        </details>
       </div>
     </div>
     <div class="rg" data-g="forms">
@@ -335,15 +339,15 @@
 <div class="phead"><div class="in">
   <div class="eyebrow">Layer 2 &middot; coordination dashboard</div>
   <h1>Coordination dashboard</h1>
-  <p class="lede">One screen for the flood response: what has been reported, who is where, what was done, every report received, and what the public website is given. It reads the live register — each figure is recomputed the moment a worker saves a report — or a file you choose, which is read in the page and never uploaded.</p>
+  <p class="lede">Review reports, narrow by place, period or organisation, and export the current selection. Figures follow the source shown below; loaded files and synthetic tests are not confirmation of operational reporting.</p>
 </div></div>
 
-<div class="wrap wide">
+<main class="wrap wide" id="main" tabindex="-1">
 
   <div class="card" id="loader">
     <div class="drop" id="drop">
-      <p style="margin:0 0 4px"><b>Read the live register</b> — every figure on the dashboard updates as reports arrive.</p>
-      <p class="xs" style="margin:0 0 12px">A Firestore listener, not a refresh schedule: the page recomputes on the change itself. <b>Until 30 September 2026 the activity reports open without an account</b>, so the dashboard can be tried without credentials being issued; service contacts, PHQ-9 follow-ups and referrals stay behind an account throughout, because those carry a per-person code.</p>
+      <p style="margin:0 0 4px"><b>Read the live register</b> — access and returned reports determine what can be shown.</p>
+      <p class="xs" style="margin:0 0 12px">Signing in establishes identity, not entitlement. A refused read remains visible. Use only non-identifiable examples for a review; synthetic tests do not populate operational reporting.</p>
       <div class="btns" style="justify-content:center">
         <button type="button" class="btn" id="useLive">Connect to the live register</button>
       </div>
@@ -369,16 +373,40 @@
     <!-- one status line: srcNote for a file, liveStrip for the register -->
 
     <div class="card" id="emptyReg" hidden>
-      <h2 style="margin:0 0 8px;font-size:18px">The register is connected, and holds no activity reports yet</h2>
-      <p style="margin:0 0 10px">This is the live state, not an error, and not a page of zeros dressed up as figures.
-         The listener is attached: the moment a worker saves a report on
-         <a href="../form/5ws-report.html">the activity form</a>, it appears here without a reload.</p>
-      <p class="xs" style="margin:0">Two things put real figures in: reports filed on the form from now on, and the cleaned
-         backlog of 300 records once its four import blockers close. Until then the
-         <b>synthetic demonstration data</b> on the previous screen is what shows the dashboard's shape —
-         and it is labelled synthetic wherever it appears.</p>
+      <h2 style="margin:0 0 8px;font-size:18px">No confirmed reports</h2>
+      <p>No activity reports were returned by this read. This does not prove that a device has saved or sent a report.</p>
+      <p class="xs">Synthetic examples are tests, not operational reports. Change source to inspect a file or a demonstration.</p>
       <div class="btns" style="margin-top:12px"><button type="button" class="btn grey sm" id="emptyOff">Change source</button></div>
     </div>
+
+    <div class="scope" id="scope">
+      <span id="fSum"></span>
+      <span id="fChips"></span>
+      <button type="button" class="btn ghost sm" id="expAll">Export selection as CSV</button>
+      <button type="button" class="btn grey sm" id="fClear">Clear filters</button>
+    </div>
+
+    <section class="filters" id="filters" aria-label="Report filters">
+      <h2 class="filter-heading">Place, period and organisation</h2>
+      <div class="grid">
+        <div><label for="fProv">Province</label><select id="fProv" data-dim="province"></select></div>
+        <div><label for="fDist">District</label><select id="fDist" data-dim="district"></select></div>
+        <div><label for="fPal">Palika</label><select id="fPal" data-dim="palika"></select></div>
+        <div><label for="fOrg">Organisation</label><select id="fOrg" data-dim="org"></select></div>
+        <div class="w2"><label for="fPeriod">Period</label><select id="fPeriod"></select></div>
+        <div class="w2"><label for="fBasis">Period reads</label><select id="fBasis"></select></div>
+        <div><label for="fFrom">From</label><input type="date" id="fFrom"></div>
+        <div><label for="fTo">To</label><input type="date" id="fTo"></div>
+      </div>
+      <details class="secondary-filters"><summary>More filters</summary><div class="grid">
+        <div><label for="fDon">Funding source</label><select id="fDon" data-dim="donor"></select></div>
+        <div><label for="fGrp">Activity layer</label><select id="fGrp" data-dim="group"></select></div>
+        <div><label for="fAct">Activity</label><select id="fAct" data-dim="activity"></select></div>
+        <div><label for="fMod">Service setting</label><select id="fMod" data-dim="modality"></select></div>
+        <div><label for="fSta">Status</label><select id="fSta" data-dim="status"></select></div>
+      </div></details>
+    </section>
+
 
     <div class="stats" id="stats"></div>
 
@@ -388,6 +416,7 @@
          it changes. Everything here is drawn from PUBSRC -- the same objects
          the tables below were drawn from -- so a column can never disagree
          with the section under it. -->
+    <details id="analysisDetails" class="secondary-analysis"><summary>Who, what, for whom, geography and implementation status</summary>
     <div class="ovcols" id="ovcols">
       <div class="ovcol">
         <div class="ovcolh"><h2>Who</h2><span class="ovsp"></span>
@@ -474,29 +503,6 @@
          narrowing becomes a chip that can be dropped on its own, and the
          thirteen controls are one tap away in the panel below. The controls
          themselves are unchanged -- same ids, same data-dim, same engine. -->
-    <div class="scope" id="scope">
-      <span id="fSum"></span>
-      <span id="fChips"></span>
-      <button type="button" class="btn grey sm" id="fClear">Clear filters</button>
-    </div>
-
-    <details class="filters" id="filters">
-      <summary class="fopen"><span class="fopenb">All filters</span><span class="xs">nine dimensions and the period — every figure and table on this page follows them, and each list offers only the values that survive the others</span></summary>
-      <div class="grid">
-        <div><label for="fProv">Province</label><select id="fProv" data-dim="province"></select></div>
-        <div><label for="fDist">District</label><select id="fDist" data-dim="district"></select></div>
-        <div><label for="fPal">Palika</label><select id="fPal" data-dim="palika"></select></div>
-        <div><label for="fOrg">Organisation</label><select id="fOrg" data-dim="org"></select></div>
-        <div><label for="fDon">Funding source</label><select id="fDon" data-dim="donor"></select></div>
-        <div><label for="fGrp">Activity layer</label><select id="fGrp" data-dim="group"></select></div>
-        <div><label for="fAct">Activity</label><select id="fAct" data-dim="activity"></select></div>
-        <div><label for="fMod">Service setting</label><select id="fMod" data-dim="modality"></select></div>
-        <div><label for="fSta">Status</label><select id="fSta" data-dim="status"></select></div>
-        <div class="w2"><label for="fPeriod">Period</label><select id="fPeriod"></select></div>
-        <div class="w2"><label for="fBasis">Period reads</label><select id="fBasis"></select></div>
-        <div><label for="fFrom">From</label><input type="date" id="fFrom"></div>
-        <div><label for="fTo">To</label><input type="date" id="fTo"></div>
-      </div>
     </details>
 
     <!-- The same five sections the rail lists, in the same order. Both
@@ -504,32 +510,39 @@
          can be sent as a link. -->
     <div class="tabs">
       <button class="tab on" data-p="ov">Overview</button>
-      <button class="tab" data-p="who">Who is where</button>
-      <button class="tab" data-p="act">Activities</button>
-      <button class="tab" data-p="raw">Reports received</button>
-      <button class="tab" data-p="pub">Publish</button>
+      <button class="tab" data-p="raw">Reports</button>
+      <details id="advancedSections"><summary>Advanced</summary><div class="advanced-actions">
+        <button class="tab" data-p="who">Who is where</button>
+        <button class="tab" data-p="act">Activities</button>
+        <button class="tab" data-p="pub">Publish</button>
+      </div></details>
     </div>
 
     <!-- OVERVIEW: coverage of the roster, the duplication flag, who was
          reached and the shape over time. One section, because a coordinator
          reads these four things in one pass. -->
     <div class="panel on" id="p-ov">
+      <p class="overview-guide">Use Reports to review entries. Export includes the current place, date and organisation filters; the report search does not change the export.</p>
+      <p class="xs">Activity participations are not a separate measure in this legacy reader. No unique-person total is inferred.</p>
+      <details id="rosterDetails" class="secondary-analysis"><summary>Roster coverage, duplicate flags, historical breakdown and daily reports</summary>
       <h2 class="sechead">Coverage of the roster</h2>
       <p class="secsay">Which holding-centre sites have a report in this period, and which are still at zero.</p>
       <div class="banner warn" id="covLede"></div>
       <div class="btns" style="margin-bottom:12px">
         <button type="button" class="btn ghost sm" id="expGap">Export the gap list as CSV</button>
       </div>
-      <div class="tbl-wrap">
+      <div class="tbl-wrap" tabindex="0" role="region" aria-label="Scrollable report table">
         <table class="data">
-          <thead><tr><th>Site</th><th>District</th><th>Recorded population</th><th>Reports</th><th>Attendances</th><th>Organisations</th><th>Last report</th></tr></thead>
+          <caption>Roster coverage</caption>
+          <thead><tr><th scope="col">Site</th><th scope="col">District</th><th scope="col">Recorded population</th><th scope="col">Reports</th><th scope="col">Attendances</th><th scope="col">Organisations</th><th scope="col">Last report</th></tr></thead>
           <tbody id="covBody"></tbody>
         </table>
       </div>
       <h2>Reported, but not on the roster</h2>
-      <div class="tbl-wrap">
+      <div class="tbl-wrap" tabindex="0" role="region" aria-label="Scrollable report table">
         <table class="data">
-          <thead><tr><th>Site as reported</th><th>District</th><th>Reports</th><th>Attendances</th></tr></thead>
+          <caption>Reported sites outside the roster</caption>
+          <thead><tr><th scope="col">Site as reported</th><th scope="col">District</th><th scope="col">Reports</th><th scope="col">Attendances</th></tr></thead>
           <tbody id="offBody"></tbody>
         </table>
       </div>
@@ -540,9 +553,10 @@
 
       <h2>More than one organisation at one site on one day</h2>
       <div class="banner" id="dupLede"></div>
-      <div class="tbl-wrap">
+      <div class="tbl-wrap" tabindex="0" role="region" aria-label="Scrollable report table">
         <table class="data">
-          <thead><tr><th>Date</th><th>Site</th><th>Organisations reporting</th><th>Activities</th><th>Attendances</th><th>Reading</th></tr></thead>
+          <caption>Potential duplicate site-days</caption>
+          <thead><tr><th scope="col">Date</th><th scope="col">Site</th><th scope="col">Organisations reporting</th><th scope="col">Activities</th><th scope="col">Attendances</th><th scope="col">Reading</th></tr></thead>
           <tbody id="dupBody"></tbody>
         </table>
       </div>
@@ -552,9 +566,10 @@
       </details>
 
       <h2>Who was reached</h2>
-      <div class="tbl-wrap">
+      <div class="tbl-wrap" tabindex="0" role="region" aria-label="Scrollable report table">
         <table class="data">
-          <thead><tr><th>Age band</th><th>Female</th><th>Male</th><th>Not recorded</th><th>Total</th></tr></thead>
+          <caption>Reported age and sex breakdown</caption>
+          <thead><tr><th scope="col">Age band</th><th scope="col">Female</th><th scope="col">Male</th><th scope="col">Not recorded</th><th scope="col">Total</th></tr></thead>
           <tbody id="disBody"></tbody>
         </table>
       </div>
@@ -563,6 +578,7 @@
       <h2>Reports per day</h2>
       <p class="secsay">Follows the period and the date basis chosen above.</p>
       <div id="dayWrap"></div>
+      </details>
     </div>
 
     <!-- WHO IS WHERE: the 5Ws proper -->
@@ -573,8 +589,9 @@
       <div class="btns" style="margin-bottom:12px">
         <button type="button" class="btn ghost sm" id="expMx">Export the matrix as CSV</button>
       </div>
-      <div class="tbl-wrap">
+      <div class="tbl-wrap" tabindex="0" role="region" aria-label="Scrollable report table">
         <table class="data mx" id="pxTable">
+          <caption>Organisation by palika</caption>
           <thead id="pxHead"></thead>
           <tbody id="pxBody"></tbody>
         </table>
@@ -584,9 +601,10 @@
         <p>A cell lists the activity codes an organisation has reported in that palika, with the number of reports per code and the attendances underneath. A site's palika comes from the site list; a palika-level report carries its own. Reports whose palika is not established sit in the last column rather than being dropped.</p>
       </details>
       <h2>By organisation</h2>
-      <div class="tbl-wrap">
+      <div class="tbl-wrap" tabindex="0" role="region" aria-label="Scrollable report table">
         <table class="data">
-          <thead><tr><th>Organisation</th><th>District</th><th>Sites</th><th>Activities</th><th>Reports</th><th>Attendances</th><th>First</th><th>Last</th></tr></thead>
+          <caption>Reports by organisation</caption>
+          <thead><tr><th scope="col">Organisation</th><th scope="col">District</th><th scope="col">Sites</th><th scope="col">Activities</th><th scope="col">Reports</th><th scope="col">Attendances</th><th scope="col">First</th><th scope="col">Last</th></tr></thead>
           <tbody id="mxBody"></tbody>
         </table>
       </div>
@@ -596,9 +614,10 @@
     <div class="panel" id="p-act">
       <h2 class="sechead">What was done</h2>
       <p class="secsay">The same code read twice: the plain label the form showed the worker, and the IASC reading the backend reports.</p>
-      <div class="tbl-wrap">
+      <div class="tbl-wrap" tabindex="0" role="region" aria-label="Scrollable report table">
         <table class="data">
-          <thead><tr><th>Activity — as the form shows it</th><th>IASC layer</th><th>Backend reading — IASC 4Ws (2012)</th><th>Reports</th><th>Attendances</th><th>Share</th><th>Organisations</th></tr></thead>
+          <caption>Reports by activity</caption>
+          <thead><tr><th scope="col">Activity — as the form shows it</th><th scope="col">IASC layer</th><th scope="col">Backend reading — IASC 4Ws (2012)</th><th scope="col">Reports</th><th scope="col">Attendances</th><th scope="col">Share</th><th scope="col">Organisations</th></tr></thead>
           <tbody id="actBody"></tbody>
         </table>
       </div>
@@ -613,17 +632,17 @@
          any word (organisation, site, activity, date, id). -->
     <div class="panel" id="p-raw">
       <h2 class="sechead">Reports received</h2>
-      <p class="secsay">The home of the activity report (5Ws): every entry made on that form, newest first. A report appears here the moment the phone has signal; the same report saved twice on one phone stays one row.</p>
+      <p class="secsay">Reports from the selected source, newest received first. The source label distinguishes register reads, imported files and synthetic examples; this list is not proof of zero-loss delivery.</p>
       <div class="btns" style="margin-bottom:12px;align-items:center;flex-wrap:wrap">
-        <input type="search" id="rawFind" placeholder="Find — organisation, site, activity, date, id" style="flex:1 1 260px;min-width:200px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;font:inherit;font-size:13px">
+        <input aria-label="Find reports" type="search" id="rawFind" placeholder="Find — organisation, site, activity, date, id" style="flex:1 1 260px;min-width:200px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;font:inherit;font-size:13px">
         <span class="xs" id="rawCount"></span>
-        <button type="button" class="btn ghost sm" id="expAll">Export everything loaded as CSV</button>
         <label class="btn ghost sm" style="cursor:pointer">Import a file<input type="file" id="file2" accept=".json,.csv" hidden></label>
         <button type="button" class="btn grey sm" id="reload">Change source</button>
       </div>
-      <div class="tbl-wrap">
+      <div class="tbl-wrap" tabindex="0" role="region" aria-label="Scrollable report table">
         <table class="data">
-          <thead><tr><th>Received</th><th>Date of activity</th><th>Site</th><th>Organisation</th><th>Activity</th><th class="n">Attendance</th><th>Target groups</th><th>ID</th></tr></thead>
+          <caption>Reports received</caption>
+          <thead><tr><th scope="col">Received</th><th scope="col">Date of activity</th><th scope="col">Site</th><th scope="col">Organisation</th><th scope="col">Activity</th><th scope="col" class="n">Attendance</th><th scope="col">Target groups</th><th scope="col">ID</th></tr></thead>
           <tbody id="rawBody"></tbody>
         </table>
       </div>
@@ -667,7 +686,7 @@
   </div>
 
   <p class="xs" style="margin-top:26px">Draft instrument. Coverage denominators come from the holding-centre roster of the daily reporting workbook. Figures shown are only as good as the source loaded; nothing here is validated against any other source.</p>
-</div>
+</main>
 
 <div id="toast"></div>
 
@@ -1661,11 +1680,9 @@
     }
 
     $("stats").innerHTML = [
-      stat(DATA.length, "Reports loaded", "one report per session — activity, place, day"),
-      stat(reach.toLocaleString(), reachLabel, reachSub),
-      stat(orgs.size, "Organisations reporting", ""),
-      stat(covered.length + " / " + ROSTER.length, "Roster sites reached", "", covered.length === ROSTER.length ? "good" : ""),
-      stat(GAPS.length, "Roster sites with no report", gapPop ? "≈" + gapPop.toLocaleString() + " people recorded there" : "", GAPS.length ? "alert" : "good")
+      stat(DATA.length, "Reports / sessions", "reports · source period " + (PERIOD || "dates not supplied") + " · " + pubFilters()),
+      stat(reach.toLocaleString(), reachLabel, reachSub + " · source period " + (PERIOD || "dates not supplied") + " · " + pubFilters()),
+      stat(orgs.size, "Reporting organisations", "organisations · source period " + (PERIOD || "dates not supplied") + " · " + pubFilters())
     ].join("");
 
     /* --- coverage --- */
@@ -1947,7 +1964,7 @@
         " attendances are in every other figure on this screen; only the day is unplaced.</p>"
       : "";
     $("dayWrap").innerHTML = (days.length
-      ? '<div class="tbl-wrap"><table class="data"><thead><tr><th>' +
+      ? '<div class="tbl-wrap" tabindex="0" role="region" aria-label="Scrollable report table"><table class="data"><thead><tr><th>' +
         (FILT.basis === "received" ? "Date received" : "Date of activity") + '</th>' +
         '<th class="n">Reports</th><th class="n">Attendances</th><th class="n">Organisations</th><th>Share of the attendances placed on a day</th></tr></thead><tbody>' +
         days.map(function (d) {

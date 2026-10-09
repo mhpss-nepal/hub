@@ -1,0 +1,93 @@
+{
+  "base": "1775af56d9be12e2f76d8d9a4e45631f6933cd58",
+  "blocks": {
+    "csv_parser": {
+      "base_sha256": "3422cd40bd94af3b98db7d8d16d047f979a3bd56013dfc1a25e380f0da2a1ed2",
+      "candidate_sha256": "3422cd40bd94af3b98db7d8d16d047f979a3bd56013dfc1a25e380f0da2a1ed2",
+      "byte_identical": true
+    },
+    "source_load": {
+      "base_sha256": "6c313cd12977885851b6b451d3f040d1d5ccf01b0671f90d887784d5149a80ab",
+      "candidate_sha256": "6c313cd12977885851b6b451d3f040d1d5ccf01b0671f90d887784d5149a80ab",
+      "byte_identical": true
+    },
+    "filters": {
+      "base_sha256": "fc28cd39a1619669478ba0e648ea40f04728e3285a43dd86ab156cf3c37c5e55",
+      "candidate_sha256": "fc28cd39a1619669478ba0e648ea40f04728e3285a43dd86ab156cf3c37c5e55",
+      "byte_identical": true
+    },
+    "live_auth_source_handlers": {
+      "base_sha256": "df52f11a3b3b5fbd2887c9fb078ed7c6ebc53a4d675566b28e186df45b1caf02",
+      "candidate_sha256": "df52f11a3b3b5fbd2887c9fb078ed7c6ebc53a4d675566b28e186df45b1caf02",
+      "byte_identical": true
+    },
+    "raw_report_renderer": {
+      "base_sha256": "a4e2a23a1f6f50a0548dc07899bbc4905403663cea1abbadd66ef00d7b641557",
+      "candidate_sha256": "a4e2a23a1f6f50a0548dc07899bbc4905403663cea1abbadd66ef00d7b641557",
+      "byte_identical": true
+    },
+    "gap_export": {
+      "base_sha256": "f4f7ccde55a3a07091d5a4c8d38541078c572526bd4688028d6e354346de893d",
+      "candidate_sha256": "f4f7ccde55a3a07091d5a4c8d38541078c572526bd4688028d6e354346de893d",
+      "byte_identical": true
+    },
+    "publication_and_all_matrix_export_handlers": {
+      "base_sha256": "e8123478491ea139b1cf00cbfd8fb50330d62a68ab2e7a4b6126cbdb20305b36",
+      "candidate_sha256": "e8123478491ea139b1cf00cbfd8fb50330d62a68ab2e7a4b6126cbdb20305b36",
+      "byte_identical": true
+    },
+    "assets/store.js": {
+      "base_sha256": "ffeee988efc0d961777aaee6df3a2ee2153a457dad78e3d7890c94dc3e9f3e7f",
+      "candidate_sha256": "ffeee988efc0d961777aaee6df3a2ee2153a457dad78e3d7890c94dc3e9f3e7f",
+      "byte_identical": true
+    },
+    "assets/fb.js": {
+      "base_sha256": "159f606f26a3811ec380b42a52995b67339a34980695602cfed22f01b5121dec",
+      "candidate_sha256": "159f606f26a3811ec380b42a52995b67339a34980695602cfed22f01b5121dec",
+      "byte_identical": true
+    },
+    "assets/fb-config.js": {
+      "base_sha256": "7756103cabd291ee4322a4c9fe63f6bfb4239cebabeba1eb702a5b0321051034",
+      "candidate_sha256": "7756103cabd291ee4322a4c9fe63f6bfb4239cebabeba1eb702a5b0321051034",
+      "byte_identical": true
+    },
+    "assets/codes.js": {
+      "base_sha256": "846aec4e5f980d9a97e8a9ddddc3cd348700ecd10f03887d07f5adf24760d90c",
+      "candidate_sha256": "846aec4e5f980d9a97e8a9ddddc3cd348700ecd10f03887d07f5adf24760d90c",
+      "byte_identical": true
+    },
+    "assets/i18n.js": {
+      "base_sha256": "7fde722dded90401f0d7f74c5568811d367c00077fa507e9609070953ddff93b",
+      "candidate_sha256": "7fde722dded90401f0d7f74c5568811d367c00077fa507e9609070953ddff93b",
+      "byte_identical": true
+    },
+    "assets/i18n-strings.js": {
+      "base_sha256": "feb9241604dafc18a5ad5d9fdd3b089188b9840579e3e9cd5bcceac3cb7d0cc1",
+      "candidate_sha256": "feb9241604dafc18a5ad5d9fdd3b089188b9840579e3e9cd5bcceac3cb7d0cc1",
+      "byte_identical": true
+    },
+    "assets/app.css": {
+      "base_sha256": "474e45bce8fb969093f4ae46bcb9c2f7044032f1e78923cc30090a3c2deebae5",
+      "candidate_sha256": "474e45bce8fb969093f4ae46bcb9c2f7044032f1e78923cc30090a3c2deebae5",
+      "byte_identical": true
+    },
+    "assets/design.css": {
+      "base_sha256": "6b317fc300c8c395fc429ac9ecebe3c4e3624997d4a14a487767350e652b2a7e",
+      "candidate_sha256": "6b317fc300c8c395fc429ac9ecebe3c4e3624997d4a14a487767350e652b2a7e",
+      "byte_identical": true
+    },
+    "assets/hub-shell.css": {
+      "base_sha256": "6e19b855baaa23c2705500cf1829adb39bc2de6a24cbd282e17dff29dc551f31",
+      "candidate_sha256": "6e19b855baaa23c2705500cf1829adb39bc2de6a24cbd282e17dff29dc551f31",
+      "byte_identical": true
+    },
+    "assets/form.css": {
+      "base_sha256": "d15c5a17e97b1228adb5870238c8a177676db1d7f19a7941750378099663c4ab",
+      "candidate_sha256": "d15c5a17e97b1228adb5870238c8a177676db1d7f19a7941750378099663c4ab",
+      "byte_identical": true
+    }
+  },
+  "source_index_sha256": "e7d20cf9045044814d09d984ad2163b19139c2d59a01969c82ea12a078ff68c4",
+  "candidate_css_sha256": "7b715f8a03c5062b6b15518b4e881821a55ee78ce3c81685d25256c72cc346ff",
+  "note": "Exact handlers/export/publishing preserved. Headline markup and scrollable day-table attributes are the only inline-script presentation differences allowed by source contract."
+}

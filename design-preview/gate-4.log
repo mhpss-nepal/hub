@@ -1,0 +1,8 @@
+test_focal_point_is_stripped_from_network_but_kept_in_export (test_store_data_path_contract.StoreDataPathContractTests.test_focal_point_is_stripped_from_network_but_kept_in_export) ... ok
+test_header_describes_the_register_bridge_not_a_local_only_store (test_store_data_path_contract.StoreDataPathContractTests.test_header_describes_the_register_bridge_not_a_local_only_store) ... ok
+test_save_writes_the_device_copy_before_syncing (test_store_data_path_contract.StoreDataPathContractTests.test_save_writes_the_device_copy_before_syncing) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.003s
+
+OK

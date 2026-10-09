@@ -1,0 +1,8 @@
+{
+  "source": "index.html",
+  "source_sha256": "e7d20cf9045044814d09d984ad2163b19139c2d59a01969c82ea12a078ff68c4",
+  "preview_sha256": "e7bb356dca2a03f4221047dbd98e0c1dbd710dd46a58f1d8a66b30866c25bc42",
+  "changes": "CSS/JS embedded; fb-config omitted; FB replaced with refusing stub; CSP blocks all connections; visible preview warning",
+  "executor": "Thar Lay/server",
+  "network": "connect-src none"
+}

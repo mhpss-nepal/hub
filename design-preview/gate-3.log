@@ -1,0 +1,9 @@
+HUB READ-SCOPING GUARD: FAIL
+  - index.html: an UNFILTERED register listen (.watch() with no kind) is present
+  - index.html: no kind-scoped register listen (watchKind) found
+  - index.html: Q_KINDS declares ['activity'] but no watchKind asks for them -- a declared kind is never read
+  - forms.html: an UNFILTERED register listen (.watch() with no kind) is present
+  - forms.html: no kind-scoped register listen (watchKind) found
+  - forms.html: LIVE_KINDS declares ['phq9', 'referral', 'self_report', 'service_contact'] but no watchKind asks for them -- a declared kind is never read
+  - field-output-home.html: an UNFILTERED register listen (.watch() with no kind) is present
+SELF-TEST OK: the guard went red exactly as it must.

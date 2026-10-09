@@ -1,0 +1,15 @@
+The dashboard follows the field forms -- token parity
+  source  assets/form.css        (body.fx)
+  adopter assets/hub-shell.css   (body.hub)
+
+  --fx-bg          -> --bg         #eef3f6                                          ok
+  --fx-blue-d      -> --fx-blue-d  #006996                                          ok
+  --fx-blue-dd     -> --fx-blue-dd #004969                                          ok
+  --fx-line        -> --line       #d5dde3                                          ok
+  --fx-line-s      -> --line-s     #e8eef2                                          ok
+  --fx-r           -> --r          14px                                             ok
+  --fx-r           -> --r-md       14px                                             ok
+  --fx-rs          -> --fx-rs      12px                                             ok
+  --fx-shadow      -> --fx-shadow  0 1px 2px rgba(18,38,52,.06), 0 10px 28px -...   ok
+
+FX TOKEN PARITY: PASS (9 adopted declarations match)

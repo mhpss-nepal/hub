@@ -1,0 +1,247 @@
+[
+  {
+    "id": "expAll",
+    "tag": "BUTTON",
+    "text": "Export selection as CSV",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "fProv",
+    "tag": "SELECT",
+    "text": "All (1)Bagmati (63)",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "fDist",
+    "tag": "SELECT",
+    "text": "All (2)Nuwakot (54)Rasuwa (9)",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "fPal",
+    "tag": "SELECT",
+    "text": "All (5)Belkotgadhi Municipality (6)Bidur",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "fOrg",
+    "tag": "SELECT",
+    "text": "All (5)CMC-Nepal (16)CWIN Nepal (9)KOSHI",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "fPeriod",
+    "tag": "SELECT",
+    "text": "All datesTodayYesterdayThis week (Sun\u2013Sa",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "fBasis",
+    "tag": "SELECT",
+    "text": "Date of activityDate received",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "fFrom",
+    "tag": "INPUT",
+    "text": "",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "fFrom",
+    "tag": "INPUT",
+    "text": "",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "fFrom",
+    "tag": "INPUT",
+    "text": "",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "fFrom",
+    "tag": "INPUT",
+    "text": "",
+    "outline": "none",
+    "overlaps": []
+  },
+  {
+    "id": "fTo",
+    "tag": "INPUT",
+    "text": "",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "fTo",
+    "tag": "INPUT",
+    "text": "",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "fTo",
+    "tag": "INPUT",
+    "text": "",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "fTo",
+    "tag": "INPUT",
+    "text": "",
+    "outline": "none",
+    "overlaps": []
+  },
+  {
+    "id": "",
+    "tag": "SUMMARY",
+    "text": "More filters",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "",
+    "tag": "SUMMARY",
+    "text": "Who, what, for whom, geography and imple",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "",
+    "tag": "BUTTON",
+    "text": "Overview",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "",
+    "tag": "BUTTON",
+    "text": "Reports",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "",
+    "tag": "SUMMARY",
+    "text": "Advanced",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "",
+    "tag": "SUMMARY",
+    "text": "Roster coverage, duplicate flags, histor",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "",
+    "tag": "BODY",
+    "text": "Skip to dashboard\n\n\nPREVIEW ONLY \u2014 SYNTH",
+    "outline": "none",
+    "overlaps": []
+  },
+  {
+    "id": "",
+    "tag": "A",
+    "text": "Skip to dashboard",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "",
+    "tag": "A",
+    "text": "\n    \n    MHPSS NepalLayer 2 \u00b7 coordinat",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "",
+    "tag": "A",
+    "text": "1Field formson phones, works offline",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "",
+    "tag": "A",
+    "text": "2Coordinationthis hub \u00b7 restricted",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "",
+    "tag": "A",
+    "text": "3Public sitepublished summaries only",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "",
+    "tag": "BUTTON",
+    "text": "Coordinationlayer 2",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "",
+    "tag": "A",
+    "text": "Dashboard \u00b7 overview",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "",
+    "tag": "A",
+    "text": "Reports",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "",
+    "tag": "SUMMARY",
+    "text": "Advanced",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "",
+    "tag": "BUTTON",
+    "text": "Field formsoutputs",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "",
+    "tag": "BUTTON",
+    "text": "Public sitelayer 3",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "",
+    "tag": "BUTTON",
+    "text": "ENG",
+    "outline": "solid",
+    "overlaps": []
+  },
+  {
+    "id": "",
+    "tag": "BUTTON",
+    "text": "NEP",
+    "outline": "solid",
+    "overlaps": []
+  }
+]
