@@ -1,0 +1,32 @@
+"""Exact-baseline presentation contract; no third party dependency."""
+import unittest,re,json,hashlib,subprocess
+from pathlib import Path
+from html.parser import HTMLParser
+ROOT=Path(__file__).resolve().parents[1]
+BASE='180a64e8ccb077e26d0905adffa320e107ffb45f'
+class Parser(HTMLParser):
+ def __init__(self):super().__init__();self.controls=[];self.ids=[];self.assets=[]
+ def handle_starttag(self,t,attrs):
+  a=dict(attrs)
+  if a.get('id'):self.ids.append(a['id'])
+  if t in ['input','select','textarea','button']:self.controls.append((t,)+tuple(a.get(k,'') for k in ['type','id','name','form','data-dim','data-p','required']))
+  if t in ['script','link'] and (a.get('src') or a.get('href')):self.assets.append(a.get('src',a.get('href')))
+def parse(s):p=Parser();p.feed(s);return p
+class Contract(unittest.TestCase):
+ def setUp(self):
+  self.old=subprocess.check_output(['git','show',BASE+':index.html'],cwd=ROOT).decode();self.new=(ROOT/'index.html').read_text()
+ def test_controls_and_assets_exact(self):
+  a,b=parse(self.old),parse(self.new)
+  self.assertCountEqual(a.controls,b.controls);self.assertEqual(a.assets,b.assets)
+  self.assertEqual(len(b.ids),len(set(b.ids)))
+ def test_scripts_byte_exact(self):self.assertEqual(re.findall(r'<script>(.*?)</script>',self.old,re.S),re.findall(r'<script>(.*?)</script>',self.new,re.S))
+ def test_all_existing_runtime_assets_exact(self):
+  inv=json.loads((ROOT/'design-preview/PRESERVATION-INVENTORY.json').read_text())
+  for f,d in inv['assets'].items():self.assertEqual(hashlib.sha256((ROOT/f).read_bytes()).hexdigest(),d['sha256'],f)
+ def test_selected_reference_structure(self):
+  self.assertIn('dashboard-selected',self.new)
+  self.assertIn('id="dashboard-main"',self.new)
+  self.assertIn('id="analysis-primary"',self.new)
+  self.assertIn('aria-label="Find reports"',self.new)
+ def test_control_loss_is_detectable(self):self.assertNotEqual(parse(self.new).controls,parse(self.new.replace('id="fOrg"','id="lostOrg"')).controls)
+if __name__=='__main__':unittest.main(verbosity=2)

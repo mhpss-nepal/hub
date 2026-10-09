@@ -214,9 +214,76 @@
   .ovpct div:last-child{border-right:0}
   .ovso{border-left:3px solid var(--who-d); background:var(--who-t); padding:10px 13px;
     border-radius:0 3px 3px 0; font-size:13.5px; margin:14px 0 0}
+
+
+/* Owner-selected 27 Sep reference. Dashboard only, no shared token changes.
+   Presentation source of truth: navy masthead, pale canvas, outlined cards.
+   English UI additions are non-clinical; Nepali review remains pending. */
+body.hub.dashboard-selected{--bg:#f3f6f9;background:var(--bg);font-family:Arial,"Noto Sans",sans-serif;line-height:1.5}
+body.dashboard-selected .top{background:#1d3d60;box-shadow:none;position:static;padding:22px 28px}
+body.dashboard-selected .top .brand{font:700 25px/1.2 Arial,sans-serif}
+body.dashboard-selected .top .sub{color:#e0e9f3;font-size:12px}
+body.dashboard-selected .phead{background:#fff;margin:0;padding:16px 0;border-bottom:1px solid #d8e1ec}
+body.dashboard-selected .phead h1{font:700 21px/1.25 Arial,sans-serif;color:#1d3d60}
+body.dashboard-selected .phead .eyebrow{display:none}
+body.dashboard-selected .phead .lede{font-size:14px;max-width:none}
+body.dashboard-selected .intro-details{margin-top:8px}
+body.dashboard-selected .wrap.wide{max-width:1600px;padding:22px 24px 60px}
+body.dashboard-selected .stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:18px 0}
+body.dashboard-selected .stat,body.dashboard-selected .ovcol,body.dashboard-selected .ovfig,body.dashboard-selected .filters,body.dashboard-selected .card,body.dashboard-selected .tbl-wrap{border:1px solid #d8e1ec;box-shadow:none;border-radius:12px;background:#fff}
+body.dashboard-selected .stat{border-top:1px solid #d8e1ec;padding:16px}
+body.dashboard-selected .stat .v{font:700 30px/1.15 Arial,sans-serif;color:#1d3d60}
+body.dashboard-selected .stat .k{font-size:12px;color:#455569;letter-spacing:.02em}
+body.dashboard-selected .stat .s{font-size:12px;color:#455569;margin-top:7px}
+body.dashboard-selected .filters{padding:10px 16px}
+body.dashboard-selected .filters .grid{grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+body.dashboard-selected .scope{padding:8px 0;margin:0;font-size:14px}
+body.dashboard-selected .ovcols{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start}
+body.dashboard-selected .ovcol:nth-child(2){order:-1}
+body.dashboard-selected .ovcolh{padding:12px 16px;border-bottom:1px solid #d8e1ec;flex-wrap:wrap}
+body.dashboard-selected .ovcolh h2{font-size:16px;letter-spacing:0;text-transform:none;color:#1d3d60}
+body.dashboard-selected .ovcolb{padding:16px}
+body.dashboard-selected .ovico{display:none}
+body.dashboard-selected .ovnum .n{font-size:24px;color:#1d3d60}
+body.dashboard-selected .ovnum .l{font-size:12px;color:#455569}
+body.dashboard-selected .ovsubh{color:#1d3d60;font-size:12px;letter-spacing:0;text-transform:none}
+body.dashboard-selected .ovbars{gap:12px}
+body.dashboard-selected .ovbl small,body.dashboard-selected .ovlegend,body.dashboard-selected .xs{color:#455569}
+body.dashboard-selected .ovbt{height:10px;background:#edf2f7;border-radius:2px}
+body.dashboard-selected .analysis-detail{border:1px solid #d8e1ec;border-radius:12px;background:#fff;padding:12px 16px;margin:16px 0}
+body.dashboard-selected summary{min-height:44px;cursor:pointer;padding:10px 0;color:#1d3d60;font-weight:700}
+body.dashboard-selected .tab{min-height:44px;padding:10px 14px;color:#455569}
+body.dashboard-selected .tab.on{color:#1d3d60;border-bottom-color:#2674be}
+body.dashboard-selected .btn,body.dashboard-selected select,body.dashboard-selected input:not([type=checkbox]):not([type=file]),body.dashboard-selected .rgh,body.dashboard-selected .rmenu,body.dashboard-selected .rgb a,body.dashboard-selected .lyr,body.dashboard-selected #i18nwrap button{min-height:44px;min-width:44px}
+body.dashboard-selected .ovcolf select{max-width:100%;font-size:12px}
+body.dashboard-selected .ovcolf{flex:1 1 140px}
+body.dashboard-selected .chipf button{width:44px;height:44px}
+body.dashboard-selected .tbl-wrap{max-width:100%;overflow:auto}
+body.dashboard-selected table.data{min-width:650px}
+body.dashboard-selected .tbl-wrap:focus{outline:3px solid #2674be;outline-offset:2px}
+body.dashboard-selected :is(button,a,input,select,summary,textarea):focus-visible{outline:3px solid #2674be;outline-offset:3px}
+body.dashboard-selected #toast:not(.show){display:none}
+body.dashboard-selected .ovso{border-left:0;border:1px solid #d8e1ec;background:#edf4fa;border-radius:8px}
+body.dashboard-selected .skip{position:absolute;left:8px;top:-100px;z-index:999;background:white;padding:12px;color:#1d3d60}
+body.dashboard-selected .skip:focus{top:8px}
+@media(max-width:1100px){body.dashboard-selected .stats{grid-template-columns:repeat(3,minmax(0,1fr))}body.dashboard-selected .ovcols{grid-template-columns:1fr 1fr}body.dashboard-selected .ovcol:last-child{grid-column:1/-1}}
+@media(max-width:650px){body.dashboard-selected .wrap.wide{padding:16px 12px 40px}body.dashboard-selected .stats{grid-template-columns:1fr 1fr}body.dashboard-selected .stat{padding:12px}body.dashboard-selected .stat:last-child{grid-column:1/-1}body.dashboard-selected .ovcols{grid-template-columns:1fr}body.dashboard-selected .top{padding:18px 16px}body.dashboard-selected .top .brand{font-size:22px}body.dashboard-selected .row{grid-template-columns:1fr}body.dashboard-selected .filters .grid{grid-template-columns:1fr}body.dashboard-selected .w2{grid-column:span 1}body.dashboard-selected .btns>*{max-width:100%}body.dashboard-selected .ovcolf{max-width:100%}body.dashboard-selected .ovfigh>*{max-width:100%}}
+
+body.hub.dashboard-selected .primary-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-bottom:16px;align-items:start}
+body.hub.dashboard-selected .ovcols{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+body.hub.dashboard-selected .ovcol:nth-child(2){order:initial}
+body.hub.dashboard-selected #i18nbar button{min-width:44px;min-height:44px;color:#1d3d60}
+body.hub.dashboard-selected #i18nbar button[aria-pressed=true]{background:#dcebf7;color:#1d3d60}
+body.hub.dashboard-selected #dayWrap{overflow:auto;max-width:100%}
+body.hub.dashboard-selected #dayWrap .tbl-wrap{border:0;box-shadow:none;overflow:visible}
+body.hub.dashboard-selected .time-card table.data{min-width:530px;font-size:12px}
+body.hub.dashboard-selected .time-card th{white-space:normal}
+body.hub.dashboard-selected .ovcols .ovcol:last-child{grid-column:auto}
+@media(max-width:650px){body.hub.dashboard-selected .primary-grid,body.hub.dashboard-selected .ovcols{grid-template-columns:minmax(0,1fr)}}
 </style>
 </head>
-<body class="hub">
+<body class="hub dashboard-selected">
+<a class="skip" href="#dashboard-main">Skip to dashboard</a>
 
 <div class="topline"><div class="in">
   <span class="tl">MHPSS Technical Working Group &middot; Nepal</span>
@@ -335,10 +402,10 @@
 <div class="phead"><div class="in">
   <div class="eyebrow">Layer 2 &middot; coordination dashboard</div>
   <h1>Coordination dashboard</h1>
-  <p class="lede">One screen for the flood response: what has been reported, who is where, what was done, every report received, and what the public website is given. It reads the live register — each figure is recomputed the moment a worker saves a report — or a file you choose, which is read in the page and never uploaded.</p>
+  <details class="intro-details"><summary>About this dashboard</summary><p class="lede">One screen for the flood response: what has been reported, who is where, what was done, every report received, and what the public website is given. It reads the live register — each figure is recomputed the moment a worker saves a report — or a file you choose, which is read in the page and never uploaded.</p></details>
 </div></div>
 
-<div class="wrap wide">
+<main class="wrap wide" id="dashboard-main">
 
   <div class="card" id="loader">
     <div class="drop" id="drop">
@@ -380,6 +447,30 @@
       <div class="btns" style="margin-top:12px"><button type="button" class="btn grey sm" id="emptyOff">Change source</button></div>
     </div>
 
+    <div class="scope" id="scope">
+      <span id="fSum"></span>
+      <span id="fChips"></span>
+      <button type="button" class="btn grey sm" id="fClear">Clear filters</button>
+    </div>
+
+    <details class="filters" id="filters">
+      <summary class="fopen"><span class="fopenb">All filters</span><span class="xs">nine dimensions and the period — every figure and table on this page follows them, and each list offers only the values that survive the others</span></summary>
+      <div class="grid">
+        <div><label for="fProv">Province</label><select id="fProv" data-dim="province"></select></div>
+        <div><label for="fDist">District</label><select id="fDist" data-dim="district"></select></div>
+        <div><label for="fPal">Palika</label><select id="fPal" data-dim="palika"></select></div>
+        <div><label for="fOrg">Organisation</label><select id="fOrg" data-dim="org"></select></div>
+        <div><label for="fDon">Funding source</label><select id="fDon" data-dim="donor"></select></div>
+        <div><label for="fGrp">Activity layer</label><select id="fGrp" data-dim="group"></select></div>
+        <div><label for="fAct">Activity</label><select id="fAct" data-dim="activity"></select></div>
+        <div><label for="fMod">Service setting</label><select id="fMod" data-dim="modality"></select></div>
+        <div><label for="fSta">Status</label><select id="fSta" data-dim="status"></select></div>
+        <div class="w2"><label for="fPeriod">Period</label><select id="fPeriod"></select></div>
+        <div class="w2"><label for="fBasis">Period reads</label><select id="fBasis"></select></div>
+        <div><label for="fFrom">From</label><input type="date" id="fFrom"></div>
+        <div><label for="fTo">To</label><input type="date" id="fTo"></div>
+      </div>
+    </details>
     <div class="stats" id="stats"></div>
 
     <!-- The three columns of the 5Ws, in the order a coordinator asks them:
@@ -388,19 +479,7 @@
          it changes. Everything here is drawn from PUBSRC -- the same objects
          the tables below were drawn from -- so a column can never disagree
          with the section under it. -->
-    <div class="ovcols" id="ovcols">
-      <div class="ovcol">
-        <div class="ovcolh"><h2>Who</h2><span class="ovsp"></span>
-          <span class="ovcolf"><select data-dim="org" aria-label="Narrow to one organisation"></select></span></div>
-        <div class="ovcolb">
-          <div class="ovhero">
-            <svg class="ovico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 21V9l6-4 6 4v12M9 21v-5h3v5M18 21V12l3 2v7M3 21h18"/></svg>
-            <div class="ovnum" id="ovWho"></div></div>
-          <p class="ovsubh">Attendances by organisation</p>
-          <div class="ovbars" id="ovWhoBars"></div>
-        </div>
-      </div>
-      <div class="ovcol">
+<div id="analysis-primary" class="primary-grid">      <div class="ovcol">
         <div class="ovcolh"><h2>What</h2><span class="ovsp"></span>
           <span class="ovcolf"><select data-dim="activity" aria-label="Narrow to one activity"></select></span></div>
         <div class="ovcolb">
@@ -415,6 +494,18 @@
           <p class="xs" id="ovModNote"></p>
         </div>
       </div>
+<section class="ovcol time-card"><div class="ovcolh"><h2>When — reports by day</h2></div><div class="ovcolb"><p class="xs">Follows the selected period and date basis. Existing daily attendance table; no weekly conversion.</p><div id="dayWrap" tabindex="0" role="region" aria-label="Reports by day, scroll horizontally if needed"></div></div></section></div>
+<div class="ovcols" id="ovcols">      <div class="ovcol">
+        <div class="ovcolh"><h2>Who</h2><span class="ovsp"></span>
+          <span class="ovcolf"><select data-dim="org" aria-label="Narrow to one organisation"></select></span></div>
+        <div class="ovcolb">
+          <div class="ovhero">
+            <svg class="ovico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 21V9l6-4 6 4v12M9 21v-5h3v5M18 21V12l3 2v7M3 21h18"/></svg>
+            <div class="ovnum" id="ovWho"></div></div>
+          <p class="ovsubh">Attendances by organisation</p>
+          <div class="ovbars" id="ovWhoBars"></div>
+        </div>
+      </div>
       <div class="ovcol">
         <div class="ovcolh"><h2>For whom</h2><span class="ovsp"></span>
           <span class="ovcolf"><select data-dim="status" aria-label="Narrow to one implementation status"></select></span></div>
@@ -426,12 +517,11 @@
           <div class="ovbars" id="ovSadd"></div>
           <p class="xs" id="ovSaddNote"></p>
         </div>
-      </div>
-    </div>
-
+  </div>
     <!-- WHERE, at palika level. The roster coverage table below is at site
          level; this is the palika reading the 4Ws matrix joins on, and the
          gap-list item the map will eventually draw. -->
+<details class="analysis-detail"><summary>Where and delivery status</summary>
     <div class="ovfig" id="ovWhere">
       <div class="ovfigh"><h3>Where</h3>
         <span class="ovcolf ovfigf">
@@ -468,36 +558,14 @@
       <div class="banner warn" style="margin-top:14px"><b>Three states, and ours are not the IASC three.</b> The 4Ws manual's states are: currently being implemented; funded but not yet implemented; unfunded and not yet implemented. Ongoing / Completed / Planned is a working rendering and does not carry the funded–unfunded distinction.</div>
     </div>
 
+</details>
     <!-- The scope line replaces the wall of dropdowns that used to stand
          between the reader and the figures. Nothing is offered until
          something is narrowed: the line says what is in scope, an active
          narrowing becomes a chip that can be dropped on its own, and the
          thirteen controls are one tap away in the panel below. The controls
          themselves are unchanged -- same ids, same data-dim, same engine. -->
-    <div class="scope" id="scope">
-      <span id="fSum"></span>
-      <span id="fChips"></span>
-      <button type="button" class="btn grey sm" id="fClear">Clear filters</button>
-    </div>
 
-    <details class="filters" id="filters">
-      <summary class="fopen"><span class="fopenb">All filters</span><span class="xs">nine dimensions and the period — every figure and table on this page follows them, and each list offers only the values that survive the others</span></summary>
-      <div class="grid">
-        <div><label for="fProv">Province</label><select id="fProv" data-dim="province"></select></div>
-        <div><label for="fDist">District</label><select id="fDist" data-dim="district"></select></div>
-        <div><label for="fPal">Palika</label><select id="fPal" data-dim="palika"></select></div>
-        <div><label for="fOrg">Organisation</label><select id="fOrg" data-dim="org"></select></div>
-        <div><label for="fDon">Funding source</label><select id="fDon" data-dim="donor"></select></div>
-        <div><label for="fGrp">Activity layer</label><select id="fGrp" data-dim="group"></select></div>
-        <div><label for="fAct">Activity</label><select id="fAct" data-dim="activity"></select></div>
-        <div><label for="fMod">Service setting</label><select id="fMod" data-dim="modality"></select></div>
-        <div><label for="fSta">Status</label><select id="fSta" data-dim="status"></select></div>
-        <div class="w2"><label for="fPeriod">Period</label><select id="fPeriod"></select></div>
-        <div class="w2"><label for="fBasis">Period reads</label><select id="fBasis"></select></div>
-        <div><label for="fFrom">From</label><input type="date" id="fFrom"></div>
-        <div><label for="fTo">To</label><input type="date" id="fTo"></div>
-      </div>
-    </details>
 
     <!-- The same five sections the rail lists, in the same order. Both
          controls write the same hash, so either can be used and a section
@@ -514,22 +582,23 @@
          reached and the shape over time. One section, because a coordinator
          reads these four things in one pass. -->
     <div class="panel on" id="p-ov">
+<details class="analysis-detail"><summary>Roster coverage and coordination checks</summary>
       <h2 class="sechead">Coverage of the roster</h2>
       <p class="secsay">Which holding-centre sites have a report in this period, and which are still at zero.</p>
       <div class="banner warn" id="covLede"></div>
       <div class="btns" style="margin-bottom:12px">
         <button type="button" class="btn ghost sm" id="expGap">Export the gap list as CSV</button>
       </div>
-      <div class="tbl-wrap">
+      <div class="tbl-wrap" tabindex="0" role="region" aria-label="Data table, scroll horizontally if needed">
         <table class="data">
-          <thead><tr><th>Site</th><th>District</th><th>Recorded population</th><th>Reports</th><th>Attendances</th><th>Organisations</th><th>Last report</th></tr></thead>
+          <thead><tr><th scope="col">Site</th><th scope="col">District</th><th scope="col">Recorded population</th><th scope="col">Reports</th><th scope="col">Attendances</th><th scope="col">Organisations</th><th scope="col">Last report</th></tr></thead>
           <tbody id="covBody"></tbody>
         </table>
       </div>
       <h2>Reported, but not on the roster</h2>
-      <div class="tbl-wrap">
+      <div class="tbl-wrap" tabindex="0" role="region" aria-label="Data table, scroll horizontally if needed">
         <table class="data">
-          <thead><tr><th>Site as reported</th><th>District</th><th>Reports</th><th>Attendances</th></tr></thead>
+          <thead><tr><th scope="col">Site as reported</th><th scope="col">District</th><th scope="col">Reports</th><th scope="col">Attendances</th></tr></thead>
           <tbody id="offBody"></tbody>
         </table>
       </div>
@@ -540,9 +609,9 @@
 
       <h2>More than one organisation at one site on one day</h2>
       <div class="banner" id="dupLede"></div>
-      <div class="tbl-wrap">
+      <div class="tbl-wrap" tabindex="0" role="region" aria-label="Data table, scroll horizontally if needed">
         <table class="data">
-          <thead><tr><th>Date</th><th>Site</th><th>Organisations reporting</th><th>Activities</th><th>Attendances</th><th>Reading</th></tr></thead>
+          <thead><tr><th scope="col">Date</th><th scope="col">Site</th><th scope="col">Organisations reporting</th><th scope="col">Activities</th><th scope="col">Attendances</th><th scope="col">Reading</th></tr></thead>
           <tbody id="dupBody"></tbody>
         </table>
       </div>
@@ -551,18 +620,17 @@
         <p>Two organisations at one site on one day is a flag, not a finding. It is often legitimate — a counselling session and a child-friendly space in the same shelter reach different people. It becomes double counting only when the same people are counted twice, and only the two organisations can settle that. The same organisation appearing twice under different funding tags is a funding attribution, not duplication, and is shown as such.</p>
       </details>
 
+</details>
       <h2>Who was reached</h2>
-      <div class="tbl-wrap">
+      <div class="tbl-wrap" tabindex="0" role="region" aria-label="Data table, scroll horizontally if needed">
         <table class="data">
-          <thead><tr><th>Age band</th><th>Female</th><th>Male</th><th>Not recorded</th><th>Total</th></tr></thead>
+          <thead><tr><th scope="col">Age band</th><th scope="col">Female</th><th scope="col">Male</th><th scope="col">Not recorded</th><th scope="col">Total</th></tr></thead>
           <tbody id="disBody"></tbody>
         </table>
       </div>
       <p class="xs" style="margin-top:10px" id="disNote"></p>
 
-      <h2>Reports per day</h2>
-      <p class="secsay">Follows the period and the date basis chosen above.</p>
-      <div id="dayWrap"></div>
+
     </div>
 
     <!-- WHO IS WHERE: the 5Ws proper -->
@@ -573,7 +641,7 @@
       <div class="btns" style="margin-bottom:12px">
         <button type="button" class="btn ghost sm" id="expMx">Export the matrix as CSV</button>
       </div>
-      <div class="tbl-wrap">
+      <div class="tbl-wrap" tabindex="0" role="region" aria-label="Data table, scroll horizontally if needed">
         <table class="data mx" id="pxTable">
           <thead id="pxHead"></thead>
           <tbody id="pxBody"></tbody>
@@ -584,9 +652,9 @@
         <p>A cell lists the activity codes an organisation has reported in that palika, with the number of reports per code and the attendances underneath. A site's palika comes from the site list; a palika-level report carries its own. Reports whose palika is not established sit in the last column rather than being dropped.</p>
       </details>
       <h2>By organisation</h2>
-      <div class="tbl-wrap">
+      <div class="tbl-wrap" tabindex="0" role="region" aria-label="Data table, scroll horizontally if needed">
         <table class="data">
-          <thead><tr><th>Organisation</th><th>District</th><th>Sites</th><th>Activities</th><th>Reports</th><th>Attendances</th><th>First</th><th>Last</th></tr></thead>
+          <thead><tr><th scope="col">Organisation</th><th scope="col">District</th><th scope="col">Sites</th><th scope="col">Activities</th><th scope="col">Reports</th><th scope="col">Attendances</th><th scope="col">First</th><th scope="col">Last</th></tr></thead>
           <tbody id="mxBody"></tbody>
         </table>
       </div>
@@ -596,9 +664,9 @@
     <div class="panel" id="p-act">
       <h2 class="sechead">What was done</h2>
       <p class="secsay">The same code read twice: the plain label the form showed the worker, and the IASC reading the backend reports.</p>
-      <div class="tbl-wrap">
+      <div class="tbl-wrap" tabindex="0" role="region" aria-label="Data table, scroll horizontally if needed">
         <table class="data">
-          <thead><tr><th>Activity — as the form shows it</th><th>IASC layer</th><th>Backend reading — IASC 4Ws (2012)</th><th>Reports</th><th>Attendances</th><th>Share</th><th>Organisations</th></tr></thead>
+          <thead><tr><th scope="col">Activity — as the form shows it</th><th scope="col">IASC layer</th><th scope="col">Backend reading — IASC 4Ws (2012)</th><th scope="col">Reports</th><th scope="col">Attendances</th><th scope="col">Share</th><th scope="col">Organisations</th></tr></thead>
           <tbody id="actBody"></tbody>
         </table>
       </div>
@@ -615,15 +683,15 @@
       <h2 class="sechead">Reports received</h2>
       <p class="secsay">The home of the activity report (5Ws): every entry made on that form, newest first. A report appears here the moment the phone has signal; the same report saved twice on one phone stays one row.</p>
       <div class="btns" style="margin-bottom:12px;align-items:center;flex-wrap:wrap">
-        <input type="search" id="rawFind" placeholder="Find — organisation, site, activity, date, id" style="flex:1 1 260px;min-width:200px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;font:inherit;font-size:13px">
+        <input type="search" id="rawFind" aria-label="Find reports" placeholder="Find — organisation, site, activity, date, id" style="flex:1 1 260px;min-width:200px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;font:inherit;font-size:13px">
         <span class="xs" id="rawCount"></span>
         <button type="button" class="btn ghost sm" id="expAll">Export everything loaded as CSV</button>
         <label class="btn ghost sm" style="cursor:pointer">Import a file<input type="file" id="file2" accept=".json,.csv" hidden></label>
         <button type="button" class="btn grey sm" id="reload">Change source</button>
       </div>
-      <div class="tbl-wrap">
+      <div class="tbl-wrap" tabindex="0" role="region" aria-label="Data table, scroll horizontally if needed">
         <table class="data">
-          <thead><tr><th>Received</th><th>Date of activity</th><th>Site</th><th>Organisation</th><th>Activity</th><th class="n">Attendance</th><th>Target groups</th><th>ID</th></tr></thead>
+          <thead><tr><th scope="col">Received</th><th scope="col">Date of activity</th><th scope="col">Site</th><th scope="col">Organisation</th><th scope="col">Activity</th><th scope="col" class="n">Attendance</th><th scope="col">Target groups</th><th scope="col">ID</th></tr></thead>
           <tbody id="rawBody"></tbody>
         </table>
       </div>
@@ -667,7 +735,7 @@
   </div>
 
   <p class="xs" style="margin-top:26px">Draft instrument. Coverage denominators come from the holding-centre roster of the daily reporting workbook. Figures shown are only as good as the source loaded; nothing here is validated against any other source.</p>
-</div>
+</main>
 
 <div id="toast"></div>
 
