@@ -1,0 +1,1669 @@
+{
+  "origin": "http://127.0.0.1:33743",
+  "base": "180a64e8ccb077e26d0905adffa320e107ffb45f",
+  "candidate_index_sha256": "f99862488b99054898c4fbb3637f90cfeedcb6bcfbf50c6e041275f63108c4ea",
+  "runs": [
+    {
+      "base": true,
+      "width": 320,
+      "errors": [],
+      "overview": {
+        "root": [
+          320,
+          320
+        ],
+        "overflow": [],
+        "small": [
+          {
+            "id": "",
+            "text": "1Field formson phones, works offlin",
+            "w": 146.5,
+            "h": 34
+          },
+          {
+            "id": "",
+            "text": "2Coordinationthis hub \u00b7 restricted",
+            "w": 146.5,
+            "h": 34
+          },
+          {
+            "id": "",
+            "text": "3Public sitepublished summaries onl",
+            "w": 299,
+            "h": 34
+          },
+          {
+            "id": "",
+            "text": "Menu",
+            "w": 95,
+            "h": 37.375
+          },
+          {
+            "id": "",
+            "text": "ENG",
+            "w": 46.65625,
+            "h": 23.5
+          },
+          {
+            "id": "",
+            "text": "NEP",
+            "w": 45.640625,
+            "h": 23.5
+          },
+          {
+            "id": "",
+            "text": "All (5)CMC-Nepal (16)CWIN Nepal (9)",
+            "w": 150,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "All (7)1.1 Information on where to ",
+            "w": 150,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "All (1)Completed (63)",
+            "w": 102,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "All (2)Nuwakot (54)Rasuwa (9)",
+            "w": 126.5,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "All (5)Belkotgadhi Municipality (6)",
+            "w": 126.5,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "How this is counted",
+            "w": 258,
+            "h": 18.59375
+          },
+          {
+            "id": "fProv",
+            "text": "All (1)Bagmati (63)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fDist",
+            "text": "All (2)Nuwakot (54)Rasuwa (9)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fPal",
+            "text": "All (5)Belkotgadhi Municipality (6)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fOrg",
+            "text": "All (5)CMC-Nepal (16)CWIN Nepal (9)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fDon",
+            "text": "All (2)SDC (30)UNICEF (33)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fGrp",
+            "text": "All (3)1 Information and basic serv",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fAct",
+            "text": "All (7)1.1 Information on where to ",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fMod",
+            "text": "All (3)In person \u2014 facility (health",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fSta",
+            "text": "All (1)Completed (63)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fPeriod",
+            "text": "All datesTodayYesterdayThis week (S",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fBasis",
+            "text": "Date of activityDate received",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fFrom",
+            "text": "",
+            "w": 262,
+            "h": 36.140625
+          },
+          {
+            "id": "fTo",
+            "text": "",
+            "w": 262,
+            "h": 36.140625
+          },
+          {
+            "id": "",
+            "text": "Overview",
+            "w": 96.515625,
+            "h": 41.140625
+          },
+          {
+            "id": "",
+            "text": "Who is where",
+            "w": 127.09375,
+            "h": 41.140625
+          },
+          {
+            "id": "",
+            "text": "Activities",
+            "w": 96.59375,
+            "h": 41.140625
+          },
+          {
+            "id": "",
+            "text": "Reports received",
+            "w": 152.765625,
+            "h": 41.140625
+          },
+          {
+            "id": "",
+            "text": "Publish",
+            "w": 82,
+            "h": 41.140625
+          },
+          {
+            "id": "expGap",
+            "text": "Export the gap list as CSV",
+            "w": 209.671875,
+            "h": 33.375
+          },
+          {
+            "id": "",
+            "text": "How this is counted",
+            "w": 290,
+            "h": 18.59375
+          },
+          {
+            "id": "",
+            "text": "How this is counted",
+            "w": 290,
+            "h": 18.59375
+          }
+        ]
+      },
+      "axeStates": {
+        "overview": [
+          {
+            "id": "scrollable-region-focusable",
+            "impact": "serious",
+            "nodes": [
+              [
+                "#p-ov > .tbl-wrap:nth-child(5)"
+              ],
+              [
+                ".tbl-wrap:nth-child(7)"
+              ],
+              [
+                ".tbl-wrap:nth-child(11)"
+              ],
+              [
+                ".tbl-wrap:nth-child(14)"
+              ],
+              [
+                "#dayWrap > .tbl-wrap"
+              ]
+            ]
+          }
+        ],
+        "reports": [
+          {
+            "id": "scrollable-region-focusable",
+            "impact": "serious",
+            "nodes": [
+              [
+                "#p-raw > .tbl-wrap"
+              ]
+            ]
+          }
+        ],
+        "matrix": [
+          {
+            "id": "color-contrast",
+            "impact": "serious",
+            "nodes": [
+              [
+                ".pal:nth-child(1) > span"
+              ],
+              [
+                ".pal:nth-child(2) > span"
+              ],
+              [
+                ".pal:nth-child(3) > span"
+              ],
+              [
+                ".pal:nth-child(4) > span"
+              ],
+              [
+                ".pal:nth-child(5) > span"
+              ]
+            ]
+          },
+          {
+            "id": "scrollable-region-focusable",
+            "impact": "serious",
+            "nodes": [
+              [
+                "#p-who > .tbl-wrap:nth-child(5)"
+              ],
+              [
+                ".tbl-wrap:nth-child(8)"
+              ]
+            ]
+          }
+        ],
+        "activities": [
+          {
+            "id": "scrollable-region-focusable",
+            "impact": "serious",
+            "nodes": [
+              [
+                "#p-act > .tbl-wrap"
+              ]
+            ]
+          }
+        ],
+        "expanded": [
+          {
+            "id": "scrollable-region-focusable",
+            "impact": "serious",
+            "nodes": [
+              [
+                "#p-ov > .tbl-wrap:nth-child(5)"
+              ],
+              [
+                ".tbl-wrap:nth-child(7)"
+              ],
+              [
+                ".tbl-wrap:nth-child(11)"
+              ],
+              [
+                ".tbl-wrap:nth-child(14)"
+              ],
+              [
+                "#dayWrap > .tbl-wrap"
+              ]
+            ]
+          }
+        ],
+        "ne": [
+          {
+            "id": "scrollable-region-focusable",
+            "impact": "serious",
+            "nodes": [
+              [
+                "#p-ov > .tbl-wrap:nth-child(5)"
+              ],
+              [
+                ".tbl-wrap:nth-child(7)"
+              ],
+              [
+                ".tbl-wrap:nth-child(11)"
+              ],
+              [
+                ".tbl-wrap:nth-child(14)"
+              ],
+              [
+                "#dayWrap > .tbl-wrap"
+              ]
+            ]
+          }
+        ]
+      },
+      "initialLanguage": "en",
+      "initialStorage": "{}",
+      "reports": {
+        "root": [
+          320,
+          320
+        ],
+        "overflow": [],
+        "small": [
+          {
+            "id": "",
+            "text": "1Field formson phones, works offlin",
+            "w": 146.5,
+            "h": 34
+          },
+          {
+            "id": "",
+            "text": "2Coordinationthis hub \u00b7 restricted",
+            "w": 146.5,
+            "h": 34
+          },
+          {
+            "id": "",
+            "text": "3Public sitepublished summaries onl",
+            "w": 299,
+            "h": 34
+          },
+          {
+            "id": "",
+            "text": "Menu",
+            "w": 95,
+            "h": 37.375
+          },
+          {
+            "id": "",
+            "text": "ENG",
+            "w": 46.65625,
+            "h": 23.5
+          },
+          {
+            "id": "",
+            "text": "NEP",
+            "w": 45.640625,
+            "h": 23.5
+          },
+          {
+            "id": "",
+            "text": "All (5)CMC-Nepal (16)CWIN Nepal (9)",
+            "w": 150,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "All (7)1.1 Information on where to ",
+            "w": 150,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "All (1)Completed (63)",
+            "w": 102,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "All (2)Nuwakot (54)Rasuwa (9)",
+            "w": 126.5,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "All (5)Belkotgadhi Municipality (6)",
+            "w": 126.5,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "How this is counted",
+            "w": 258,
+            "h": 18.59375
+          },
+          {
+            "id": "fProv",
+            "text": "All (1)Bagmati (63)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fDist",
+            "text": "All (2)Nuwakot (54)Rasuwa (9)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fPal",
+            "text": "All (5)Belkotgadhi Municipality (6)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fOrg",
+            "text": "All (5)CMC-Nepal (16)CWIN Nepal (9)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fDon",
+            "text": "All (2)SDC (30)UNICEF (33)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fGrp",
+            "text": "All (3)1 Information and basic serv",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fAct",
+            "text": "All (7)1.1 Information on where to ",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fMod",
+            "text": "All (3)In person \u2014 facility (health",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fSta",
+            "text": "All (1)Completed (63)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fPeriod",
+            "text": "All datesTodayYesterdayThis week (S",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fBasis",
+            "text": "Date of activityDate received",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fFrom",
+            "text": "",
+            "w": 262,
+            "h": 36.140625
+          },
+          {
+            "id": "fTo",
+            "text": "",
+            "w": 262,
+            "h": 36.140625
+          },
+          {
+            "id": "",
+            "text": "Overview",
+            "w": 96.515625,
+            "h": 41.140625
+          },
+          {
+            "id": "",
+            "text": "Who is where",
+            "w": 127.09375,
+            "h": 41.140625
+          },
+          {
+            "id": "",
+            "text": "Activities",
+            "w": 96.59375,
+            "h": 41.140625
+          },
+          {
+            "id": "",
+            "text": "Reports received",
+            "w": 152.765625,
+            "h": 41.140625
+          },
+          {
+            "id": "",
+            "text": "Publish",
+            "w": 82,
+            "h": 41.140625
+          },
+          {
+            "id": "rawFind",
+            "text": "",
+            "w": 290,
+            "h": 38.140625
+          },
+          {
+            "id": "expAll",
+            "text": "Export everything loaded as CSV",
+            "w": 257.75,
+            "h": 33.375
+          },
+          {
+            "id": "reload",
+            "text": "Change source",
+            "w": 130.171875,
+            "h": 33.375
+          }
+        ]
+      },
+      "matrix": {
+        "root": [
+          320,
+          320
+        ],
+        "overflow": [],
+        "small": [
+          {
+            "id": "",
+            "text": "1Field formson phones, works offlin",
+            "w": 146.5,
+            "h": 34
+          },
+          {
+            "id": "",
+            "text": "2Coordinationthis hub \u00b7 restricted",
+            "w": 146.5,
+            "h": 34
+          },
+          {
+            "id": "",
+            "text": "3Public sitepublished summaries onl",
+            "w": 299,
+            "h": 34
+          },
+          {
+            "id": "",
+            "text": "Menu",
+            "w": 95,
+            "h": 37.375
+          },
+          {
+            "id": "",
+            "text": "ENG",
+            "w": 46.65625,
+            "h": 23.5
+          },
+          {
+            "id": "",
+            "text": "NEP",
+            "w": 45.640625,
+            "h": 23.5
+          },
+          {
+            "id": "",
+            "text": "All (5)CMC-Nepal (16)CWIN Nepal (9)",
+            "w": 150,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "All (7)1.1 Information on where to ",
+            "w": 150,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "All (1)Completed (63)",
+            "w": 102,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "All (2)Nuwakot (54)Rasuwa (9)",
+            "w": 126.5,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "All (5)Belkotgadhi Municipality (6)",
+            "w": 126.5,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "How this is counted",
+            "w": 258,
+            "h": 18.59375
+          },
+          {
+            "id": "fProv",
+            "text": "All (1)Bagmati (63)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fDist",
+            "text": "All (2)Nuwakot (54)Rasuwa (9)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fPal",
+            "text": "All (5)Belkotgadhi Municipality (6)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fOrg",
+            "text": "All (5)CMC-Nepal (16)CWIN Nepal (9)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fDon",
+            "text": "All (2)SDC (30)UNICEF (33)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fGrp",
+            "text": "All (3)1 Information and basic serv",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fAct",
+            "text": "All (7)1.1 Information on where to ",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fMod",
+            "text": "All (3)In person \u2014 facility (health",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fSta",
+            "text": "All (1)Completed (63)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fPeriod",
+            "text": "All datesTodayYesterdayThis week (S",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fBasis",
+            "text": "Date of activityDate received",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fFrom",
+            "text": "",
+            "w": 262,
+            "h": 36.140625
+          },
+          {
+            "id": "fTo",
+            "text": "",
+            "w": 262,
+            "h": 36.140625
+          },
+          {
+            "id": "",
+            "text": "Overview",
+            "w": 96.515625,
+            "h": 41.140625
+          },
+          {
+            "id": "",
+            "text": "Who is where",
+            "w": 127.09375,
+            "h": 41.140625
+          },
+          {
+            "id": "",
+            "text": "Activities",
+            "w": 96.59375,
+            "h": 41.140625
+          },
+          {
+            "id": "",
+            "text": "Reports received",
+            "w": 152.765625,
+            "h": 41.140625
+          },
+          {
+            "id": "",
+            "text": "Publish",
+            "w": 82,
+            "h": 41.140625
+          },
+          {
+            "id": "expMx",
+            "text": "Export the matrix as CSV",
+            "w": 202.953125,
+            "h": 33.375
+          },
+          {
+            "id": "",
+            "text": "How this is counted",
+            "w": 290,
+            "h": 18.59375
+          }
+        ]
+      },
+      "activities": {
+        "root": [
+          320,
+          320
+        ],
+        "overflow": [],
+        "small": [
+          {
+            "id": "",
+            "text": "1Field formson phones, works offlin",
+            "w": 146.5,
+            "h": 34
+          },
+          {
+            "id": "",
+            "text": "2Coordinationthis hub \u00b7 restricted",
+            "w": 146.5,
+            "h": 34
+          },
+          {
+            "id": "",
+            "text": "3Public sitepublished summaries onl",
+            "w": 299,
+            "h": 34
+          },
+          {
+            "id": "",
+            "text": "Menu",
+            "w": 95,
+            "h": 37.375
+          },
+          {
+            "id": "",
+            "text": "ENG",
+            "w": 46.65625,
+            "h": 23.5
+          },
+          {
+            "id": "",
+            "text": "NEP",
+            "w": 45.640625,
+            "h": 23.5
+          },
+          {
+            "id": "",
+            "text": "All (5)CMC-Nepal (16)CWIN Nepal (9)",
+            "w": 150,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "All (7)1.1 Information on where to ",
+            "w": 150,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "All (1)Completed (63)",
+            "w": 102,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "All (2)Nuwakot (54)Rasuwa (9)",
+            "w": 126.5,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "All (5)Belkotgadhi Municipality (6)",
+            "w": 126.5,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "How this is counted",
+            "w": 258,
+            "h": 18.59375
+          },
+          {
+            "id": "fProv",
+            "text": "All (1)Bagmati (63)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fDist",
+            "text": "All (2)Nuwakot (54)Rasuwa (9)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fPal",
+            "text": "All (5)Belkotgadhi Municipality (6)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fOrg",
+            "text": "All (5)CMC-Nepal (16)CWIN Nepal (9)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fDon",
+            "text": "All (2)SDC (30)UNICEF (33)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fGrp",
+            "text": "All (3)1 Information and basic serv",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fAct",
+            "text": "All (7)1.1 Information on where to ",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fMod",
+            "text": "All (3)In person \u2014 facility (health",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fSta",
+            "text": "All (1)Completed (63)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fPeriod",
+            "text": "All datesTodayYesterdayThis week (S",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fBasis",
+            "text": "Date of activityDate received",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fFrom",
+            "text": "",
+            "w": 262,
+            "h": 36.140625
+          },
+          {
+            "id": "fTo",
+            "text": "",
+            "w": 262,
+            "h": 36.140625
+          },
+          {
+            "id": "",
+            "text": "Overview",
+            "w": 96.515625,
+            "h": 41.140625
+          },
+          {
+            "id": "",
+            "text": "Who is where",
+            "w": 127.09375,
+            "h": 41.140625
+          },
+          {
+            "id": "",
+            "text": "Activities",
+            "w": 96.59375,
+            "h": 41.140625
+          },
+          {
+            "id": "",
+            "text": "Reports received",
+            "w": 152.765625,
+            "h": 41.140625
+          },
+          {
+            "id": "",
+            "text": "Publish",
+            "w": 82,
+            "h": 41.140625
+          },
+          {
+            "id": "",
+            "text": "How this is counted",
+            "w": 290,
+            "h": 18.59375
+          }
+        ]
+      },
+      "expanded": {
+        "root": [
+          320,
+          320
+        ],
+        "overflow": [],
+        "small": [
+          {
+            "id": "",
+            "text": "1Field formson phones, works offlin",
+            "w": 146.5,
+            "h": 34
+          },
+          {
+            "id": "",
+            "text": "2Coordinationthis hub \u00b7 restricted",
+            "w": 146.5,
+            "h": 34
+          },
+          {
+            "id": "",
+            "text": "3Public sitepublished summaries onl",
+            "w": 299,
+            "h": 34
+          },
+          {
+            "id": "",
+            "text": "Menu",
+            "w": 95,
+            "h": 37.375
+          },
+          {
+            "id": "",
+            "text": "ENG",
+            "w": 46.65625,
+            "h": 23.5
+          },
+          {
+            "id": "",
+            "text": "NEP",
+            "w": 45.640625,
+            "h": 23.5
+          },
+          {
+            "id": "",
+            "text": "All (5)CMC-Nepal (16)CWIN Nepal (9)",
+            "w": 150,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "All (7)1.1 Information on where to ",
+            "w": 150,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "All (1)Completed (63)",
+            "w": 102,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "All (2)Nuwakot (54)Rasuwa (9)",
+            "w": 126.5,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "All (5)Belkotgadhi Municipality (6)",
+            "w": 126.5,
+            "h": 25.8125
+          },
+          {
+            "id": "",
+            "text": "How this is counted",
+            "w": 258,
+            "h": 18.59375
+          },
+          {
+            "id": "fProv",
+            "text": "All (1)Bagmati (63)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fDist",
+            "text": "All (2)Nuwakot (54)Rasuwa (9)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fPal",
+            "text": "All (5)Belkotgadhi Municipality (6)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fOrg",
+            "text": "All (5)CMC-Nepal (16)CWIN Nepal (9)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fDon",
+            "text": "All (2)SDC (30)UNICEF (33)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fGrp",
+            "text": "All (3)1 Information and basic serv",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fAct",
+            "text": "All (7)1.1 Information on where to ",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fMod",
+            "text": "All (3)In person \u2014 facility (health",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fSta",
+            "text": "All (1)Completed (63)",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fPeriod",
+            "text": "All datesTodayYesterdayThis week (S",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fBasis",
+            "text": "Date of activityDate received",
+            "w": 262,
+            "h": 34.140625
+          },
+          {
+            "id": "fFrom",
+            "text": "",
+            "w": 262,
+            "h": 36.140625
+          },
+          {
+            "id": "fTo",
+            "text": "",
+            "w": 262,
+            "h": 36.140625
+          },
+          {
+            "id": "",
+            "text": "Overview",
+            "w": 96.515625,
+            "h": 41.140625
+          },
+          {
+            "id": "",
+            "text": "Who is where",
+            "w": 127.09375,
+            "h": 41.140625
+          },
+          {
+            "id": "",
+            "text": "Activities",
+            "w": 96.59375,
+            "h": 41.140625
+          },
+          {
+            "id": "",
+            "text": "Reports received",
+            "w": 152.765625,
+            "h": 41.140625
+          },
+          {
+            "id": "",
+            "text": "Publish",
+            "w": 82,
+            "h": 41.140625
+          },
+          {
+            "id": "expGap",
+            "text": "Export the gap list as CSV",
+            "w": 209.671875,
+            "h": 33.375
+          },
+          {
+            "id": "",
+            "text": "How this is counted",
+            "w": 290,
+            "h": 18.59375
+          },
+          {
+            "id": "",
+            "text": "How this is counted",
+            "w": 290,
+            "h": 18.59375
+          }
+        ]
+      },
+      "axe": [
+        {
+          "id": "scrollable-region-focusable",
+          "impact": "serious",
+          "nodes": [
+            [
+              "#p-ov > .tbl-wrap:nth-child(5)"
+            ],
+            [
+              ".tbl-wrap:nth-child(7)"
+            ],
+            [
+              ".tbl-wrap:nth-child(11)"
+            ],
+            [
+              ".tbl-wrap:nth-child(14)"
+            ],
+            [
+              "#dayWrap > .tbl-wrap"
+            ]
+          ]
+        }
+      ],
+      "storageBeforeLanguage": "{}",
+      "toggleButtons": [
+        "ENG",
+        "NEP"
+      ],
+      "lang": "ne",
+      "neGeometry": {
+        "root": [
+          320,
+          320
+        ],
+        "overflow": [],
+        "small": [
+          {
+            "id": "",
+            "text": "1Field formson phones, works offlin",
+            "w": 146.5,
+            "h": 34
+          },
+          {
+            "id": "",
+            "text": "2Coordinationthis hub \u00b7 restricted",
+            "w": 146.5,
+            "h": 34
+          },
+          {
+            "id": "",
+            "text": "3Public sitepublished summaries onl",
+            "w": 299,
+            "h": 34
+          },
+          {
+            "id": "",
+            "text": "Menu",
+            "w": 95,
+            "h": 39.75
+          },
+          {
+            "id": "",
+            "text": "ENG",
+            "w": 46.65625,
+            "h": 23.5
+          },
+          {
+            "id": "",
+            "text": "NEP",
+            "w": 45.640625,
+            "h": 23.5
+          },
+          {
+            "id": "",
+            "text": "All (5)CMC-Nepal (16)CWIN Nepal (9)",
+            "w": 150,
+            "h": 28
+          },
+          {
+            "id": "",
+            "text": "All (7)1.1 Information on where to ",
+            "w": 150,
+            "h": 28
+          },
+          {
+            "id": "",
+            "text": "All (1)Completed (63)",
+            "w": 102,
+            "h": 28
+          },
+          {
+            "id": "",
+            "text": "All (2)Nuwakot (54)Rasuwa (9)",
+            "w": 126.5,
+            "h": 28
+          },
+          {
+            "id": "",
+            "text": "All (5)Belkotgadhi Municipality (6)",
+            "w": 126.5,
+            "h": 28
+          },
+          {
+            "id": "",
+            "text": "How this is counted",
+            "w": 258,
+            "h": 20.875
+          },
+          {
+            "id": "fProv",
+            "text": "All (1)Bagmati (63)",
+            "w": 262,
+            "h": 36.609375
+          },
+          {
+            "id": "fDist",
+            "text": "All (2)Nuwakot (54)Rasuwa (9)",
+            "w": 262,
+            "h": 36.609375
+          },
+          {
+            "id": "fPal",
+            "text": "All (5)Belkotgadhi Municipality (6)",
+            "w": 262,
+            "h": 36.609375
+          },
+          {
+            "id": "fOrg",
+            "text": "All (5)CMC-Nepal (16)CWIN Nepal (9)",
+            "w": 262,
+            "h": 36.609375
+          },
+          {
+            "id": "fDon",
+            "text": "All (2)SDC (30)UNICEF (33)",
+            "w": 262,
+            "h": 36.609375
+          },
+          {
+            "id": "fGrp",
+            "text": "All (3)1 Information and basic serv",
+            "w": 262,
+            "h": 36.609375
+          },
+          {
+            "id": "fAct",
+            "text": "All (7)1.1 Information on where to ",
+            "w": 262,
+            "h": 36.609375
+          },
+          {
+            "id": "fMod",
+            "text": "All (3)In person \u2014 facility (health",
+            "w": 262,
+            "h": 36.609375
+          },
+          {
+            "id": "fSta",
+            "text": "All (1)Completed (63)",
+            "w": 262,
+            "h": 36.609375
+          },
+          {
+            "id": "fPeriod",
+            "text": "All datesTodayYesterdayThis week (S",
+            "w": 262,
+            "h": 36.609375
+          },
+          {
+            "id": "fBasis",
+            "text": "Date of activityDate received",
+            "w": 262,
+            "h": 36.609375
+          },
+          {
+            "id": "fFrom",
+            "text": "",
+            "w": 262,
+            "h": 38.609375
+          },
+          {
+            "id": "fTo",
+            "text": "",
+            "w": 262,
+            "h": 38.609375
+          },
+          {
+            "id": "",
+            "text": "Overview",
+            "w": 96.515625,
+            "h": 43.609375
+          },
+          {
+            "id": "",
+            "text": "Who is where",
+            "w": 127.09375,
+            "h": 43.609375
+          },
+          {
+            "id": "",
+            "text": "Activities",
+            "w": 96.59375,
+            "h": 43.609375
+          },
+          {
+            "id": "",
+            "text": "Reports received",
+            "w": 152.765625,
+            "h": 43.609375
+          },
+          {
+            "id": "",
+            "text": "Publish",
+            "w": 82,
+            "h": 43.609375
+          },
+          {
+            "id": "expGap",
+            "text": "Export the gap list as CSV",
+            "w": 209.671875,
+            "h": 35.75
+          },
+          {
+            "id": "",
+            "text": "How this is counted",
+            "w": 290,
+            "h": 20.875
+          },
+          {
+            "id": "",
+            "text": "How this is counted",
+            "w": 290,
+            "h": 20.875
+          }
+        ]
+      },
+      "storageBefore": "{}",
+      "storageAfter": "{\"mhpss-np-lang\":\"en\"}",
+      "remoteWrites": [],
+      "blockedRequestCount": 7
+    },
+    {
+      "base": false,
+      "width": 320,
+      "errors": [],
+      "overview": {
+        "root": [
+          320,
+          320
+        ],
+        "overflow": [],
+        "small": []
+      },
+      "axeStates": {
+        "overview": [],
+        "reports": [],
+        "matrix": [],
+        "activities": [],
+        "expanded": [],
+        "ne": []
+      },
+      "initialLanguage": "en",
+      "initialStorage": "{}",
+      "reports": {
+        "root": [
+          320,
+          320
+        ],
+        "overflow": [],
+        "small": []
+      },
+      "matrix": {
+        "root": [
+          320,
+          320
+        ],
+        "overflow": [],
+        "small": []
+      },
+      "activities": {
+        "root": [
+          320,
+          320
+        ],
+        "overflow": [],
+        "small": []
+      },
+      "expanded": {
+        "root": [
+          320,
+          320
+        ],
+        "overflow": [],
+        "small": []
+      },
+      "axe": [],
+      "storageBeforeLanguage": "{}",
+      "toggleButtons": [
+        "ENG",
+        "NEP"
+      ],
+      "lang": "ne",
+      "neGeometry": {
+        "root": [
+          320,
+          320
+        ],
+        "overflow": [],
+        "small": []
+      },
+      "storageBefore": "{}",
+      "storageAfter": "{\"mhpss-np-lang\":\"en\"}",
+      "remoteWrites": [],
+      "blockedRequestCount": 7
+    },
+    {
+      "base": false,
+      "width": 390,
+      "errors": [],
+      "overview": {
+        "root": [
+          390,
+          390
+        ],
+        "overflow": [],
+        "small": []
+      },
+      "axeStates": {
+        "overview": [],
+        "reports": [],
+        "matrix": [],
+        "activities": [],
+        "expanded": [],
+        "ne": []
+      },
+      "initialLanguage": "en",
+      "initialStorage": "{}",
+      "reports": {
+        "root": [
+          390,
+          390
+        ],
+        "overflow": [],
+        "small": []
+      },
+      "matrix": {
+        "root": [
+          390,
+          390
+        ],
+        "overflow": [],
+        "small": []
+      },
+      "activities": {
+        "root": [
+          390,
+          390
+        ],
+        "overflow": [],
+        "small": []
+      },
+      "expanded": {
+        "root": [
+          390,
+          390
+        ],
+        "overflow": [],
+        "small": []
+      },
+      "axe": [],
+      "storageBeforeLanguage": "{}",
+      "toggleButtons": [
+        "ENG",
+        "NEP"
+      ],
+      "lang": "ne",
+      "neGeometry": {
+        "root": [
+          390,
+          390
+        ],
+        "overflow": [],
+        "small": []
+      },
+      "storageBefore": "{}",
+      "storageAfter": "{\"mhpss-np-lang\":\"en\"}",
+      "remoteWrites": [],
+      "blockedRequestCount": 7
+    },
+    {
+      "base": false,
+      "width": 1280,
+      "errors": [],
+      "overview": {
+        "root": [
+          1280,
+          1280
+        ],
+        "overflow": [],
+        "small": []
+      },
+      "axeStates": {
+        "overview": [],
+        "reports": [],
+        "matrix": [],
+        "activities": [],
+        "expanded": [],
+        "ne": []
+      },
+      "initialLanguage": "en",
+      "initialStorage": "{}",
+      "reports": {
+        "root": [
+          1280,
+          1280
+        ],
+        "overflow": [],
+        "small": []
+      },
+      "matrix": {
+        "root": [
+          1280,
+          1280
+        ],
+        "overflow": [],
+        "small": []
+      },
+      "activities": {
+        "root": [
+          1280,
+          1280
+        ],
+        "overflow": [],
+        "small": []
+      },
+      "expanded": {
+        "root": [
+          1280,
+          1280
+        ],
+        "overflow": [],
+        "small": []
+      },
+      "axe": [],
+      "storageBeforeLanguage": "{}",
+      "toggleButtons": [
+        "ENG",
+        "NEP"
+      ],
+      "lang": "ne",
+      "neGeometry": {
+        "root": [
+          1280,
+          1280
+        ],
+        "overflow": [],
+        "small": []
+      },
+      "storageBefore": "{}",
+      "storageAfter": "{\"mhpss-np-lang\":\"en\"}",
+      "remoteWrites": [],
+      "blockedRequestCount": 7
+    }
+  ],
+  "parity": {
+    "320": {
+      "stats": true,
+      "covBody": true,
+      "dupBody": true,
+      "pxBody": true,
+      "actBody": true,
+      "disBody": true,
+      "dayWrap": true,
+      "rawBody": true,
+      "filteredStats": true,
+      "filterSummary": true,
+      "csv": true,
+      "find": true,
+      "matrixCSV": true
+    },
+    "390": {
+      "stats": true,
+      "covBody": true,
+      "dupBody": true,
+      "pxBody": true,
+      "actBody": true,
+      "disBody": true,
+      "dayWrap": true,
+      "rawBody": true,
+      "filteredStats": true,
+      "filterSummary": true,
+      "csv": true,
+      "find": true,
+      "matrixCSV": true
+    },
+    "1280": {
+      "stats": true,
+      "covBody": true,
+      "dupBody": true,
+      "pxBody": true,
+      "actBody": true,
+      "disBody": true,
+      "dayWrap": true,
+      "rawBody": true,
+      "filteredStats": true,
+      "filterSummary": true,
+      "csv": true,
+      "find": true,
+      "matrixCSV": true
+    }
+  },
+  "network": "All non-fixture requests blocked; Firebase bridge replaced at request boundary, no remote read/write."
+}

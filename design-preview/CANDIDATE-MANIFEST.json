@@ -1,0 +1,20 @@
+{
+  "design-preview/PRESERVATION-INVENTORY.json": "016815a562ae73a39c310c1de5a107028af6238a24928732a1049b15065e3e76",
+  "design-preview/README.md": "75859a59330ce64b3065d86259c506f4a0c3bea591b6641622966f829fa2f38f",
+  "design-preview/desktop-1280.png": "e9eac2b8f504cff03d4673597dbca586bde86da36afb155db42f2bd00b92c340",
+  "design-preview/desktop-320.png": "d3759eb8843884f6b7addec2071e46b78bc87996d45fd1bb6964f885162ddd29",
+  "design-preview/desktop-390.png": "58c6ff466b40fb76ce795a0c387172f4b2bce41f9894b1b1efcf32aeb816bd0f",
+  "design-preview/expanded-1280.png": "c40a5cfebe194f9cbe5a25b9bb14e052fb2a864b52edad498289fa6636752673",
+  "design-preview/expanded-320.png": "9870ada649654c870ed58bb979deccc1a23ba19b4e59e047fb44fc8c1e8b26ca",
+  "design-preview/expanded-390.png": "160a6e103f7186f27c538426237781640eceabb4ac6f0e60b569c85f31dd0350",
+  "design-preview/final-verification.json": "7f6a5e0bbbd725a207b43880ad7178b701e1f7fd85841c3754f1ea9614d204f7",
+  "design-preview/qa-report.json": "764d037c46701e6b6200f8ae7c6a2ac2d5c7ae8cf1398aaf3d514ec77df82d88",
+  "design-preview/source/axe.min.js": "880970c081707360e64f34cea25ff91892f5bc95675b0776925b9709dd8a68bb",
+  "design-preview/source/baseline.html": "55a99a616dd5126eb3e3b21d19292cd89490bc1e8a64257eb849ff5ce4ad53d8",
+  "design-preview/source/implement.py": "fba4a7e4036f2f8d5f0fb82a736ea25f0622605acd8b7ca347817b51e9a6a882",
+  "design-preview/source/prepare.py": "2679b0d8ff61f6c3031de614731fcb99a95a02e6e07866a8e595b7e405c44561",
+  "design-preview/source/qa.py": "89923ff99c40fc7c9e751f5b7b9c1e6af5b6fa9ad85985155d2fad467b4b6874",
+  "design-preview/source/refine.py": "d86895460a09887b3595b9676de2f31dd5eb358211d1363d2ebf4772b323d6e9",
+  "design-preview/source/verify_final.py": "34960f2ca3887c0cf451935cf79188157356fabc764b552c3e136661f0127615",
+  "index.html": "f99862488b99054898c4fbb3637f90cfeedcb6bcfbf50c6e041275f63108c4ea"
+}
