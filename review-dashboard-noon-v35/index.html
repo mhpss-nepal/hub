@@ -1553,48 +1553,48 @@ body.hub.dashboard-simplified .pub .docs{grid-template-columns:repeat(auto-fit,m
 
 <!--NAV:rail hubindex-->
 <aside class="rail" aria-label="Coordination hub">
-  <a class="railid" href="./">
+  <a class="railid" href="#main" aria-disabled="true" data-preview-navigation="disabled">
     <span data-mark="30"></span>
     <span><b>MHPSS Nepal</b><i>Layer 2 &middot; coordination</i></span>
   </a>
   <div class="where" aria-label="Where you are in the system">
     <span class="wlab">Architecture &middot; you are here</span>
-    <a class="lyr" href="../form/"><b>1</b><span>Field forms<i>on phones, works offline</i></span></a>
-    <a class="lyr on" href="./" aria-current="true"><b>2</b><span>Coordination<i>this hub &middot; restricted</i></span></a>
-    <a class="lyr" href="../"><b>3</b><span>Public site<i>published summaries only</i></span></a>
+    <a class="lyr" href="#main" aria-disabled="true" data-preview-navigation="disabled"><b>1</b><span>Field forms<i>on phones, works offline</i></span></a>
+    <a class="lyr on" href="#main" aria-current="true" aria-disabled="true" data-preview-navigation="disabled"><b>2</b><span>Coordination<i>this hub &middot; restricted</i></span></a>
+    <a class="lyr" href="#main" aria-disabled="true" data-preview-navigation="disabled"><b>3</b><span>Public site<i>published summaries only</i></span></a>
   </div>
   <button class="rmenu" type="button" aria-expanded="false"><span></span>Menu</button>
   <nav>
     <div class="rg open here" data-g="coord">
       <button class="rgh" type="button"><span class="dot l2"></span>Coordination<em>layer 2</em><i class="chev"></i></button>
       <div class="rgb">
-        <a class="on" aria-current="page" data-default href="./#overview">Dashboard &middot; overview</a>
-        <a href="./#reports">Reports</a>
+        <a class="on" aria-current="page" data-default href="#main">Dashboard &middot; overview</a>
+        <a href="#main">Reports</a>
         <details class="rail-advanced"><summary>Advanced</summary>
-          <a href="./#who-is-where">Who is where</a>
-          <a href="./#activities">Activities</a>
-          <a href="./#publish">Publish</a>
+          <a href="#main">Who is where</a>
+          <a href="#main">Activities</a>
+          <a href="#main">Publish</a>
         </details>
       </div>
     </div>
     <div class="rg" data-g="forms">
       <button class="rgh" type="button"><span class="dot l1"></span>Field forms<em>outputs</em><i class="chev"></i></button>
       <div class="rgb">
-        <a href="./#reports">Activity report (5Ws)</a>
-        <a href="forms.html">Form entries</a>
-        <a href="../form/">Open the forms &rarr;</a>
+        <a href="#main">Activity report (5Ws)</a>
+        <a href="#main" aria-disabled="true" data-preview-navigation="disabled">Form entries</a>
+        <a href="#main" aria-disabled="true" data-preview-navigation="disabled">Open the forms &rarr;</a>
       </div>
     </div>
     <div class="rg" data-g="public">
       <button class="rgh" type="button"><span class="dot l3"></span>Public site<em>layer 3</em><i class="chev"></i></button>
       <div class="rgb">
-        <a href="../">Home</a>
+        <a href="#main" aria-disabled="true" data-preview-navigation="disabled">Home</a>
       </div>
     </div>
     <div class="rg admin" data-g="admin" hidden>
       <button class="rgh" type="button"><span class="dot l2"></span>Admin<em>admin only</em><i class="chev"></i></button>
       <div class="rgb">
-        <a href="access.html">Access &amp; sign-in</a>
+        <a href="#main" aria-disabled="true" data-preview-navigation="disabled">Access &amp; sign-in</a>
       </div>
     </div>
   </nav>
@@ -9011,7 +9011,7 @@ window.I18N_STRINGS = {
       $("livePanel").innerHTML = '<div class="banner stop" style="margin:0"><b>The register refused the read.</b> ' +
         esc(err) + '<br><br>Almost always this means the account is signed in but has not been granted ' +
         'access. Signing in proves who you are; it does not grant sight of the records. An admin adds ' +
-        'the address on the <a href="access.html">Access</a> page, or by hand in the console as a ' +
+        'the address on the <a href="#main" aria-disabled="true" data-preview-navigation="disabled">Access</a> page, or by hand in the console as a ' +
         '<code>roles/&lt;uid&gt;</code> document.</div>';
     });
   }
