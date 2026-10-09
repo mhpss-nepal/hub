@@ -1,0 +1,58 @@
+test_focal_point_is_stripped_from_network_but_kept_in_export (test_store_data_path_contract.StoreDataPathContractTests.test_focal_point_is_stripped_from_network_but_kept_in_export) ... ok
+test_header_describes_the_register_bridge_not_a_local_only_store (test_store_data_path_contract.StoreDataPathContractTests.test_header_describes_the_register_bridge_not_a_local_only_store) ... ok
+test_save_writes_the_device_copy_before_syncing (test_store_data_path_contract.StoreDataPathContractTests.test_save_writes_the_device_copy_before_syncing) ... ok
+test_default_rail_offers_only_the_approved_5ws_form (test_trial_scope.HubTrialScopeTest.test_default_rail_offers_only_the_approved_5ws_form) ... ok
+test_generated_rail_is_the_committed_rail (test_trial_scope.HubTrialScopeTest.test_generated_rail_is_the_committed_rail)
+A hand-edit of a rail block would otherwise pass the href checks. ... ok
+test_hub_qr_asset_encodes_only_the_trial_addresses (test_trial_scope.HubTrialScopeTest.test_hub_qr_asset_encodes_only_the_trial_addresses)
+A printed QR is a physical path; none may encode an unapproved page. ... ok
+test_hub_still_describes_and_imports_the_four_forms (test_trial_scope.HubTrialScopeTest.test_hub_still_describes_and_imports_the_four_forms)
+The trial rule removes the link, not the Hub's own review surface. ... ok
+test_no_hub_page_links_to_an_unapproved_form_page (test_trial_scope.HubTrialScopeTest.test_no_hub_page_links_to_an_unapproved_form_page) ... ok
+test_pre_fix_checker_fixture_is_unmodified (test_trial_scope.HubTrialScopeTest.test_pre_fix_checker_fixture_is_unmodified)
+The round-1 red/green demo must not be neutered by editing the fixture. ... ok
+test_rail_generator_cannot_reintroduce_an_unapproved_form_link (test_trial_scope.HubTrialScopeTest.test_rail_generator_cannot_reintroduce_an_unapproved_form_link) ... ok
+test_rendered_link_check_uses_exact_normalized_form_paths (test_trial_scope.HubTrialScopeTest.test_rendered_link_check_uses_exact_normalized_form_paths) ... ok
+test_static_form_link_rule_matches_the_rendered_rule (test_trial_scope.HubTrialScopeTest.test_static_form_link_rule_matches_the_rendered_rule)
+The static scan must flag the same spellings the browser check does. ... ok
+test_the_review_page_is_allowed_and_a_field_instrument_is_not (test_trial_scope.HubTrialScopeTest.test_the_review_page_is_allowed_and_a_field_instrument_is_not)
+The list is the decision, so the decision is pinned against real strings. ... ok
+test_no_closed_field_list_rejects_an_unknown_field (test_ward_field.LayerTwoTreatmentTest.test_no_closed_field_list_rejects_an_unknown_field)
+Nothing enumerates the record's fields as a validation allow-list. ... ok
+test_the_dimensioning_decision_is_documented_with_the_adib_flag (test_ward_field.LayerTwoTreatmentTest.test_the_dimensioning_decision_is_documented_with_the_adib_flag)
+The card requires the choice be explicit and any presentation change ... ok
+test_the_trial_form_records_a_ward_field (test_ward_field.LayerTwoTreatmentTest.test_the_trial_form_records_a_ward_field)
+The whole reason this card exists: the form sends a `ward`. ... ok
+test_ward_is_declared_known_but_not_yet_a_dimension (test_ward_field.LayerTwoTreatmentTest.test_ward_is_declared_known_but_not_yet_a_dimension)
+`ward` is NOT in DIMS: adding a ward filter changes what the ... ok
+test_every_named_protected_key_holds_no_nepali_value (test_ward_field.SafetyStringsRenderedTest.test_every_named_protected_key_holds_no_nepali_value)
+The named list in the card, checked against the dictionary itself. ... ok
+test_protected_strings_are_english_on_the_nepali_self_report_page (test_ward_field.SafetyStringsRenderedTest.test_protected_strings_are_english_on_the_nepali_self_report_page) ... ok
+test_a_palika_with_a_ward_count_carries_a_usable_one_and_a_missing_one_is_declared (test_ward_field.WardCodesTest.test_a_palika_with_a_ward_count_carries_a_usable_one_and_a_missing_one_is_declared)
+The ward control is built from the palika's own `wards` count. ... ok
+test_the_four_palikas_carry_a_ward_count (test_ward_field.WardCodesTest.test_the_four_palikas_carry_a_ward_count) ... ok
+test_a_record_carrying_a_ward_exports_it (test_ward_field.WardCsvExportTest.test_a_record_carrying_a_ward_exports_it)
+FAILING-FIRST: `ward` is in the allow-list, the header and the row. ... ok
+test_a_record_without_a_ward_still_exports_cleanly (test_ward_field.WardCsvExportTest.test_a_record_without_a_ward_still_exports_cleanly)
+`""` is "not stated", not a broken row: the column is present, empty. ... ok
+test_register_body_keeps_ward_and_treats_blank_as_not_stated (test_ward_field.WardCsvExportTest.test_register_body_keeps_ward_and_treats_blank_as_not_stated)
+Nothing may reject or silently drop the field; "" is dropped as empty. ... ok
+test_ward_reaches_the_export_for_both_shapes_in_one_run (test_ward_field.WardCsvExportTest.test_ward_reaches_the_export_for_both_shapes_in_one_run)
+One export, one with a ward and one without: both stay aligned. ... ok
+test_no_protected_key_gained_a_nepali_value (test_ward_field.WardDictionaryTest.test_no_protected_key_gained_a_nepali_value)
+The card's safety property, aligned with the shipped rule. ... ok
+test_the_ward_label_is_a_plain_string_with_no_markup (test_ward_field.WardDictionaryTest.test_the_ward_label_is_a_plain_string_with_no_markup)
+The form inserts this key with textContent, not innerHTML. ... ok
+test_the_ward_label_strings_exist_in_both_languages (test_ward_field.WardDictionaryTest.test_the_ward_label_strings_exist_in_both_languages) ... ok
+test_the_ward_strings_are_marked_machine (test_ward_field.WardDictionaryTest.test_the_ward_strings_are_marked_machine)
+Provenance: the page says the Nepali is a machine draft. ... ok
+test_the_ward_control_appears_for_a_palika_with_a_ward_count (test_ward_field.WardFieldRenderedTest.test_the_ward_control_appears_for_a_palika_with_a_ward_count)
+Aamachhodingmo is one of the four the patch fixed; its list must build. ... ok
+test_the_ward_help_line_is_not_the_raw_key_or_markup (test_ward_field.WardFieldRenderedTest.test_the_ward_help_line_is_not_the_raw_key_or_markup) ... ok
+test_the_ward_label_is_not_the_raw_key_on_the_nepali_page (test_ward_field.WardFieldRenderedTest.test_the_ward_label_is_not_the_raw_key_on_the_nepali_page)
+The symptom the hub patch removes: label renders as `f4.wardLab`. ... ok
+
+----------------------------------------------------------------------
+Ran 32 tests in 8.239s
+
+OK
