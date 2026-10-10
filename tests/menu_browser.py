@@ -56,6 +56,10 @@ try:
    forms.click();pg.locator('.rg[data-g=forms] .rgb>a').first.click();pg.wait_for_load_state('load');check(state()==[],f'{width} selection closes')
    check(urlsplit(pg.url).fragment=='reports',f'{width} navigation retained')
    check(pg.locator('.rg[data-g=coord] a[href="./#reports"]').get_attribute('aria-current')=='page',f'{width} route highlight')
+   # The selected ./#reports link deliberately returns to the default historical
+   # route. Re-enter this runner's explicit legacy route for its legacy menu
+   # preference/geometry assertions; launch menu geometry has its own gate.
+   if not LIVE:pg.goto(origin+'/index.html?source=choose#reports',wait_until='load')
    pg.evaluate("localStorage.setItem('mhpss-rail-groups',JSON.stringify({forms:true,public:true,coord:false,admin:true}));localStorage.setItem('w40-pending-sentinel','UNCHANGED');localStorage.setItem('mhpss-lang','en')")
    pg.reload(wait_until='load');check(state()==[],f'{width} legacy state closed after reload')
    check(pg.locator('.rg[data-g=coord] .rgb').is_visible(),f'{width} coordination remains visible')

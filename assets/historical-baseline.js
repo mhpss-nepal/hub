@@ -30,7 +30,17 @@
     if (!validDay(x.original_export_date) || !validCapture(x.backup_capture_utc)) throw Error('Invalid source date.');
     return Object.freeze(Object.assign({}, x));
   }
-  function setStatus(message) { $('historical-status').textContent = message; }
+  var linkPending = false;
+  function setStatus(message, focus) {
+    $('historical-status').textContent = message;
+    if (focus) $('historical-status').focus();
+  }
+  function syncActions(user) {
+    $('historical-refresh').hidden = !user;
+    $('historical-export').hidden = !user || !current;
+    $('historical-account').hidden = !user;
+    if (!user) $('historical-account').open = false;
+  }
   function card(value, label, note) {
     var c = document.createElement('div'); c.className = 'stat';
     [['k', label], ['v', value], ['s', note]].forEach(function (pair) {
@@ -40,6 +50,7 @@
   function render() {
     var stats = $('historical-stats'); stats.replaceChildren();
     $('historical-results').hidden = !current;
+    syncActions(window.BaselineAuth && window.BaselineAuth.currentUser());
     if (!current) {
       $('historical-provenance').textContent = '';
       $('historical-summary').textContent = '';
@@ -56,15 +67,17 @@
       '. Historical BS reporting dates remain unresolved. These dates are not a current response period.';
     $('historical-summary').textContent = x.unverified_form_entries.toLocaleString('en-GB') +
       ' later form entries are retained separately with trial legitimacy unverified. Their contacts are excluded from the historical figures. No combined achievement, unique-person, trend, sex/age or geographic claim is made.';
-    setStatus('Private backend historical version read at ' + readAt + '. Historical coverage is not current reporting. No operational save, queue or public publication.');
+    setStatus('Updated ' + readAt.slice(11, 16) + ' UTC · historical records, not current reporting.');
   }
   function show() {
     panel.hidden = false;
+    document.body.classList.add('historical-entry');
+    $('source-tools').open = false;
     $('entry-shell').hidden = true;
     $('app').hidden = true;
     $('access-options').open = false;
   }
-  function hide() { panel.hidden = true; }
+  function hide() { panel.hidden = true; document.body.classList.remove('historical-entry'); $('source-tools').open = true; }
   function clear(message) {
     generation += 1;
     if (controller) controller.abort(); controller = null;
@@ -108,11 +121,17 @@
   $('historical-login-form').addEventListener('submit', async function (event) {
     event.preventDefault();
     try {
-      if ($('historical-signin').textContent === 'Complete email sign-in' && !$('historical-password').value) {
-        await window.BaselineAuth.finishLink($('historical-email').value.trim());
-      } else { await window.BaselineAuth.signIn($('historical-email').value.trim(), $('historical-password').value); }
+      var email = $('historical-email').value.trim(), password = $('historical-password').value;
+      if (password || event.submitter === $('historical-password-signin')) {
+        await window.BaselineAuth.signIn(email, password);
+      } else if (linkPending) {
+        await window.BaselineAuth.finishLink(email);
+      } else {
+        await window.BaselineAuth.sendLink(email);
+        setStatus('Sign-in link requested. Open it in this browser.');
+      }
     }
-    catch (e) { clear('Sign-in failed. Check your account and try again.'); }
+    catch (e) { clear('Sign-in failed. Check your account and try again.'); setStatus($('historical-status').textContent, true); }
     finally { $('historical-password').value = ''; }
   });
   $('historical-link').addEventListener('click', async function () {
@@ -144,9 +163,11 @@
   if (window.BaselineAuth) {
     window.BaselineAuth.onChange(function (user, state) {
       clear(state.error || (user ? 'Reading the private historical backend…' : 'Sign in with the enabled primary administrator account to read the private baseline.'));
-      $('historical-login').hidden = !!user && !state.linkPending;
-      $('historical-signin').textContent = state.linkPending ? 'Complete email sign-in' : 'Sign in';
+      linkPending = !!state.linkPending;
+      $('historical-login').hidden = !!user && !linkPending;
+      $('historical-signin').textContent = linkPending ? 'Complete email sign-in' : 'Send sign-in link';
       $('historical-signout').hidden = !user;
+      syncActions(user);
       if (user && !panel.hidden) refresh();
     });
     window.addEventListener('offline', function () { clear('Private baseline unavailable offline. Refresh after reconnecting.'); });

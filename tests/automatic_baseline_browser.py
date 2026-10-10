@@ -61,13 +61,13 @@ try:
    check(page.locator('#fbbar').count()==0,f'{width} no legacy bridge initialization')
    check(page.evaluate('document.documentElement.scrollWidth===document.documentElement.clientWidth'),f'{width} root no overflow')
    for id in ['historical-refresh','historical-clear','historical-export','historical-signout']:
-    box=page.locator('#'+id).bounding_box();check(box['height']>=44 and box['width']>=44,f'{width} {id} 44px')
+    page.locator('#historical-account').evaluate('(e)=>e.open=true');box=page.locator('#'+id).bounding_box();check(box['height']>=44 and box['width']>=44,f'{width} {id} 44px')
    page.add_script_tag(path=str(R/'design-preview/source/axe.min.js'))
    axe=page.evaluate("async()=>{const r=await axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21a','wcag21aa']}});return {violations:r.violations.map(v=>({id:v.id,targets:v.nodes.map(n=>n.target)})),incomplete:r.incomplete.map(v=>v.id)}}")
    report.setdefault('axe',[]).append({'width':width,**axe});check(not axe['violations'],f'{width} axe')
    page.screenshot(path=str(E/f'populated-{width}.png'));report['screenshots'].append(str(E/f'populated-{width}.png'))
    # In-flight clear/auth/permission refusal must remove all private DOM and export state.
-   state['hold']=True;page.locator('#historical-refresh').click();page.wait_for_timeout(100);page.locator('#historical-clear').click()
+   state['hold']=True;page.locator('#historical-refresh').click();page.wait_for_timeout(100);page.locator('#historical-account').evaluate('(e)=>e.open=true');page.locator('#historical-clear').click()
    for rt in state['pending']:rt.fulfill(status=200,body=json.dumps(state['summary']),content_type='application/json')
    state['pending']=[];state['hold']=False;page.wait_for_timeout(100)
    check(page.locator('#historical-stats').text_content()=='',f'{width} delayed clear fenced')
@@ -110,7 +110,7 @@ try:
    page.screenshot(path=str(E/f'signed-out-{width}.png'))
    check(page.evaluate("localStorage.getItem('mhpss-np-queue-v1')")==POISON,f'{width} queue preserved after all faults')
    # In-page demo remains synthetic and cannot inherit private aggregate data.
-   page.locator('#useDemo').click();check(page.locator('#app').is_visible() and page.locator('#historical-baseline').is_hidden(),f'{width} explicit synthetic source switch')
+   page.locator('#source-tools').evaluate('(e)=>e.open=true');page.locator('#useDemo').click();check(page.locator('#app').is_visible() and page.locator('#historical-baseline').is_hidden(),f'{width} explicit synthetic source switch')
    page.locator('.tab[data-p=raw]').click();page.locator('#reload').click();page.locator('#useHistorical').click();check(page.locator('#historical-baseline').is_visible() and page.locator('#app').is_hidden(),f'{width} return to historical hides legacy DOM')
    context.close()
   browser.close()

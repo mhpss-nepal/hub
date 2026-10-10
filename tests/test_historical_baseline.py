@@ -18,10 +18,13 @@ class HistoricalContract(unittest.TestCase):
    self.assertEqual((R/f).read_bytes(),subprocess.check_output(['git','show',BASE+':'+f],cwd=R),f)
   old=subprocess.check_output(['git','show',BASE+':index.html'],cwd=R).decode();new=(R/'index.html').read_text()
   oldstyles=re.findall(r'<style[^>]*>(.*?)</style>',old,re.S);newstyles=re.findall(r'<style[^>]*>(.*?)</style>',new,re.S)
-  self.assertEqual(oldstyles,newstyles)
+  self.assertEqual(len(newstyles),len(oldstyles)+1)
+  self.assertEqual(oldstyles,newstyles[:-1])
+  self.assertIn('<style id="launch-entry-layout">',new)
+  self.assertIn('.historical-entry .rail',newstyles[-1])
   oldids=set(re.findall(r'\bid="([^"]+)"',old));newids=re.findall(r'\bid="([^"]+)"',new)
   self.assertEqual(len(newids),len(set(newids)))
-  approved_additions={'useHistorical','historical-baseline','historical-login','historical-login-form','historical-email','historical-password','historical-signin','historical-signout','historical-link','historical-refresh','historical-status','historical-results','historical-stats','historical-export','historical-clear','historical-provenance','historical-summary'}
+  approved_additions={'useHistorical','historical-baseline','historical-login','historical-login-form','historical-email','historical-password','historical-signin','historical-signout','historical-link','historical-refresh','historical-status','historical-results','historical-stats','historical-export','historical-clear','historical-provenance','historical-summary','launch-entry-layout','source-tools','historical-account','historical-password-options','historical-password-signin'}
   self.assertFalse(oldids-set(newids));self.assertEqual(set(newids)-oldids,approved_additions)
  def test_no_public_data_asset(self):
   j=(R/'assets/historical-baseline.js').read_text()

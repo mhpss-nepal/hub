@@ -415,6 +415,54 @@ body.hub.dashboard-selected #ovSadd .bar{background:#087f82}
 body.hub.dashboard-selected #ovPal .bar{background:#2c8071}
 body.hub.dashboard-selected .filters{border-left:4px solid #526e91}
 </style>
+<style id="launch-entry-layout">
+/* Launch entry: in-place historical route only; legacy sources retain their shell. */
+body.hub.dashboard-selected .dashboard-short-label{display:none}
+body.hub.dashboard-selected.historical-entry .dashboard-full-label{display:none}
+body.hub.dashboard-selected.historical-entry .dashboard-short-label{display:inline}
+body.hub.dashboard-selected.historical-entry .top{padding:12px 16px}
+body.hub.dashboard-selected.historical-entry .top h1{font-size:20px}
+body.hub.dashboard-selected.historical-entry .top .sub{font-size:12px;margin-top:3px}
+body.hub.dashboard-selected.historical-entry .rail{padding:0 16px}
+body.hub.dashboard-selected.historical-entry .rail .rg[data-g=coord] .rgb>a:not([data-default]){display:none}
+body.hub.dashboard-selected.historical-entry .rail .rg[data-g=coord]{flex-basis:auto;width:auto}
+body.hub.dashboard-selected.historical-entry .rail .rg[data-g=coord]>.rgb{display:flex;width:auto}
+body.hub.dashboard-selected #historical-baseline{max-width:1280px;margin:0 auto}
+body.hub.dashboard-selected .historical-heading{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+body.hub.dashboard-selected .historical-heading h2{font-size:20px;margin:0;color:#1d3d60}
+body.hub.dashboard-selected #historical-login{max-width:460px;padding:20px;margin:12px auto}
+body.hub.dashboard-selected #historical-login h3{margin:0 0 8px;color:#1d3d60;font-size:20px}
+body.hub.dashboard-selected #historical-login p{font-size:14px;margin:8px 0 12px}
+body.hub.dashboard-selected #historical-login .xs{font-size:12px}
+body.hub.dashboard-selected #historical-login input{width:100%;box-sizing:border-box;margin:6px 0 12px}
+body.hub.dashboard-selected #historical-signin{width:100%;margin-bottom:4px}
+body.hub.dashboard-selected .historical-actions{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap}
+body.hub.dashboard-selected #historical-account{position:relative;margin-left:auto}
+body.hub.dashboard-selected #historical-account>summary{padding:10px 12px;background:#fff;border:1px solid #d8e1ec;border-radius:8px}
+body.hub.dashboard-selected #historical-account[open]{padding:0 12px 12px;background:#fff;border:1px solid #d8e1ec;border-radius:8px;max-width:100%;box-sizing:border-box}
+body.hub.dashboard-selected #historical-account .xs{max-width:32ch}
+body.hub.dashboard-selected #historical-status{font-size:13px;color:#455569;margin:10px 0;overflow-wrap:break-word}
+body.hub.dashboard-selected #historical-status:focus{outline:3px solid #2674be;outline-offset:3px}
+body.hub.dashboard-selected #historical-stats .stat{min-height:112px}
+body.hub.dashboard-selected.historical-entry #source-tools{margin-top:20px}
+body.hub.dashboard-selected #source-tools>summary{font-size:13px}
+body.hub.dashboard-selected #historical-results .analysis-detail{padding:0 14px 12px}
+body.hub.dashboard-selected #historical-results .analysis-detail>summary{background:transparent;border:0}
+@media(max-width:650px){
+ body.hub.dashboard-selected.historical-entry .rail{padding:0 12px;position:relative}
+ body.hub.dashboard-selected.historical-entry .rail .rg[data-g=public]{position:static}
+ body.hub.dashboard-selected.historical-entry .rail .rg[data-g=public].open>.rgb{left:12px;right:auto;top:100%}
+ body.hub.dashboard-selected.historical-entry .rail nav{flex-basis:auto}
+ body.hub.dashboard-selected.historical-entry .rail .railtoggle{margin-left:0}
+ body.hub.dashboard-selected.historical-entry .top h1{font-size:18px}
+ body.hub.dashboard-selected #historical-login{padding:16px}
+ body.hub.dashboard-selected #historical-stats{gap:8px;margin:10px 0}
+ body.hub.dashboard-selected #historical-stats .stat{min-height:108px;padding:10px}
+ body.hub.dashboard-selected #historical-stats .v{font-size:30px}
+ body.hub.dashboard-selected #historical-stats .k{font-size:10px}
+ body.hub.dashboard-selected #historical-stats .s{font-size:11px;margin-top:4px}
+}
+</style>
 </head>
 <body class="hub dashboard-selected">
 <a class="skip" href="#dashboard-main">Skip to dashboard</a>
@@ -438,7 +486,7 @@ body.hub.dashboard-selected .filters{border-left:4px solid #526e91}
     <div class="rg open here" data-g="coord">
       <button class="rgh" type="button"><span class="dot l2"></span>Coordination<em>layer 2</em><i class="chev"></i></button>
       <div class="rgb">
-        <a class="on" aria-current="page" data-default href="./#overview">Dashboard &middot; overview</a>
+        <a class="on" aria-current="page" data-default href="./#overview"><span class="dashboard-full-label">Dashboard &middot; overview</span><span class="dashboard-short-label">Dashboard</span></a>
         <a href="./#who-is-where">Who is where</a>
         <a href="./#activities">Activities</a>
         <a href="./#reports">Reports received</a>
@@ -546,6 +594,41 @@ body.hub.dashboard-selected .filters{border-left:4px solid #526e91}
 
 <main class="wrap wide" id="dashboard-main">
 
+  <section id="historical-baseline" aria-label="Private historical baseline" hidden>
+    <div class="historical-heading"><h2>Historical baseline</h2><span class="xs">Private · read-only</span></div>
+    <div id="historical-login" class="card" hidden>
+      <h3>Sign in to your dashboard</h3>
+      <p>Your authorised account opens the retained historical summary automatically.</p>
+      <form id="historical-login-form">
+        <label for="historical-email">Email address</label><input type="email" id="historical-email" autocomplete="username" required>
+        <button type="submit" class="btn" id="historical-signin">Send sign-in link</button>
+        <p class="xs">Stay signed in on your personal browser. On a shared device, sign out before leaving.</p>
+        <details id="historical-password-options"><summary>Use a password or request a replacement link</summary>
+          <label for="historical-password">Password (existing accounts only)</label><input type="password" id="historical-password" autocomplete="current-password">
+          <div class="btns"><button type="submit" class="btn grey" id="historical-password-signin">Sign in with password</button><button type="button" class="btn grey" id="historical-link">Send replacement link</button></div>
+        </details>
+      </form>
+    </div>
+    <div class="historical-actions">
+      <button type="button" class="btn" id="historical-refresh" hidden>Refresh</button>
+      <button type="button" class="btn grey" id="historical-export" aria-label="Download summary CSV" hidden>CSV</button>
+      <details id="historical-account" hidden><summary>Account</summary><div class="btns"><button type="button" class="btn grey" id="historical-signout" hidden>Sign out</button><button type="button" class="btn grey" id="historical-clear">Clear this view</button></div><p class="xs">Clearing this view does not delete records or sign you out.</p></details>
+    </div>
+    <p id="historical-status" role="status" aria-live="polite" tabindex="-1">Connecting…</p>
+    <div id="historical-results" hidden>
+      <p class="entry-note">Historical records · all entries · not current reporting. Contacts are not unique people; unknown counts are excluded, not zero.</p>
+      <div class="stats" id="historical-stats"></div>
+      <p id="historical-summary" class="entry-note"></p>
+      <details class="analysis-detail"><summary>Source, dates &amp; analysis limits</summary>
+        <p id="historical-provenance" class="entry-note"></p>
+        <p>Historical BS reporting dates remain unresolved; capture and export dates are not a current response period. No filters applied.</p>
+        <p>Organisation, site coverage, trends and sex-by-age breakdowns are unavailable in this minimized reading copy. Historical entries are not new session reports. No unsupported chart or zero is substituted.</p>
+        <p>The CSV contains the same version and units as these cards. Source and correction review remains separate from backend readiness and institutional approval.</p>
+        <p>Available only to the enabled primary administrator. This page reads the maintained private backend; no dataset is embedded here. No file upload, operational save, queue or public publication occurs.</p>
+      </details>
+    </div>
+  </section>
+  <details id="source-tools" class="analysis-detail"><summary>Other sources &amp; tools</summary>
   <div class="card" id="loader">
     <div class="source-start">
       <div id="band">Historical baseline uses a private retained summary, not generated demo figures. Choose another source below.</div>
@@ -572,30 +655,7 @@ body.hub.dashboard-selected .filters{border-left:4px solid #526e91}
       <p class="xs" style="margin:12px 0 0">The synthetic demo is generated locally and is not operational data. Coverage denominators use the holding-centre roster; loaded figures are not independently validated.</p>
     </div></details>
   </div>
-  <section id="historical-baseline" aria-label="Private historical baseline" hidden>
-    <div class="source-start"><div><b>Historical baseline · private reading</b><br><span class="xs">Real retained data, not a synthetic demo. No dataset is embedded in this public page.</span></div></div>
-    <div class="card" style="margin-top:12px">
-      <div id="historical-login" hidden>
-        <form id="historical-login-form">
-          <label for="historical-email">Administrator email</label><input type="email" id="historical-email" autocomplete="username" required style="min-height:44px;width:100%">
-          <label for="historical-password">Password</label><input type="password" id="historical-password" autocomplete="current-password" style="min-height:44px;width:100%">
-          <div class="btns"><button type="submit" class="btn" id="historical-signin">Sign in</button><button type="button" class="btn grey" id="historical-link">Email sign-in link</button></div>
-        </form>
-      </div>
-      <div class="btns"><button type="button" class="btn" id="historical-refresh">Refresh historical baseline</button><button type="button" class="btn grey" id="historical-clear">Clear historical view</button><button type="button" class="btn grey" id="historical-signout">Sign out</button></div>
-      <p id="historical-status" role="status" aria-live="polite">Connecting to private historical reader…</p>
-      <p class="xs">Available only to the enabled primary administrator. Sign in once using the existing project account; the private baseline loads automatically. Refresh reads the maintained backend version. No file upload, operational write or public publication occurs.</p>
-    </div>
-    <div id="historical-results" hidden>
-      <div class="stats" id="historical-stats"></div>
-      <p id="historical-provenance" class="entry-note"></p>
-      <div class="primary-grid">
-        <section class="ovcol"><div class="ovcolh"><h2>What the figures mean</h2></div><div class="ovcolb"><p id="historical-summary"></p><p>All historical entries · no filters applied. Counts are service contacts, not unique people. Unknown counts are excluded rather than converted to zero.</p></div></section>
-        <section class="ovcol"><div class="ovcolh"><h2>Analysis limits</h2></div><div class="ovcolb"><p>Organisation, site coverage, trends and sex-by-age breakdowns are unavailable in this minimized reading copy. Historical entries are not new session reports. No unsupported chart or zero is substituted.</p><p>Source and correction review remains separate from backend readiness and institutional approval.</p></div></section>
-      </div>
-      <div class="btns"><button type="button" class="btn" id="historical-export">Export private summary CSV</button></div>
-    </div>
-  </section>
+  </details>
   <section id="entry-shell" aria-label="Dashboard awaiting a data source">
     <div class="entry-filters" aria-label="Filters available after loading a source"><span>Period —</span><span>Province —</span><span>District —</span><span>Palika —</span><span>Organisation —</span><span>Activity layer —</span><span>Service setting —</span></div>
     <div class="stats"><div class="stat"><div class="k">Reports</div><div class="v">—</div><div class="s">Awaiting a source</div></div><div class="stat"><div class="k">Attendances</div><div class="v">—</div><div class="s">Awaiting a source</div></div><div class="stat"><div class="k">Organisations reporting</div><div class="v">—</div><div class="s">Awaiting a source</div></div><div class="stat"><div class="k">Roster sites reached</div><div class="v">—</div><div class="s">Awaiting a source</div></div><div class="stat"><div class="k">Roster sites with no report</div><div class="v">—</div><div class="s">Awaiting a source</div></div></div>

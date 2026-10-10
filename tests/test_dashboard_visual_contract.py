@@ -17,7 +17,7 @@ class Contract(unittest.TestCase):
   self.old=subprocess.check_output(['git','show',BASE+':index.html'],cwd=ROOT).decode();self.new=(ROOT/'index.html').read_text()
  def test_controls_and_assets_exact(self):
   a,b=parse(self.old),parse(self.new)
-  approved_additions={'useHistorical','historical-export','historical-clear','historical-email','historical-password','historical-signin','historical-signout','historical-link','historical-refresh'}
+  approved_additions={'useHistorical','historical-export','historical-clear','historical-email','historical-password','historical-signin','historical-signout','historical-link','historical-refresh','historical-password-signin'}
   added=[c for c in b.controls if c not in a.controls]
   self.assertCountEqual(a.controls,[c for c in b.controls if c not in added])
   self.assertEqual({c[2] for c in added},approved_additions);self.assertEqual(len(added),len(approved_additions))
