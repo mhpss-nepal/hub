@@ -465,6 +465,11 @@ body.hub.dashboard-selected #historical-results .analysis-detail>summary{backgro
  body.hub.dashboard-selected #historical-stats .k{font-size:10px}
  body.hub.dashboard-selected #historical-stats .s{font-size:11px;margin-top:4px}
 }
+/* V50 source navigation: links only; no source or account state. */
+  body.hub.dashboard-selected .source-nav{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+  body.hub.dashboard-selected .source-nav a{display:inline-flex;align-items:center;min-height:44px;min-width:44px;padding:8px 12px;border:1px solid var(--line);border-radius:var(--r);background:#fff;color:var(--who-d);font-size:13px;font-weight:700;white-space:normal;max-width:100%;box-sizing:border-box;overflow-wrap:break-word}
+  body.hub.dashboard-selected .source-nav a:focus-visible{outline:3px solid var(--who-d);outline-offset:2px}
+  body.hub.dashboard-selected .source-note{font-size:12px;color:var(--slate);margin:0 0 14px}
 </style>
 <link rel="stylesheet" href="assets/historical-analytics.css">
 </head>
@@ -477,6 +482,12 @@ body.hub.dashboard-selected #historical-results .analysis-detail>summary{backgro
  <p class="rfoot">Verification entry, not operational launch.</p>
 </aside>
 <main class="wrap wide" id="dashboard-main">
+  <nav class="source-nav" aria-label="Dashboard data sources">
+    <a href="../?source=choose">Dashboard home</a>
+    <a aria-current="page" href="?source=historical">Historical data (real retained records)</a>
+    <a href="../?source=demo">Synthetic demo (generated examples, not real service figures)</a>
+  </nav>
+  <p class="source-note">Historical data retains source gaps. The demo is synthetic and never fills missing historical fields; its figures and units are not a performance comparison.</p>
   <section id="historical-baseline" aria-label="Private historical baseline" hidden>
     <div class="historical-heading"><h2>Historical baseline</h2><span class="xs">Private · read-only</span></div>
     <div id="historical-login" class="card" hidden>
