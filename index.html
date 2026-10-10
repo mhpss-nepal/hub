@@ -384,6 +384,37 @@ body.hub.dashboard-selected .ovcolh h2{flex-shrink:1;min-width:0;max-width:100%;
 body.hub.dashboard-selected input[type=file]{display:block;width:100%;max-width:100%;font:inherit;font-size:12px;padding:8px 0;min-height:44px}
 body.hub.dashboard-selected .file-choice{display:block;font-size:13px;font-weight:700;color:#1d3d60;max-width:100%}
 </style>
+<style id="dashboard-category-palette">
+/* Owner-approved category palette. Category colours never imply validation. */
+body.hub.dashboard-selected{--who:#2563eb;--who-d:#1d4ed8;background:#edf2f8}
+body.hub.dashboard-selected .top{background:#143451;background-image:linear-gradient(110deg,#143451,#225579);border-bottom:4px solid #38b3bd}
+body.hub.dashboard-selected .stats .stat{--accent:#235dc1;--tint:#edf4ff;--ink:#173c7d;background:var(--tint);border:1px solid #d5deea;border-top:5px solid var(--accent);box-shadow:0 3px 12px #18355108}
+body.hub.dashboard-selected .stats .stat:nth-child(2){--accent:#087f82;--tint:#eaf8f6;--ink:#075b5d}
+body.hub.dashboard-selected .stats .stat:nth-child(3){--accent:#7852ac;--tint:#f4effb;--ink:#583581}
+body.hub.dashboard-selected .stats .stat:nth-child(4){--accent:#b44778;--tint:#fff0f6;--ink:#873154}
+body.hub.dashboard-selected .stats .stat:nth-child(5){--accent:#b66623;--tint:#fff3e8;--ink:#864516}
+body.hub.dashboard-selected .stats .stat .v{color:var(--ink)}
+body.hub.dashboard-selected .stats .stat .k{color:var(--ink);font-weight:800}
+body.hub.dashboard-selected .stats .stat .s{color:#45546b}
+body.hub.dashboard-selected .ovcol{--panel:#2563eb;--panel-tint:#eef4ff;--panel-ink:#1d427f;border:1px solid #d7e0ec;border-top:4px solid var(--panel);box-shadow:0 4px 14px #1d36500a;overflow:hidden}
+body.hub.dashboard-selected .ovcol .ovcolh{background:var(--panel-tint);border-bottom:1px solid #dbe3ee;padding-bottom:14px}
+body.hub.dashboard-selected .ovcol .ovcolh h2{color:var(--panel-ink)}
+body.hub.dashboard-selected .ovcol .ovnum{color:var(--panel-ink)}
+body.hub.dashboard-selected .primary-grid>.ovcol:nth-child(2){--panel:#6262ba;--panel-tint:#f0effc;--panel-ink:#45457f}
+body.hub.dashboard-selected #ovcols>.ovcol:first-child,body.hub.dashboard-selected .entry-secondary>.ovcol:first-child{--panel:#7852ac;--panel-tint:#f4effb;--panel-ink:#583581}
+body.hub.dashboard-selected #ovcols>.ovcol:nth-child(2),body.hub.dashboard-selected .entry-secondary>.ovcol:nth-child(2){--panel:#087f82;--panel-tint:#eaf8f6;--panel-ink:#075b5d}
+body.hub.dashboard-selected .entry-secondary>.ovcol:nth-child(3){--panel:#2c8071;--panel-tint:#edf7f2;--panel-ink:#20594f}
+body.hub.dashboard-selected #ovWhere{border-top:4px solid #2c8071;background:#fff;border-radius:12px}
+body.hub.dashboard-selected #ovWhere .ovfigh h3{color:#20594f}
+body.hub.dashboard-selected .analysis-detail{background:#fff;border:1px solid #d7e0ec;border-radius:12px;overflow:hidden}
+body.hub.dashboard-selected .analysis-detail>summary{background:#edf7f2;color:#20594f;border-left:4px solid #2c8071}
+body.hub.dashboard-selected .analysis-detail+.analysis-detail>summary{background:#fff3e8;color:#864516;border-left-color:#b66623}
+body.hub.dashboard-selected .ovbar .bar{background:#2563eb}
+body.hub.dashboard-selected #ovWhoBars .bar{background:#7852ac}
+body.hub.dashboard-selected #ovSadd .bar{background:#087f82}
+body.hub.dashboard-selected #ovPal .bar{background:#2c8071}
+body.hub.dashboard-selected .filters{border-left:4px solid #526e91}
+</style>
 </head>
 <body class="hub dashboard-selected">
 <a class="skip" href="#dashboard-main">Skip to dashboard</a>
