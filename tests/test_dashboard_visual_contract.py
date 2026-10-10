@@ -2,6 +2,7 @@
 import unittest,re,json,hashlib,subprocess
 from pathlib import Path
 from html.parser import HTMLParser
+from test_source_navigation import DEMO
 ROOT=Path(__file__).resolve().parents[1]
 BASE='180a64e8ccb077e26d0905adffa320e107ffb45f'
 class Parser(HTMLParser):
@@ -38,7 +39,8 @@ class Contract(unittest.TestCase):
   legacy_source_guard='if (/[?&]source=choose\\b/.test(location.search) || !window.FB || !window.FB.onStatus) return;'
   explicit_source_guard='if (new URLSearchParams(location.search).get("source") !== "live" || !window.FB || !window.FB.onStatus) return;'
   self.assertEqual(a[1].count(legacy_source_guard),1)
-  self.assertEqual(b[1],a[1].replace(old_guard,new_guard).replace(legacy_source_guard,explicit_source_guard))
+  self.assertEqual(b[1].count(DEMO),1)
+  self.assertEqual(b[1].replace(DEMO,""),a[1].replace(old_guard,new_guard).replace(legacy_source_guard,explicit_source_guard))
   self.assertEqual(b[1].count(explicit_source_guard),1)
   self.assertEqual(hashlib.sha256(b[2].encode()).hexdigest(),'85a7cfca5e4d8fb42822015a90fd65b443a816efeec4379fb3de6d67e9910ed0')
  def test_changed_menu_or_route_rejected(self):

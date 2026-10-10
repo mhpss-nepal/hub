@@ -1,5 +1,6 @@
 import unittest,re,subprocess,hashlib
 from pathlib import Path
+from test_source_navigation import STYLE
 R=Path(__file__).resolve().parents[1]
 BASE='47f66df13198345907ace5c314f2fbe6f9d1db58'
 class HistoricalContract(unittest.TestCase):
@@ -16,7 +17,8 @@ class HistoricalContract(unittest.TestCase):
    self.assertEqual((R/f).read_bytes(),subprocess.check_output(['git','show',BASE+':'+f],cwd=R),f)
   old=subprocess.check_output(['git','show',BASE+':index.html'],cwd=R).decode();new=(R/'index.html').read_text()
   oldstyles=re.findall(r'<style[^>]*>(.*?)</style>',old,re.S);newstyles=re.findall(r'<style[^>]*>(.*?)</style>',new,re.S)
-  self.assertEqual(oldstyles,newstyles)
+  self.assertEqual(new.count(STYLE),1)
+  self.assertEqual(oldstyles,[s.replace(STYLE,"") for s in newstyles])
   oldids=set(re.findall(r'\bid="([^"]+)"',old));newids=re.findall(r'\bid="([^"]+)"',new)
   self.assertEqual(len(newids),len(set(newids)))
   approved_additions={'useHistorical','historical-baseline','historical-file','historical-status','historical-results','historical-stats','historical-export','historical-clear','historical-provenance','historical-summary'}
