@@ -84,7 +84,7 @@
         credentials: 'omit', cache: 'no-store', redirect: 'error', referrerPolicy: 'no-referrer', signal: abort.signal });
       token = null;
       if (mine !== generation || auth.currentUser() !== user) return;
-      if (!response.ok) throw Error(response.status === 401 || response.status === 403 ? 'Private baseline access refused. Sign in again or check primary administrator access.' : 'Private baseline unavailable. Retry when online.');
+      if (response.status !== 200) throw Error(response.status === 401 || response.status === 403 ? 'Private baseline access refused. Sign in again or check primary administrator access.' : 'Private baseline unavailable. Retry when online.');
       var text = await response.text();
       if (text.length > 16384) throw Error('Private reader response refused.');
       var value = validate(JSON.parse(text));
@@ -97,7 +97,7 @@
     } finally { clearTimeout(timeout); if (mine === generation) controller = null; }
   }
   function csv() {
-    if (!current) return '';
+    if (!current || !window.BaselineAuth.currentUser()) return '';
     var x = current;
     return 'version,historical_entries,known_service_contacts,unknown_count_entries,unverified_form_entries,unit,backup_capture_utc,original_export_date,historical_date_status,scope\r\n' +
       [x.version, x.historical_entries, x.known_service_contacts, x.unknown_count_entries, x.unverified_form_entries,
@@ -107,7 +107,11 @@
   $('historical-refresh').addEventListener('click', refresh);
   $('historical-login-form').addEventListener('submit', async function (event) {
     event.preventDefault();
-    try { await window.BaselineAuth.signIn($('historical-email').value.trim(), $('historical-password').value); }
+    try {
+      if ($('historical-signin').textContent === 'Complete email sign-in' && !$('historical-password').value) {
+        await window.BaselineAuth.finishLink($('historical-email').value.trim());
+      } else { await window.BaselineAuth.signIn($('historical-email').value.trim(), $('historical-password').value); }
+    }
     catch (e) { clear('Sign-in failed. Check your account and try again.'); }
     finally { $('historical-password').value = ''; }
   });
@@ -118,8 +122,9 @@
   $('historical-signout').addEventListener('click', function () { clear('Signed out view cleared.'); window.BaselineAuth.signOut().catch(function () { setStatus('Sign-out unavailable. Close this private view and retry when online.'); }); });
   $('historical-clear').addEventListener('click', clear);
   $('historical-export').addEventListener('click', function () {
-    if (!current) return;
-    var url = URL.createObjectURL(new Blob(['\ufeff' + csv()], { type: 'text/csv;charset=utf-8' }));
+    var content = csv();
+    if (!content) return;
+    var url = URL.createObjectURL(new Blob(['\ufeff' + content], { type: 'text/csv;charset=utf-8' }));
     var a = document.createElement('a'); a.href = url; a.download = 'private-historical-summary.csv'; a.click();
     setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
   });
@@ -139,7 +144,8 @@
   if (window.BaselineAuth) {
     window.BaselineAuth.onChange(function (user, state) {
       clear(state.error || (user ? 'Reading the private historical backend…' : 'Sign in with the enabled primary administrator account to read the private baseline.'));
-      $('historical-login').hidden = !!user;
+      $('historical-login').hidden = !!user && !state.linkPending;
+      $('historical-signin').textContent = state.linkPending ? 'Complete email sign-in' : 'Sign in';
       $('historical-signout').hidden = !user;
       if (user && !panel.hidden) refresh();
     });
