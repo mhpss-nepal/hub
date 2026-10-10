@@ -7,6 +7,16 @@
   var keys = ['schema', 'version', 'classification', 'historical_entries', 'known_service_contacts',
     'unknown_count_entries', 'unverified_form_entries', 'backup_capture_utc', 'original_export_date',
     'historical_date_status', 'unit', 'combine_classes'];
+  function validDay(value) {
+    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+    var date = new Date(value + 'T00:00:00.000Z');
+    return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value;
+  }
+  function validCapture(value) {
+    if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}\+00:00$/.test(value) || !validDay(value.slice(0, 10))) return false;
+    var parts = value.slice(11, 19).split(':').map(Number);
+    return parts[0] < 24 && parts[1] < 60 && parts[2] < 60 && Number.isFinite(Date.parse(value));
+  }
   function validate(x) {
     if (!x || Array.isArray(x) || typeof x !== 'object' || Object.keys(x).sort().join('|') !== keys.slice().sort().join('|')) throw Error('Not a minimized historical summary. Use the supplied private summary file, not a full record export.');
     if (x.schema !== 'mhpss-private-historical-summary-v1' || x.version !== 'historical-master-v1' ||
@@ -16,9 +26,7 @@
       if (!Number.isSafeInteger(x[k]) || x[k] < 0) throw Error('Invalid count: ' + k);
     });
     if (x.unknown_count_entries > x.historical_entries) throw Error('Unknown counts exceed historical entries.');
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(x.original_export_date) ||
-      !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}\+00:00$/.test(x.backup_capture_utc) ||
-      !Number.isFinite(Date.parse(x.original_export_date)) || !Number.isFinite(Date.parse(x.backup_capture_utc))) throw Error('Invalid source date.');
+    if (!validDay(x.original_export_date) || !validCapture(x.backup_capture_utc)) throw Error('Invalid source date.');
     return Object.freeze(Object.assign({}, x));
   }
   function setStatus(message) { $('historical-status').textContent = message; }
@@ -31,7 +39,11 @@
   function render() {
     var stats = $('historical-stats'); stats.replaceChildren();
     $('historical-results').hidden = !current;
-    if (!current) return;
+    if (!current) {
+      $('historical-provenance').textContent = '';
+      $('historical-summary').textContent = '';
+      return;
+    }
     var x = current;
     stats.appendChild(card(x.historical_entries.toLocaleString('en-GB'), 'Historical entries', 'Entries, not unique sessions'));
     stats.appendChild(card(x.known_service_contacts.toLocaleString('en-GB'), 'Known service contacts', 'Not unique people; incomplete total'));
