@@ -548,8 +548,9 @@ body.hub.dashboard-selected .filters{border-left:4px solid #526e91}
 
   <div class="card" id="loader">
     <div class="source-start">
-      <div id="band">Draft · No source loaded. Choose a source or explore the explicitly synthetic demo.</div>
-      <button type="button" class="btn" id="useDemo">Explore synthetic demo</button>
+      <div id="band">Historical baseline uses a private retained summary, not generated demo figures. Choose another source below.</div>
+      <button type="button" class="btn" id="useHistorical">Historical baseline</button>
+      <button type="button" class="btn grey" id="useDemo">Explore synthetic demo</button>
     </div>
     <details id="access-options"><summary>Access live register or import a file</summary>
     <div class="drop" id="drop">
@@ -571,6 +572,24 @@ body.hub.dashboard-selected .filters{border-left:4px solid #526e91}
       <p class="xs" style="margin:12px 0 0">The synthetic demo is generated locally and is not operational data. Coverage denominators use the holding-centre roster; loaded figures are not independently validated.</p>
     </div></details>
   </div>
+  <section id="historical-baseline" aria-label="Private historical baseline" hidden>
+    <div class="source-start"><div><b>Historical baseline · private reading</b><br><span class="xs">Real retained data, not a synthetic demo. No dataset is embedded in this public page.</span></div></div>
+    <div class="card" style="margin-top:12px">
+      <label for="historical-file">Open the supplied private historical-summary JSON</label>
+      <input type="file" id="historical-file" accept=".json,application/json" style="min-height:44px;max-width:100%;width:100%">
+      <p id="historical-status" role="status" aria-live="polite">No historical data attached.</p>
+      <p class="xs">Keep this file private. The importer reads only a minimized aggregate summary, not a full master or source records. Data stays in this page's memory; there is no upload, save, queue, or publication action.</p>
+    </div>
+    <div id="historical-results" hidden>
+      <div class="stats" id="historical-stats"></div>
+      <p id="historical-provenance" class="entry-note"></p>
+      <div class="primary-grid">
+        <section class="ovcol"><div class="ovcolh"><h2>What the figures mean</h2></div><div class="ovcolb"><p id="historical-summary"></p><p>All historical entries · no filters applied. Counts are service contacts, not unique people. Unknown counts are excluded rather than converted to zero.</p></div></section>
+        <section class="ovcol"><div class="ovcolh"><h2>Analysis limits</h2></div><div class="ovcolb"><p>Organisation, site coverage, trends and sex-by-age breakdowns are unavailable in this minimized reading copy. Historical entries are not new session reports. No unsupported chart or zero is substituted.</p><p>Source and correction review remains separate from backend readiness and institutional approval.</p></div></section>
+      </div>
+      <div class="btns"><button type="button" class="btn" id="historical-export">Export private summary CSV</button><button type="button" class="btn grey" id="historical-clear">Clear historical view</button></div>
+    </div>
+  </section>
   <section id="entry-shell" aria-label="Dashboard awaiting a data source">
     <div class="entry-filters" aria-label="Filters available after loading a source"><span>Period —</span><span>Province —</span><span>District —</span><span>Palika —</span><span>Organisation —</span><span>Activity layer —</span><span>Service setting —</span></div>
     <div class="stats"><div class="stat"><div class="k">Reports</div><div class="v">—</div><div class="s">Awaiting a source</div></div><div class="stat"><div class="k">Attendances</div><div class="v">—</div><div class="s">Awaiting a source</div></div><div class="stat"><div class="k">Organisations reporting</div><div class="v">—</div><div class="s">Awaiting a source</div></div><div class="stat"><div class="k">Roster sites reached</div><div class="v">—</div><div class="s">Awaiting a source</div></div><div class="stat"><div class="k">Roster sites with no report</div><div class="v">—</div><div class="s">Awaiting a source</div></div></div>
@@ -1571,7 +1590,7 @@ body.hub.dashboard-selected .filters{border-left:4px solid #526e91}
      password it does not need. `?source=choose` keeps the chooser, for loading
      a file or the synthetic set. Change source still works afterwards. */
   (function openOnLive() {
-    if (/[?&]source=choose\b/.test(location.search) || !window.FB || !window.FB.onStatus) return;
+    if (new URLSearchParams(location.search).get("source") !== "live" || !window.FB || !window.FB.onStatus) return;
     var done = false;
     window.FB.onStatus(function (st) {
       if (done || !st || !st.ready || !st.user) return;
@@ -2542,5 +2561,6 @@ body.hub.dashboard-selected .filters{border-left:4px solid #526e91}
   observeBridge();
 })();
 </script>
+<script src="assets/historical-baseline.js"></script>
 </body>
 </html>
