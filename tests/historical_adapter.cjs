@@ -1,18 +1,21 @@
-// Synthetic-only executable adapter regression; no operational data.
+// Synthetic-only executable automatic reader regression; no operational data.
 const vm=require('node:vm'),fs=require('node:fs'),assert=require('node:assert/strict');
 const nodes=new Map();
-function node(){return {hidden:true,value:'',textContent:'',children:[],handlers:{},addEventListener(k,f){this.handlers[k]=f},appendChild(n){this.children.push(n)},replaceChildren(){this.children=[]},click(){this.handlers.click?.()},};}
+function node(){return {hidden:true,value:'',textContent:'',children:[],handlers:{},addEventListener(k,f){this.handlers[k]=f},appendChild(n){this.children.push(n)},replaceChildren(){this.children=[]},click(){return this.handlers.click?.()},};}
 const get=id=>{if(!nodes.has(id))nodes.set(id,node());return nodes.get(id)};
-const sandbox={document:{getElementById:get,createElement:node},MutationObserver:class{observe(){}},URLSearchParams,location:{search:''},Object,Number,Date,JSON,Error,Blob,URL,setTimeout};
+let body, resolveText, rejectText, authCallback;const user={};
+const auth={currentUser:()=>user,token:async()=> 'fixture',onChange:f=>{authCallback=f},signOut:async()=>{}};
+const sandbox={window:{BASELINE_ONLY:true,BaselineAuth:auth,addEventListener(){}},document:{getElementById:get,createElement:node},MutationObserver:class{observe(){}},URLSearchParams,location:{search:''},Object,Number,Date,JSON,Error,Blob,URL,setTimeout,clearTimeout,AbortController,fetch:async()=>({ok:true,text:()=>body===undefined?new Promise((r,j)=>{resolveText=r;rejectText=j}):Promise.resolve(JSON.stringify(body))})};
 vm.runInNewContext(fs.readFileSync(require('node:path').join(__dirname,'../assets/historical-baseline.js'),'utf8'),sandbox);
 const x={schema:'mhpss-private-historical-summary-v1',version:'historical-master-v1',classification:'private-owner-reading',historical_entries:40,known_service_contacts:900,unknown_count_entries:2,unverified_form_entries:10,backup_capture_utc:'2026-09-25T01:00:00.123456+00:00',original_export_date:'2026-09-13',historical_date_status:'unresolved-bs-dates',unit:'service contacts, not unique people',combine_classes:false};
-async function load(v){get('historical-file').handlers.change({target:{files:[{size:1000,text:()=>Promise.resolve(JSON.stringify(v))}]}});await new Promise(r=>setImmediate(r));}
+async function load(v){body=v;await get('historical-refresh').click();}
 (async()=>{
  await load(x);assert.equal(get('historical-results').hidden,false);
- for(const patch of [{original_export_date:['2026-09-13']},{backup_capture_utc:[x.backup_capture_utc]},{original_export_date:'2026-02-30'},{backup_capture_utc:'2026-02-30T01:00:00.123456+00:00'},{historical_entries:true},{known_service_contacts:NaN},{extra:'not-permitted'}]){
+ for(const patch of [{version:['historical-master-v1']},{original_export_date:['2026-09-13']},{backup_capture_utc:[x.backup_capture_utc]},{original_export_date:'2026-02-30'},{backup_capture_utc:'2026-02-30T01:00:00.123456+00:00'},{historical_entries:true},{known_service_contacts:NaN},{extra:'not-permitted'}]){
   await load(x);await load({...x,...patch});assert.equal(get('historical-results').hidden,true);assert.equal(get('historical-summary').textContent,'');assert.equal(get('historical-provenance').textContent,'');
  }
  await load(x);get('historical-clear').click();assert.equal(get('historical-summary').textContent,'');assert.equal(get('historical-provenance').textContent,'');assert.equal(get('historical-stats').children.length,0);
- let resolve;get('historical-file').handlers.change({target:{files:[{size:1000,text:()=>new Promise(r=>resolve=r)}]}});get('historical-clear').click();resolve(JSON.stringify(x));await new Promise(r=>setImmediate(r));assert.equal(get('historical-results').hidden,true);
- console.log('PASS synthetic adapter: strict dates/types/keys, complete Clear/refusal erasure, delayed-read fencing');
+ body=undefined;let pending=get('historical-refresh').click();await new Promise(r=>setImmediate(r));get('historical-clear').click();resolveText(JSON.stringify(x));await pending;assert.equal(get('historical-results').hidden,true);
+ pending=get('historical-refresh').click();await new Promise(r=>setImmediate(r));get('historical-clear').click();rejectText(Error('delayed failure'));await pending;assert.equal(get('historical-results').hidden,true);
+ console.log('PASS synthetic automatic adapter: strict dates/types/keys, complete Clear/refusal erasure, delayed success/failure fencing');
 })().catch(e=>{console.error(e);process.exitCode=1});

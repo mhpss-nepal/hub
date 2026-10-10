@@ -1,5 +1,7 @@
 # Historical baseline reading mode
 
+**Superseded implementation:** the file-import workflow below records the earlier release only. The current candidate automatically reads the authenticated existing backend. See [Automatic private historical baseline](AUTOMATIC-HISTORICAL-BASELINE.md) for the active reader, startup, access, maintenance and rollback contract. Do not request recurring uploads.
+
 The dashboard opens on a historical-source shell, with no data embedded in the public page. The synthetic demonstration remains a separate, explicit source. The register can still be requested through the existing access panel; `?source=live` permits its existing signed-in auto-open path. `?source=choose` retains the source chooser.
 
 ## Private file workflow

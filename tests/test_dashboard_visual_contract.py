@@ -17,11 +17,11 @@ class Contract(unittest.TestCase):
   self.old=subprocess.check_output(['git','show',BASE+':index.html'],cwd=ROOT).decode();self.new=(ROOT/'index.html').read_text()
  def test_controls_and_assets_exact(self):
   a,b=parse(self.old),parse(self.new)
-  approved_additions={'useHistorical','historical-file','historical-export','historical-clear'}
+  approved_additions={'useHistorical','historical-export','historical-clear','historical-email','historical-password','historical-signin','historical-signout','historical-link','historical-refresh'}
   added=[c for c in b.controls if c not in a.controls]
   self.assertCountEqual(a.controls,[c for c in b.controls if c not in added])
   self.assertEqual({c[2] for c in added},approved_additions);self.assertEqual(len(added),len(approved_additions))
-  self.assertEqual(b.assets,a.assets+['assets/historical-baseline.js'])
+  self.assertEqual(b.assets,[x.replace('assets/fb.js','assets/baseline-startup.js') for x in a.assets]+['assets/historical-baseline.js'])
   self.assertEqual(len(b.ids),len(set(b.ids)))
  def assert_scripts_contract(self,new):
   a=re.findall(r'<script>(.*?)</script>',self.old,re.S);b=re.findall(r'<script>(.*?)</script>',new,re.S)

@@ -1,9 +1,10 @@
-/* Historical reading adapter. Private summary file -> memory-only presentation.
+/* Historical reading adapter. Authenticated private backend -> memory-only presentation.
    No operational collector, record store, queue, register reader or publisher is called. */
 (function () {
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
-  var panel = $('historical-baseline'), current = null, generation = 0;
+  var panel = $('historical-baseline'), current = null, generation = 0, controller = null, readAt = null;
+  var ENDPOINT = 'https://mhpss5ws-tdp3xtfnsq-as.a.run.app/admin/baseline';
   var keys = ['schema', 'version', 'classification', 'historical_entries', 'known_service_contacts',
     'unknown_count_entries', 'unverified_form_entries', 'backup_capture_utc', 'original_export_date',
     'historical_date_status', 'unit', 'combine_classes'];
@@ -18,8 +19,8 @@
     return parts[0] < 24 && parts[1] < 60 && parts[2] < 60 && Number.isFinite(Date.parse(value));
   }
   function validate(x) {
-    if (!x || Array.isArray(x) || typeof x !== 'object' || Object.keys(x).sort().join('|') !== keys.slice().sort().join('|')) throw Error('Not a minimized historical summary. Use the supplied private summary file, not a full record export.');
-    if (x.schema !== 'mhpss-private-historical-summary-v1' || x.version !== 'historical-master-v1' ||
+    if (!x || Array.isArray(x) || typeof x !== 'object' || Object.keys(x).sort().join('|') !== keys.slice().sort().join('|')) throw Error('Not a minimized historical summary. The private reader must return only the minimized summary.');
+    if (x.schema !== 'mhpss-private-historical-summary-v1' || typeof x.version !== 'string' || !/^historical-master-v[1-9][0-9]{0,5}$/.test(x.version) ||
       x.classification !== 'private-owner-reading' || x.unit !== 'service contacts, not unique people' ||
       x.combine_classes !== false || x.historical_date_status !== 'unresolved-bs-dates') throw Error('Unsupported summary contract.');
     ['historical_entries', 'known_service_contacts', 'unknown_count_entries', 'unverified_form_entries'].forEach(function (k) {
@@ -55,7 +56,7 @@
       '. Historical BS reporting dates remain unresolved. These dates are not a current response period.';
     $('historical-summary').textContent = x.unverified_form_entries.toLocaleString('en-GB') +
       ' later form entries are retained separately with trial legitimacy unverified. Their contacts are excluded from the historical figures. No combined achievement, unique-person, trend, sex/age or geographic claim is made.';
-    setStatus('Private historical summary loaded in page memory only. Not live cloud data. No record import, save, queue, synchronization or public publication. Reload or Clear removes this view.');
+    setStatus('Private backend historical version read at ' + readAt + '. Historical coverage is not current reporting. No operational save, queue or public publication.');
   }
   function show() {
     panel.hidden = false;
@@ -64,23 +65,36 @@
     $('access-options').open = false;
   }
   function hide() { panel.hidden = true; }
-  function clear() {
-    generation += 1; current = null; $('historical-file').value = ''; render();
-    setStatus('No historical data attached. Import the supplied private summary file. It stays in page memory and is not uploaded.');
+  function clear(message) {
+    generation += 1;
+    if (controller) controller.abort(); controller = null;
+    current = null; readAt = null; render();
+    setStatus(typeof message === 'string' ? message : 'Historical view cleared. Refresh to read the private backend again.');
   }
-  function read(file) {
-    var mine = ++generation;
-    current = null; render();
-    if (!file || file.size > 16384) { clear(); setStatus('No file loaded: choose a minimized summary smaller than 16 KB.'); return; }
-    setStatus('Reading the private summary…');
-    file.text().then(function (text) {
+  async function refresh() {
+    clear('Reading the private historical backend…');
+    var auth = window.BaselineAuth, user = auth && auth.currentUser();
+    if (!user) { clear('Sign in with the enabled primary administrator account to read the private baseline.'); return; }
+    var mine = generation, abort = new AbortController(); controller = abort;
+    var timeout = setTimeout(function () { abort.abort(); }, 30000);
+    try {
+      var token = await auth.token();
+      if (mine !== generation || auth.currentUser() !== user) return;
+      var response = await fetch(ENDPOINT, { method: 'GET', headers: { Authorization: 'Bearer ' + token },
+        credentials: 'omit', cache: 'no-store', redirect: 'error', referrerPolicy: 'no-referrer', signal: abort.signal });
+      token = null;
+      if (mine !== generation || auth.currentUser() !== user) return;
+      if (!response.ok) throw Error(response.status === 401 || response.status === 403 ? 'Private baseline access refused. Sign in again or check primary administrator access.' : 'Private baseline unavailable. Retry when online.');
+      var text = await response.text();
+      if (text.length > 16384) throw Error('Private reader response refused.');
+      var value = validate(JSON.parse(text));
+      if (mine !== generation || auth.currentUser() !== user) return;
+      current = value; readAt = new Date().toISOString(); render();
+    } catch (e) {
       if (mine !== generation) return;
-      try { current = validate(JSON.parse(text)); render(); }
-      catch (e) { current = null; render(); setStatus('Not loaded: ' + e.message); }
-    }).catch(function () {
-      if (mine !== generation) return;
-      current = null; render(); setStatus('Not loaded: the file could not be read.');
-    });
+      current = null; readAt = null; render();
+      setStatus(e.name === 'AbortError' ? 'Private baseline unavailable: request timed out or cancelled. Retry when online.' : e.message === 'Private baseline access refused. Sign in again or check primary administrator access.' ? e.message : 'Private baseline unavailable or invalid. Retry when online; no figures substituted.');
+    } finally { clearTimeout(timeout); if (mine === generation) controller = null; }
   }
   function csv() {
     if (!current) return '';
@@ -90,7 +104,18 @@
         'service contacts; not unique people', x.backup_capture_utc, x.original_export_date,
         x.historical_date_status, 'all historical entries; later forms excluded from contacts'].join(',') + '\r\n';
   }
-  $('historical-file').addEventListener('change', function (e) { read(e.target.files[0]); });
+  $('historical-refresh').addEventListener('click', refresh);
+  $('historical-login-form').addEventListener('submit', async function (event) {
+    event.preventDefault();
+    try { await window.BaselineAuth.signIn($('historical-email').value.trim(), $('historical-password').value); }
+    catch (e) { clear('Sign-in failed. Check your account and try again.'); }
+    finally { $('historical-password').value = ''; }
+  });
+  $('historical-link').addEventListener('click', async function () {
+    try { await window.BaselineAuth.sendLink($('historical-email').value.trim()); setStatus('Sign-in link requested. Open it in this browser.'); }
+    catch (e) { clear('Sign-in link unavailable. Check your email address and connection.'); }
+  });
+  $('historical-signout').addEventListener('click', function () { clear('Signed out view cleared.'); window.BaselineAuth.signOut().catch(function () { setStatus('Sign-out unavailable. Close this private view and retry when online.'); }); });
   $('historical-clear').addEventListener('click', clear);
   $('historical-export').addEventListener('click', function () {
     if (!current) return;
@@ -98,9 +123,9 @@
     var a = document.createElement('a'); a.href = url; a.download = 'private-historical-summary.csv'; a.click();
     setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
   });
-  $('useHistorical').addEventListener('click', show);
+  $('useHistorical').addEventListener('click', function () { if (!window.BASELINE_ONLY) { location.search = '?source=historical'; return; } show(); refresh(); });
   ['useDemo', 'useLive', 'useLocal', 'file', 'file2', 'drop'].forEach(function (id) {
-    var e = $(id); if (e) e.addEventListener(id === 'file' || id === 'file2' ? 'change' : id === 'drop' ? 'drop' : 'click', hide, true);
+    var e = $(id); if (e) e.addEventListener(id === 'file' || id === 'file2' ? 'change' : id === 'drop' ? 'drop' : 'click', function () { clear(); hide(); }, true);
   });
   // The legacy arrival observer may repaint its placeholder shell. Hide only
   // that placeholder while this separate historical presentation is active.
@@ -111,4 +136,16 @@
   var source = new URLSearchParams(location.search).get('source');
   if (!source || source === 'historical') show();
   else hide();
+  if (window.BaselineAuth) {
+    window.BaselineAuth.onChange(function (user, state) {
+      clear(state.error || (user ? 'Reading the private historical backend…' : 'Sign in with the enabled primary administrator account to read the private baseline.'));
+      $('historical-login').hidden = !!user;
+      $('historical-signout').hidden = !user;
+      if (user && !panel.hidden) refresh();
+    });
+    window.addEventListener('offline', function () { clear('Private baseline unavailable offline. Refresh after reconnecting.'); });
+    window.addEventListener('online', function () { if (!panel.hidden) refresh(); });
+  }
+  // Enter legacy live mode only through a full, explicit source switch.
+  if (window.BASELINE_ONLY) $('useLive').addEventListener('click', function () { location.search = '?source=live'; }, true);
 })();
