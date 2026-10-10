@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://mhpss5ws-tdp3xtfnsq-as.a.run.app https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com; frame-src https://mhpss-nepal-hub.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Private dashboard verification — MHPSS Nepal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Lora + Manrope. design.css declares Georgia / system fallbacks, so a
+     failed font request costs typography and never legibility -- which
+     matters on the field forms, where there may be no signal at all. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Manrope:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="assets/design.css">
+<!-- The Layer 2 shell. Loaded AFTER design.css so it wins the cascade, and
+     by the hub's pages only: design.css is loaded by every field form too,
+     so the rail and the masthead cannot be repainted there without
+     repainting Layer 1. Scoped to body.hub throughout. -->
+<link rel="stylesheet" href="assets/hub-shell.css">
+<style>
+  .tabs{display:flex; gap:4px; border-bottom:2px solid var(--line); margin:22px 0 16px; flex-wrap:wrap}
+  .tab{font:inherit; font-size:13px; font-weight:700; background:none; border:0; border-bottom:3px solid transparent;
+    padding:9px 14px; margin-bottom:-2px; cursor:pointer; color:var(--slate)}
+  .tab.on{color:var(--who-d); border-bottom-color:var(--who)}
+  .panel{display:none} .panel.on{display:block}
+  /* An empty live register hides the tabs rather than showing five panels of
+     zeros. !important because it has to beat .panel.on, which is what the tab
+     handler sets. */
+  .panel.noshow{display:none!important}
+  /* The hidden ATTRIBUTE is display:none in the UA sheet, which any later
+     display:flex or display:grid silently beats. It bit .tabs over the
+     empty-register panel, and again on the live strip, which stayed on screen
+     above a synthetic file with a stale "as of" time on it. Restating the rule
+     once, with weight, ends the whole family of "I set hidden and it stayed
+     visible" bugs on this page. */
+  [hidden]{display:none!important}
+  .hideblk{display:none!important}
+
+  /* The live strip. An "as of" time on every figure is the Layer 2 gap-list
+     item: a dashboard that moves is only trustworthy if it says WHEN it last
+     moved. The dot pulses so the listener is visibly attached, and stops
+     pulsing for anyone who has asked for reduced motion. */
+  .livestrip{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;
+    margin:0 0 14px;padding:9px 13px;border:1px solid var(--ok);border-left:3px solid var(--ok);
+    border-radius:var(--r);background:var(--ok-t);font-size:12.5px;color:var(--ink)}
+  .livestrip .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);flex:0 0 auto;
+    animation:livepulse 2s ease-in-out infinite}
+  .livestrip .asof{font-variant-numeric:tabular-nums;color:var(--ok);font-weight:700}
+  .livestrip .xs{color:var(--slate)}
+  /* The open window is a temporary state, so it reads as one: amber, not the
+     green of the ordinary live path. What is on screen during the window is a
+     SUBSET -- activity reports only -- and is readable by anyone holding the
+     URL. Both facts belong on the strip, not in a footnote. */
+  .livestrip .openwin{background:var(--warn-t);color:var(--warn);border:1px solid var(--warn);
+    border-radius:var(--r);padding:2px 8px;font-size:11.5px;font-weight:600}
+  @keyframes livepulse{0%,100%{opacity:1}50%{opacity:.35}}
+  @media (prefers-reduced-motion:reduce){ .livestrip .dot{animation:none} }
+  .drop{border:2px dashed var(--line); border-radius:var(--r); padding:26px; text-align:center; background:#fff}
+  .drop.over{border-color:var(--who); background:var(--who-t)}
+  .bar{height:9px; background:var(--line-s); border-radius:5px; overflow:hidden; min-width:70px}
+  .bar i{display:block; height:100%; background:var(--who)}
+  .bar.zero i{background:var(--warn)}
+
+  /* Filters: nine dimensions, applied to every visual at once. Each list
+     offers only the values that survive the OTHER eight -- cascading in every
+     direction, which is what the reference report does and what separates a
+     dashboard from a page of charts. */
+  .filters{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:12px 14px 8px;margin:0 0 14px}
+  .filters .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px 10px}
+  /* the period names its own boundary ("This week (Sun-Sat)"), which does not
+     fit a 148px cell -- these two take two cells each so nothing is clipped */
+  .filters .grid > .w2{grid-column:span 2}
+  @media (max-width:620px){ .filters .grid > .w2{grid-column:span 1} }
+  .filters .grid > div{align-self:end}
+  .filters label{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--mute);margin-bottom:3px}
+  .filters select,.filters input{padding:6px 8px;font-size:13px}
+  .filters .sum{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin:9px 0 2px;font-size:12.5px;color:var(--slate)}
+  .filters .sum b{color:var(--ink)}
+  /* The 5Ws proper: who (rows) is where (palika columns, grouped by district)
+     doing what (activity chips, with report counts). */
+  .mx th.dist{background:var(--who-t);color:var(--who-d);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;text-align:center;border-left:1px solid var(--line)}
+  .mx th.pal{font-weight:600;white-space:normal;min-width:118px;vertical-align:bottom;border-left:1px solid var(--line);text-transform:none;letter-spacing:0;font-size:12px}
+  .mx th.pal .xs{display:block;font-weight:400}
+  .mx td.cell{vertical-align:top;font-size:12px;line-height:1.5;border-left:1px solid var(--line)}
+  .mx td.cell.empty{color:#c9c9c7;text-align:center}
+  .mx .ac{display:inline-block;border:1px solid var(--line);border-radius:10px;padding:0 6px;margin:1px 2px 1px 0;font-size:11px;font-weight:700;color:var(--who-d);background:#fff;white-space:nowrap}
+  .mx .ac i{font-style:normal;font-weight:400;color:var(--slate);margin-left:3px}
+  .mx .rch{display:block;font-size:11px;color:var(--slate);margin-top:2px;white-space:nowrap}
+  .mx td.tot{background:#fafaf9;font-variant-numeric:tabular-nums}
+  /* The publish step. Everything the coordinator sees in the preview is
+     exactly the document the public website will read. */
+  .pub .docs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin:12px 0}
+  .pub .doc{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+  .pub .doc h3{margin:0 0 4px;font-size:14.5px}
+  .pub .doc .id{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;color:var(--slate)}
+  .pub .doc .st{font-size:12.5px;margin:6px 0 0;color:var(--slate)}
+  .pub .doc .st b{color:var(--ink)}
+  .pub textarea{min-height:58px}
+  .pubprev{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-top:12px}
+  .pubprev h3{margin:0 0 8px;font-size:14px}
+  .pubprev .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:6px 0 12px}
+  .pubprev .kpi{border:1px solid var(--line);border-radius:var(--r);padding:8px 10px}
+  .pubprev .kpi .n{display:block;font-size:22px;font-weight:700;color:var(--who-d);font-variant-numeric:tabular-nums}
+  .pubprev .kpi .l{display:block;font-size:11.5px;color:var(--slate)}
+  .pubprev table{width:100%;border-collapse:collapse;font-size:12.5px}
+  .pubprev th,.pubprev td{padding:5px 8px;border-bottom:1px solid var(--line-s);vertical-align:top}
+  .pubprev details{margin-top:8px} .pubprev summary{cursor:pointer;font-size:12.5px;color:var(--slate)}
+  .pubprev pre{font-size:11px;line-height:1.4;max-height:320px;overflow:auto;background:#fafaf9;padding:8px;border-radius:4px;white-space:pre-wrap;word-break:break-word}
+  .pub .state{font-size:12.5px;color:var(--slate);margin:0 0 6px}
+  /* an organisation name is a label, not a paragraph: keep it on one line so it never justifies */
+  .mx td:first-child{white-space:nowrap}
+  .mx th.tot{vertical-align:bottom}
+  /* ONE dashboard, five sections, addressed by hash and switched from the
+     rail or from the tabs above -- both write the same hash, so a section
+     can be sent as a link. The long method notes used to sit in the open
+     and made every section read like a memo; they are behind one expander
+     per section now, closed by default. */
+  .howcount{margin:12px 0 0;border-top:1px solid var(--line);padding-top:8px}
+  .howcount > summary{cursor:pointer;font-size:12px;font-weight:700;letter-spacing:.3px;
+                      text-transform:uppercase;color:var(--slate);list-style:none}
+  .howcount > summary::-webkit-details-marker{display:none}
+  .howcount > summary::before{content:"\25B8\00a0"}
+  .howcount[open] > summary::before{content:"\25BE\00a0"}
+  .howcount p{font-size:12.5px;line-height:1.6;margin:9px 0 0;color:var(--slate)}
+  .nodate{color:var(--warn);font-weight:600}
+  .sechead{margin:0 0 4px}
+  .secsay{margin:0 0 14px;font-size:14px;color:var(--slate)}
+
+  /* ---- the scope line and the filter panel ----------------------------
+     The nine dropdowns used to stand above every figure, so the first thing
+     on the screen was a row of empty controls rather than the numbers. They
+     are the same controls, in a panel that is shut until it is wanted; what
+     is actually narrowed shows as a chip on the line above. The rule that
+     "Clear filters appears only when one is set" (claude/layer2-filters-and-matrix.md,
+     16 September) now governs the whole bar, not just that one button. */
+  .scope{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 10px;font-size:13.5px}
+  .scope #fSum{color:var(--ink)}
+  .chipf{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;
+    background:var(--who-t);border:1px solid #bcdcec;color:var(--who-d);border-radius:14px;padding:2px 6px 2px 11px}
+  .chipf b{font-weight:800}
+  .chipf button{font:inherit;font-size:14px;line-height:1;border:0;background:transparent;color:var(--who-d);
+    cursor:pointer;padding:2px 5px;border-radius:50%}
+  .chipf button:hover{background:#bcdcec}
+  details.filters{margin:0 0 18px}
+  details.filters > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;
+    flex-wrap:wrap;padding:7px 0}
+  details.filters > summary::-webkit-details-marker{display:none}
+  .fopenb{display:inline-block;font-size:12.5px;font-weight:700;padding:3px 11px;border-radius:13px;
+    background:transparent;color:var(--who-d);border:1px solid var(--who-d)}
+  details.filters[open] > summary .fopenb{background:var(--who-t)}
+  details.filters > summary .xs{flex:1 1 320px;min-width:0}
+
+  /* ---- the three columns, WHERE and WHEN --------------------------------
+     Class names are prefixed `ov` because app.css and design.css are shared
+     with the form repository and already own .cols, .units and .fig.
+
+     The ordinal ramp is claude/chart-rules.md's, unchanged: one hue, light
+     to dark, broadest support to most specialised. Re-checked as an ordinal
+     ramp on 22 September -- monotone lightness, every adjacent gap >= 0.08.
+     The residual is hatched, because "not yet placed" is a remainder and not
+     a sixth family. */
+  :root{ --a1:#6fc0e9; --a2:#22a3dd; --a3:#0079ae; --a4:#005a84; --a5:#003c59; --a0:#9a9a98; }
+  select.fset{border-color:var(--who-d); background:var(--who-t); color:var(--who-d); font-weight:700}
+  .ovcols{display:grid; gap:14px; grid-template-columns:1fr; margin-bottom:18px}
+  @media(min-width:920px){ .ovcols{grid-template-columns:repeat(3,1fr)} }
+  .ovcol{background:#fff; border:1px solid var(--line); border-radius:var(--r); display:flex;
+    flex-direction:column; min-width:0}
+  .ovcolh{display:flex; align-items:center; gap:10px; padding:8px 14px;
+    border-bottom:2px solid var(--who-d); min-height:45px}
+  .ovcolh h2{font-size:13px; letter-spacing:.11em; text-transform:uppercase; color:var(--who-d);
+    margin:0; flex:0 0 auto}
+  .ovsp{flex:1 1 auto}
+  .ovcolf{display:flex; gap:5px; justify-content:flex-end; min-width:0; flex:0 1 auto}
+  .ovcolf select{font:inherit; font-size:11.5px; padding:3px 5px; border:1px solid var(--line);
+    border-radius:3px; background:#fff; color:var(--mute); max-width:150px; min-width:0}
+  .ovcolb{padding:14px}
+  .ovhero{display:flex; align-items:center; gap:14px; flex-wrap:wrap}
+  .ovico{flex:0 0 auto; width:48px; height:48px; color:var(--who)}
+  .ovnum{display:flex; gap:20px; flex-wrap:wrap}
+  .ovnum .n{font-size:29px; font-weight:700; line-height:1; color:var(--who-d);
+    font-variant-numeric:tabular-nums}
+  .ovnum .l{display:block; font-size:12px; color:var(--mute); font-weight:600; line-height:1.35;
+    margin-top:4px; max-width:16ch; text-align:left}
+  .ovsubh{font-size:12px; letter-spacing:.07em; text-transform:uppercase; font-weight:700;
+    color:var(--who-d); margin:18px 0 9px; padding-top:12px; border-top:1px solid var(--line-s)}
+  .ovsubh:first-child{margin-top:0; padding-top:0; border-top:0}
+  .ovbars{display:flex; flex-direction:column; gap:7px}
+  .ovbrow{display:grid; grid-template-columns:1fr auto; gap:2px 10px; align-items:center}
+  .ovbl{font-size:13px; line-height:1.3; min-width:0; text-align:left}
+  .ovbl small{display:block; font-size:11px; color:var(--mute)}
+  .ovbv{font-size:14px; font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap}
+  .ovbt{grid-column:1/-1; height:12px; background:var(--line-s); border-radius:2px; overflow:hidden}
+  .ovbt i{display:block; height:100%; border-radius:0 3px 3px 0; min-width:2px}
+  .ovhatch{background-image:repeating-linear-gradient(45deg,transparent,transparent 3px,
+    rgba(255,255,255,.55) 3px,rgba(255,255,255,.55) 6px)}
+  .ovlegend{display:flex; flex-wrap:wrap; gap:6px 14px; margin-top:11px; font-size:11.5px; color:var(--mute)}
+  .ovlegend span{display:inline-flex; align-items:center; gap:5px}
+  .ovlegend i{width:11px; height:11px; border-radius:2px; flex:0 0 auto}
+  .ovlegend i.ovzero{background:#fff; border:1.5px solid var(--warn)}
+  .ovfig{background:#fff; border:1px solid var(--line); border-radius:var(--r); padding:16px; margin-bottom:18px}
+  .ovfigh{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:4px}
+  .ovfigh h3{margin:0; font-size:18px; color:var(--who-d)}
+  .ovfigf{margin-left:auto}
+  .ovfigf select{max-width:200px}
+  .ovwrap{display:grid; gap:20px; grid-template-columns:1fr}
+  @media(min-width:900px){ .ovwrap{grid-template-columns:1fr 1fr} }
+  .ovunits{display:flex; flex-wrap:wrap; gap:4px; margin:10px 0}
+  .ovunits .u{width:20px; height:20px; border-radius:2px; border:1px solid var(--line); background:#fff}
+  .ovunits .u.rep{background:var(--who-d); border-color:var(--who-d)}
+  .ovunits .u.zero{border-color:var(--warn); border-width:1.5px}
+  .ovpct{display:flex; height:34px; border-radius:3px; overflow:hidden; border:1px solid var(--line)}
+  .ovpct div{display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;
+    color:#fff; min-width:0; overflow:hidden; white-space:nowrap; border-right:2px solid #fff}
+  .ovpct div:last-child{border-right:0}
+  .ovso{border-left:3px solid var(--who-d); background:var(--who-t); padding:10px 13px;
+    border-radius:0 3px 3px 0; font-size:13.5px; margin:14px 0 0}
+
+
+/* Owner-selected 27 Sep reference. Dashboard only, no shared token changes.
+   Presentation source of truth: navy masthead, pale canvas, outlined cards.
+   English UI additions are non-clinical; Nepali review remains pending. */
+body.hub.dashboard-selected{--bg:#f3f6f9;background:var(--bg);font-family:Arial,"Noto Sans",sans-serif;line-height:1.5}
+body.dashboard-selected .top{background:#1d3d60;box-shadow:none;position:static;padding:22px 28px}
+body.dashboard-selected .top .brand{font:700 25px/1.2 Arial,sans-serif}
+body.dashboard-selected .top .sub{color:#e0e9f3;font-size:12px}
+body.dashboard-selected .phead{background:#fff;margin:0;padding:16px 0;border-bottom:1px solid #d8e1ec}
+body.dashboard-selected .phead h1{font:700 21px/1.25 Arial,sans-serif;color:#1d3d60}
+body.dashboard-selected .phead .eyebrow{display:none}
+body.dashboard-selected .phead .lede{font-size:14px;max-width:none}
+body.dashboard-selected .intro-details{margin-top:8px}
+body.dashboard-selected .wrap.wide{max-width:1600px;padding:22px 24px 60px}
+body.dashboard-selected .stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin:18px 0}
+body.dashboard-selected .stat,body.dashboard-selected .ovcol,body.dashboard-selected .ovfig,body.dashboard-selected .filters,body.dashboard-selected .card,body.dashboard-selected .tbl-wrap{border:1px solid #d8e1ec;box-shadow:none;border-radius:12px;background:#fff}
+body.dashboard-selected .stat{border-top:1px solid #d8e1ec;padding:16px}
+body.dashboard-selected .stat .v{font:700 30px/1.15 Arial,sans-serif;color:#1d3d60}
+body.dashboard-selected .stat .k{font-size:12px;color:#455569;letter-spacing:.02em}
+body.dashboard-selected .stat .s{font-size:12px;color:#455569;margin-top:7px}
+body.dashboard-selected .filters{padding:10px 16px}
+body.dashboard-selected .filters .grid{grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+body.dashboard-selected .scope{padding:8px 0;margin:0;font-size:14px}
+body.dashboard-selected .ovcols{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start}
+body.dashboard-selected .ovcol:nth-child(2){order:-1}
+body.dashboard-selected .ovcolh{padding:12px 16px;border-bottom:1px solid #d8e1ec;flex-wrap:wrap}
+body.dashboard-selected .ovcolh h2{font-size:16px;letter-spacing:0;text-transform:none;color:#1d3d60}
+body.dashboard-selected .ovcolb{padding:16px}
+body.dashboard-selected .ovico{display:none}
+body.dashboard-selected .ovnum .n{font-size:24px;color:#1d3d60}
+body.dashboard-selected .ovnum .l{font-size:12px;color:#455569}
+body.dashboard-selected .ovsubh{color:#1d3d60;font-size:12px;letter-spacing:0;text-transform:none}
+body.dashboard-selected .ovbars{gap:12px}
+body.dashboard-selected .ovbl small,body.dashboard-selected .ovlegend,body.dashboard-selected .xs{color:#455569}
+body.dashboard-selected .ovbt{height:10px;background:#edf2f7;border-radius:2px}
+body.dashboard-selected .analysis-detail{border:1px solid #d8e1ec;border-radius:12px;background:#fff;padding:12px 16px;margin:16px 0}
+body.dashboard-selected summary{min-height:44px;cursor:pointer;padding:10px 0;color:#1d3d60;font-weight:700}
+body.dashboard-selected .tab{min-height:44px;padding:10px 14px;color:#455569}
+body.dashboard-selected .tab.on{color:#1d3d60;border-bottom-color:#2674be}
+body.dashboard-selected .btn,body.dashboard-selected select,body.dashboard-selected input:not([type=checkbox]):not([type=file]),body.dashboard-selected .rgh,body.dashboard-selected .rmenu,body.dashboard-selected .rgb a,body.dashboard-selected .lyr,body.dashboard-selected #i18nwrap button{min-height:44px;min-width:44px}
+body.dashboard-selected .ovcolf select{max-width:100%;font-size:12px}
+body.dashboard-selected .ovcolf{flex:1 1 140px}
+body.dashboard-selected .chipf button{width:44px;height:44px}
+body.dashboard-selected .tbl-wrap{max-width:100%;overflow:auto}
+body.dashboard-selected table.data{min-width:650px}
+/* Pre-existing matrix contrast defect reproduced at base; presentation-only
+   foreground correction required by the owner's zero-violation review gate. */
+body.hub.dashboard-selected .mx th.pal .xs{color:#f0f5fa}
+body.dashboard-selected .tbl-wrap:focus{outline:3px solid #2674be;outline-offset:2px}
+body.dashboard-selected :is(button,a,input,select,summary,textarea):focus-visible{outline:3px solid #2674be;outline-offset:3px}
+body.dashboard-selected #toast:not(.show){display:none}
+body.dashboard-selected .ovso{border-left:0;border:1px solid #d8e1ec;background:#edf4fa;border-radius:8px}
+body.dashboard-selected .skip{position:absolute;left:8px;top:-100px;z-index:999;background:white;padding:12px;color:#1d3d60}
+body.dashboard-selected .skip:focus{top:8px}
+@media(max-width:1100px){body.dashboard-selected .stats{grid-template-columns:repeat(3,minmax(0,1fr))}body.dashboard-selected .ovcols{grid-template-columns:1fr 1fr}body.dashboard-selected .ovcol:last-child{grid-column:1/-1}}
+@media(max-width:650px){body.dashboard-selected .wrap.wide{padding:16px 12px 40px}body.dashboard-selected .stats{grid-template-columns:1fr 1fr}body.dashboard-selected .stat{padding:12px}body.dashboard-selected .stat:last-child{grid-column:1/-1}body.dashboard-selected .ovcols{grid-template-columns:1fr}body.dashboard-selected .top{padding:18px 16px}body.dashboard-selected .top .brand{font-size:22px}body.dashboard-selected .row{grid-template-columns:1fr}body.dashboard-selected .filters .grid{grid-template-columns:1fr}body.dashboard-selected .w2{grid-column:span 1}body.dashboard-selected .btns>*{max-width:100%}body.dashboard-selected .ovcolf{max-width:100%}body.dashboard-selected .ovfigh>*{max-width:100%}}
+
+body.hub.dashboard-selected .primary-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-bottom:16px;align-items:start}
+body.hub.dashboard-selected .ovcols{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+body.hub.dashboard-selected .ovcol:nth-child(2){order:initial}
+body.hub.dashboard-selected #i18nbar button{min-width:44px;min-height:44px;color:#1d3d60}
+body.hub.dashboard-selected #i18nbar button[aria-pressed=true]{background:#dcebf7;color:#1d3d60}
+body.hub.dashboard-selected #dayWrap{overflow:auto;max-width:100%}
+body.hub.dashboard-selected #dayWrap .tbl-wrap{border:0;box-shadow:none;overflow:visible}
+body.hub.dashboard-selected .time-card table.data{min-width:530px;font-size:12px}
+body.hub.dashboard-selected .time-card th{white-space:normal}
+body.hub.dashboard-selected .ovcols .ovcol:last-child{grid-column:auto}
+@media(max-width:650px){body.hub.dashboard-selected .primary-grid,body.hub.dashboard-selected .ovcols{grid-template-columns:minmax(0,1fr)}}
+
+/* Reference4 entry correction: page-local horizontal shell, no shared CSS. */
+body.hub.dashboard-selected{padding-left:0;--who:#2d79d7;--who-d:#1d3d60;--who-dd:#1d3d60}
+body.hub.dashboard-selected .top{padding:18px 28px;background:#1d3d60;display:flex;align-items:center}
+body.hub.dashboard-selected .top h1{margin:0;font:700 25px/1.25 Arial,sans-serif;color:#fff}
+body.hub.dashboard-selected .top .sub{margin-top:5px;font-size:13px;letter-spacing:0;text-transform:none;font-weight:400}
+body.hub.dashboard-selected .rail{position:static;inset:auto;width:auto;overflow:visible;display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:0 28px;background:white;border:0;border-bottom:1px solid #d8e1ec}
+body.hub.dashboard-selected .rail :is(.railid,.where,.rmenu,.rfoot){display:none}
+body.hub.dashboard-selected .rail nav{display:flex;flex:1 1 auto;flex-direction:row;align-items:center;flex-wrap:wrap;padding:0;max-height:none;overflow:visible;gap:4px}
+body.hub.dashboard-selected .rail .rg{margin:0;position:relative}
+body.hub.dashboard-selected .rail .rg[data-g=coord]>.rgh{display:none}
+body.hub.dashboard-selected .rail .rgb{border:0;margin:0;padding:0}
+body.hub.dashboard-selected .rail .rg.open>.rgb{display:flex;flex-wrap:wrap;gap:2px}
+body.hub.dashboard-selected .rail .rgb>a{padding:11px 10px;font-size:12px;min-height:44px;display:inline-flex;align-items:center;border-radius:0;box-shadow:none;white-space:normal}
+body.hub.dashboard-selected .rail .rgb>a.on{background:#edf4fa;box-shadow:inset 0 -3px #2d79d7}
+body.hub.dashboard-selected .rail .rgh{min-height:44px;padding:8px 10px;font-size:12px}
+body.hub.dashboard-selected .rail .rgh :is(em,.dot){display:none}
+body.hub.dashboard-selected .rail .rg:not([data-g=coord]).open>.rgb{position:absolute;right:0;top:100%;z-index:45;width:200px;background:#fff;border:1px solid #d8e1ec;border-radius:8px;padding:8px;box-shadow:0 5px 12px #1d3d6020}
+body.hub.dashboard-selected .rail .rg[data-g=forms].open>.rgb,body.hub.dashboard-selected .rail .rg[data-g=admin].open>.rgb{left:0;right:auto}
+body.hub.dashboard-selected .rail .railtoggle{padding:0;margin:0;display:inline-flex}
+body.hub.dashboard-selected #band{background:transparent!important;color:#455569!important;border:0;padding:0!important;text-align:left;font-size:12px;margin:0}
+body.hub.dashboard-selected #band span{color:#455569!important}
+body.hub.dashboard-selected .wrap.wide{max-width:1600px;margin:0 auto;padding:16px 28px 48px}
+body.hub.dashboard-selected #loader{padding:0;border:0;background:transparent;margin-bottom:14px}
+body.hub.dashboard-selected .source-start{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+body.hub.dashboard-selected .source-start .btn{background:#1d3d60;color:#fff;font-size:13px}
+body.hub.dashboard-selected #access-options{border:1px solid #d8e1ec;background:#fff;border-radius:8px;padding:0 14px}
+body.hub.dashboard-selected #access-options>summary{font-size:13px;padding:10px 0;min-height:44px}
+body.hub.dashboard-selected #drop{padding:12px 0;border:0;border-radius:0;text-align:left;background:transparent}
+body.hub.dashboard-selected #drop .btns{justify-content:flex-start!important}
+body.hub.dashboard-selected #drop hr{margin:12px 0!important}
+body.hub.dashboard-selected #drop p{max-width:95ch;font-size:13px}
+body.hub.dashboard-selected #drop .row{gap:12px}
+body.hub.dashboard-selected #drop .row input{max-width:100%}
+body.hub.dashboard-selected .entry-filters{display:flex;gap:8px;flex-wrap:wrap;padding:12px;background:white;border:1px solid #d8e1ec;border-radius:10px;font-size:12px;color:#455569}
+body.hub.dashboard-selected .entry-filters span{border:1px solid #d8e1ec;border-radius:6px;padding:9px 12px}
+body.hub.dashboard-selected .entry-filters p{margin:0;align-self:center}
+body.hub.dashboard-selected .entry-note{font-size:12px;color:#455569;margin:0 0 12px}
+body.hub.dashboard-selected .entry-row{display:grid;grid-template-columns:210px 1fr 22px;gap:12px;align-items:center;margin:18px 0;font-size:13px;color:#455569}
+body.hub.dashboard-selected .entry-track{height:14px;border-radius:2px;background:#f3f6f9}
+body.hub.dashboard-selected .entry-time{display:flex;align-items:center;justify-content:center;min-height:160px;background:#f8fafc;border-radius:6px;color:#455569;font-size:13px}
+body.hub.dashboard-selected .entry-secondary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+body.hub.dashboard-selected .entry-secondary .ovcolb{min-height:100px}
+body.hub.dashboard-selected .stats{margin:14px 0;gap:12px}
+body.hub.dashboard-selected .stat{min-height:130px;padding:16px 18px}
+body.hub.dashboard-selected .stat .v{font-size:34px;color:#20313b}
+body.hub.dashboard-selected .stat .k{font-size:11px;text-transform:uppercase;letter-spacing:.04em;font-weight:700}
+body.hub.dashboard-selected .primary-grid{align-items:stretch}
+body.hub.dashboard-selected .primary-grid>.ovcol{min-height:285px}
+body.hub.dashboard-selected .ovcolh{border:0;padding:18px 20px 6px}
+body.hub.dashboard-selected .ovcolh h2{font-size:18px;color:#20313b}
+body.hub.dashboard-selected .ovcolb{padding:10px 20px 20px}
+body.hub.dashboard-selected #ovFam .ovbt i{background:#2d79d7!important}
+body.hub.dashboard-selected #ovFam .ovbt{height:18px}
+body.hub.dashboard-selected #srcNote{margin-bottom:10px;padding:8px 12px;border:1px solid #d8e1ec;border-radius:8px;background:#fff;color:#455569;font-size:12px}
+body.hub.dashboard-selected #srcNote::before{content:'Draft · ';font-weight:700}
+body.hub.dashboard-selected .filters .grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:8px 10px}
+body.hub.dashboard-selected .filters .grid>.w2{grid-column:span 1}
+body.hub.dashboard-selected .filters>summary{min-height:44px;padding:0}
+body.hub.dashboard-selected .filters>summary .xs{display:none}
+body.hub.dashboard-selected .filters label{color:#455569;font-size:10px}
+body.hub.dashboard-selected .filters .grid input,body.hub.dashboard-selected .filters .grid select{min-width:0;width:100%;font-size:12px}
+body.hub.dashboard-selected .analysis-detail{margin:16px 0}
+body.hub.dashboard-selected #fbbar{position:static!important;margin:0 auto;font-size:12px!important}
+body.hub.dashboard-selected #fbbar[data-observational=true]{background:#f3f6f9!important;color:#455569!important;border:0!important;padding:4px 28px!important;font-weight:400!important}
+body.hub.dashboard-selected #fbbar:not([data-observational=true]){padding:8px 28px!important}
+@media(max-width:1100px){body.hub.dashboard-selected .filters .grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:650px){
+ body.hub.dashboard-selected .top{padding:16px 12px}body.hub.dashboard-selected .top h1{font-size:21px}
+ body.hub.dashboard-selected .rail{padding:0 12px;gap:0}body.hub.dashboard-selected .rail nav{flex-basis:100%;gap:0}
+ body.hub.dashboard-selected .rail .rgb>a{font-size:11px;padding:9px 7px}
+ body.hub.dashboard-selected .rail .rg[data-g=coord]{flex-basis:100%}
+ body.hub.dashboard-selected .rail .railtoggle{margin-left:auto}
+ body.hub.dashboard-selected .wrap.wide{padding:12px}
+ body.hub.dashboard-selected .source-start{align-items:flex-start;gap:8px}
+ body.hub.dashboard-selected .source-start .btn{width:100%}
+ body.hub.dashboard-selected .filters .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ body.hub.dashboard-selected .entry-filters{gap:6px;padding:10px}.entry-filters span{flex:1 1 auto}
+ body.hub.dashboard-selected .entry-row{grid-template-columns:1fr 24px;gap:4px;font-size:12px;margin:14px 0}
+ body.hub.dashboard-selected .entry-track{grid-column:1;grid-row:auto;height:8px}.entry-row b{grid-column:2;grid-row:span 2}
+ body.hub.dashboard-selected .entry-secondary{grid-template-columns:1fr}
+ body.hub.dashboard-selected .stat{min-height:108px;padding:12px}
+ body.hub.dashboard-selected .primary-grid>.ovcol{min-height:240px}
+ body.hub.dashboard-selected .ovcolh{padding:14px 14px 6px}body.hub.dashboard-selected .ovcolb{padding:10px 14px 14px}
+ body.hub.dashboard-selected #fbbar[data-observational=true]{padding:4px 12px!important}
+}
+
+body.hub.dashboard-selected .filters .grid{grid-template-columns:repeat(7,minmax(0,1fr))}
+body.hub.dashboard-selected .filter-more>summary{font-size:12px;min-height:44px;padding:10px 0 0}
+body.hub.dashboard-selected .filter-more .grid{grid-template-columns:repeat(6,minmax(0,1fr));padding-top:8px}
+body.hub.dashboard-selected .rail .rgb>a{min-width:0}
+body.hub.dashboard-selected .top>div{min-width:0}
+body.hub.dashboard-selected .entry-filters span{color:#657386;background:#f8fafc;border-style:dashed}
+@media(max-width:1100px){body.hub.dashboard-selected .filters .grid,body.hub.dashboard-selected .filter-more .grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:650px){body.hub.dashboard-selected .filters .grid,body.hub.dashboard-selected .filter-more .grid{grid-template-columns:repeat(2,minmax(0,1fr))}body.hub.dashboard-selected .rail .rg[data-g=coord]>.rgb{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%}body.hub.dashboard-selected .rail .rg[data-g=coord]{width:100%;min-width:0}}
+
+body.hub.dashboard-selected p{text-align:left}
+body.hub.dashboard-selected .ovcolh h2{flex-shrink:1;min-width:0;max-width:100%;white-space:normal;overflow-wrap:break-word}
+body.hub.dashboard-selected input[type=file]{display:block;width:100%;max-width:100%;font:inherit;font-size:12px;padding:8px 0;min-height:44px}
+body.hub.dashboard-selected .file-choice{display:block;font-size:13px;font-weight:700;color:#1d3d60;max-width:100%}
+</style>
+<style id="dashboard-category-palette">
+/* Owner-approved category palette. Category colours never imply validation. */
+body.hub.dashboard-selected{--who:#2563eb;--who-d:#1d4ed8;background:#edf2f8}
+body.hub.dashboard-selected .top{background:#143451;background-image:linear-gradient(110deg,#143451,#225579);border-bottom:4px solid #38b3bd}
+body.hub.dashboard-selected .stats .stat{--accent:#235dc1;--tint:#edf4ff;--ink:#173c7d;background:var(--tint);border:1px solid #d5deea;border-top:5px solid var(--accent);box-shadow:0 3px 12px #18355108}
+body.hub.dashboard-selected .stats .stat:nth-child(2){--accent:#087f82;--tint:#eaf8f6;--ink:#075b5d}
+body.hub.dashboard-selected .stats .stat:nth-child(3){--accent:#7852ac;--tint:#f4effb;--ink:#583581}
+body.hub.dashboard-selected .stats .stat:nth-child(4){--accent:#b44778;--tint:#fff0f6;--ink:#873154}
+body.hub.dashboard-selected .stats .stat:nth-child(5){--accent:#b66623;--tint:#fff3e8;--ink:#864516}
+body.hub.dashboard-selected .stats .stat .v{color:var(--ink)}
+body.hub.dashboard-selected .stats .stat .k{color:var(--ink);font-weight:800}
+body.hub.dashboard-selected .stats .stat .s{color:#45546b}
+body.hub.dashboard-selected .ovcol{--panel:#2563eb;--panel-tint:#eef4ff;--panel-ink:#1d427f;border:1px solid #d7e0ec;border-top:4px solid var(--panel);box-shadow:0 4px 14px #1d36500a;overflow:hidden}
+body.hub.dashboard-selected .ovcol .ovcolh{background:var(--panel-tint);border-bottom:1px solid #dbe3ee;padding-bottom:14px}
+body.hub.dashboard-selected .ovcol .ovcolh h2{color:var(--panel-ink)}
+body.hub.dashboard-selected .ovcol .ovnum{color:var(--panel-ink)}
+body.hub.dashboard-selected .primary-grid>.ovcol:nth-child(2){--panel:#6262ba;--panel-tint:#f0effc;--panel-ink:#45457f}
+body.hub.dashboard-selected #ovcols>.ovcol:first-child,body.hub.dashboard-selected .entry-secondary>.ovcol:first-child{--panel:#7852ac;--panel-tint:#f4effb;--panel-ink:#583581}
+body.hub.dashboard-selected #ovcols>.ovcol:nth-child(2),body.hub.dashboard-selected .entry-secondary>.ovcol:nth-child(2){--panel:#087f82;--panel-tint:#eaf8f6;--panel-ink:#075b5d}
+body.hub.dashboard-selected .entry-secondary>.ovcol:nth-child(3){--panel:#2c8071;--panel-tint:#edf7f2;--panel-ink:#20594f}
+body.hub.dashboard-selected #ovWhere{border-top:4px solid #2c8071;background:#fff;border-radius:12px}
+body.hub.dashboard-selected #ovWhere .ovfigh h3{color:#20594f}
+body.hub.dashboard-selected .analysis-detail{background:#fff;border:1px solid #d7e0ec;border-radius:12px;overflow:hidden}
+body.hub.dashboard-selected .analysis-detail>summary{background:#edf7f2;color:#20594f;border-left:4px solid #2c8071}
+body.hub.dashboard-selected .analysis-detail+.analysis-detail>summary{background:#fff3e8;color:#864516;border-left-color:#b66623}
+body.hub.dashboard-selected .ovbar .bar{background:#2563eb}
+body.hub.dashboard-selected #ovWhoBars .bar{background:#7852ac}
+body.hub.dashboard-selected #ovSadd .bar{background:#087f82}
+body.hub.dashboard-selected #ovPal .bar{background:#2c8071}
+body.hub.dashboard-selected .filters{border-left:4px solid #526e91}
+</style>
+<style id="launch-entry-layout">
+/* Launch entry: in-place historical route only; legacy sources retain their shell. */
+body.hub.dashboard-selected .dashboard-short-label{display:none}
+body.hub.dashboard-selected.historical-entry .dashboard-full-label{display:none}
+body.hub.dashboard-selected.historical-entry .dashboard-short-label{display:inline}
+body.hub.dashboard-selected.historical-entry .top{padding:12px 16px}
+body.hub.dashboard-selected.historical-entry .top h1{font-size:20px}
+body.hub.dashboard-selected.historical-entry .top .sub{font-size:12px;margin-top:3px}
+body.hub.dashboard-selected.historical-entry .rail{padding:0 16px}
+body.hub.dashboard-selected.historical-entry .rail .rg[data-g=coord] .rgb>a:not([data-default]){display:none}
+body.hub.dashboard-selected.historical-entry .rail .rg[data-g=coord]{flex-basis:auto;width:auto}
+body.hub.dashboard-selected.historical-entry .rail .rg[data-g=coord]>.rgb{display:flex;width:auto}
+body.hub.dashboard-selected #historical-baseline{max-width:1280px;margin:0 auto}
+body.hub.dashboard-selected .historical-heading{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+body.hub.dashboard-selected .historical-heading h2{font-size:20px;margin:0;color:#1d3d60}
+body.hub.dashboard-selected #historical-login{max-width:460px;padding:20px;margin:12px auto}
+body.hub.dashboard-selected #historical-login h3{margin:0 0 8px;color:#1d3d60;font-size:20px}
+body.hub.dashboard-selected #historical-login p{font-size:14px;margin:8px 0 12px}
+body.hub.dashboard-selected #historical-login .xs{font-size:12px}
+body.hub.dashboard-selected #historical-login input{width:100%;box-sizing:border-box;margin:6px 0 12px}
+body.hub.dashboard-selected #historical-signin{width:100%;margin-bottom:4px}
+body.hub.dashboard-selected .historical-actions{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap}
+body.hub.dashboard-selected #historical-account{position:relative;margin-left:auto}
+body.hub.dashboard-selected #historical-account>summary{padding:10px 12px;background:#fff;border:1px solid #d8e1ec;border-radius:8px}
+body.hub.dashboard-selected #historical-account[open]{padding:0 12px 12px;background:#fff;border:1px solid #d8e1ec;border-radius:8px;max-width:100%;box-sizing:border-box}
+body.hub.dashboard-selected #historical-account .xs{max-width:32ch}
+body.hub.dashboard-selected #historical-status{font-size:13px;color:#455569;margin:10px 0;overflow-wrap:break-word}
+body.hub.dashboard-selected #historical-status:focus{outline:3px solid #2674be;outline-offset:3px}
+body.hub.dashboard-selected #historical-stats .stat{min-height:112px}
+body.hub.dashboard-selected.historical-entry #source-tools{margin-top:20px}
+body.hub.dashboard-selected #source-tools>summary{font-size:13px}
+body.hub.dashboard-selected #historical-results .analysis-detail{padding:0 14px 12px}
+body.hub.dashboard-selected #historical-results .analysis-detail>summary{background:transparent;border:0}
+@media(max-width:650px){
+ body.hub.dashboard-selected.historical-entry .rail{padding:0 12px;position:relative}
+ body.hub.dashboard-selected.historical-entry .rail .rg[data-g=public]{position:static}
+ body.hub.dashboard-selected.historical-entry .rail .rg[data-g=public].open>.rgb{left:12px;right:auto;top:100%}
+ body.hub.dashboard-selected.historical-entry .rail nav{flex-basis:auto}
+ body.hub.dashboard-selected.historical-entry .rail .railtoggle{margin-left:0}
+ body.hub.dashboard-selected.historical-entry .top h1{font-size:18px}
+ body.hub.dashboard-selected #historical-login{padding:16px}
+ body.hub.dashboard-selected #historical-stats{gap:8px;margin:10px 0}
+ body.hub.dashboard-selected #historical-stats .stat{min-height:108px;padding:10px}
+ body.hub.dashboard-selected #historical-stats .v{font-size:30px}
+ body.hub.dashboard-selected #historical-stats .k{font-size:10px}
+ body.hub.dashboard-selected #historical-stats .s{font-size:11px;margin-top:4px}
+}
+</style>
+<link rel="stylesheet" href="assets/historical-analytics.css">
+</head>
+<body class="hub dashboard-selected">
+<a class="skip" href="#dashboard-main">Skip to dashboard</a>
+<header class="top"><div><h1>MHPSS 5Ws — coordination dashboard</h1><div class="sub">Isolated verification · private read-only · default dashboard unchanged</div></div></header>
+<aside class="rail" aria-label="Private dashboard verification">
+ <a class="railid" href="./"><span><b>MHPSS Nepal</b><i>Layer 2 · private verification</i></span></a>
+ <nav><div class="rg open here" data-g="coord"><div class="rgb"><a class="on" data-default aria-current="page" href="./#historical-baseline">Historical baseline</a></div></div></nav>
+ <p class="rfoot">Verification entry, not operational launch.</p>
+</aside>
+<main class="wrap wide" id="dashboard-main">
+  <section id="historical-baseline" aria-label="Private historical baseline" hidden>
+    <div class="historical-heading"><h2>Historical baseline</h2><span class="xs">Private · read-only</span></div>
+    <div id="historical-login" class="card" hidden>
+      <h3>Sign in to your dashboard</h3>
+      <p>Your authorised account opens the retained historical summary automatically.</p>
+      <form id="historical-login-form">
+        <label for="historical-email">Email address</label><input type="email" id="historical-email" autocomplete="username" required>
+        <button type="submit" class="btn" id="historical-signin">Send sign-in link</button>
+        <p class="xs">Stay signed in on your personal browser. On a shared device, sign out before leaving.</p>
+        <details id="historical-password-options"><summary>Use a password or request a replacement link</summary>
+          <label for="historical-password">Password (existing accounts only)</label><input type="password" id="historical-password" autocomplete="current-password">
+          <div class="btns"><button type="submit" class="btn grey" id="historical-password-signin">Sign in with password</button><button type="button" class="btn grey" id="historical-link">Send replacement link</button></div>
+        </details>
+      </form>
+    </div>
+    <div class="historical-actions">
+      <button type="button" class="btn" id="historical-refresh" hidden>Refresh</button>
+      <button type="button" class="btn grey" id="historical-export" aria-label="Download summary CSV" hidden>CSV</button>
+      <details id="historical-account" hidden><summary>Account</summary><div class="btns"><button type="button" class="btn grey" id="historical-signout" hidden>Sign out</button><button type="button" class="btn grey" id="historical-clear">Clear this view</button></div><p class="xs">Clearing this view does not delete records or sign you out.</p></details>
+    </div>
+    <p id="historical-status" role="status" aria-live="polite" tabindex="-1">Connecting…</p>
+    <div id="historical-results" hidden>
+      <p class="entry-note">Historical records · all entries · not current reporting. Contacts are not unique people; unknown counts are excluded, not zero.</p>
+      <div class="stats" id="historical-stats"></div>
+<div id="historical-analytics"></div>
+
+      <p id="historical-summary" class="entry-note"></p>
+      <details class="analysis-detail"><summary>Source, dates &amp; analysis limits</summary>
+        <p id="historical-provenance" class="entry-note"></p>
+        <p>Historical BS reporting dates remain unresolved; capture and export dates are not a current response period. No filters applied.</p>
+        <p>Organisation, site coverage, trends and sex-by-age breakdowns are unavailable in this minimized reading copy. Historical entries are not new session reports. No unsupported chart or zero is substituted.</p>
+        <p>The CSV contains the same version and units as these cards. Source and correction review remains separate from backend readiness and institutional approval.</p>
+        <p>Available only to the enabled primary administrator. This page reads the maintained private backend; no dataset is embedded here. No file upload, operational save, queue or public publication occurs.</p>
+      </details>
+    </div>
+  </section>
+
+<!-- Inert adapter compatibility targets; no legacy controls, scripts or readers. -->
+<details id="source-tools" hidden><summary>Unavailable here</summary></details>
+<div id="entry-shell" hidden></div><div id="app" hidden></div>
+<details id="access-options" hidden><summary>Unavailable here</summary></details>
+<button id="useHistorical" hidden type="button">Historical baseline</button>
+<button id="useLive" hidden disabled type="button">Unavailable here</button>
+</main>
+<script src="assets/fb-config.js"></script>
+<script src="assets/review-startup.js"></script>
+<script src="assets/baseline-auth.js"></script>
+<script src="assets/historical-analytics.js"></script>
+<script src="assets/historical-baseline.js"></script>
+</body></html>
