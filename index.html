@@ -301,6 +301,7 @@ body.hub.dashboard-selected .rail .rgb>a.on{background:#edf4fa;box-shadow:inset 
 body.hub.dashboard-selected .rail .rgh{min-height:44px;padding:8px 10px;font-size:12px}
 body.hub.dashboard-selected .rail .rgh :is(em,.dot){display:none}
 body.hub.dashboard-selected .rail .rg:not([data-g=coord]).open>.rgb{position:absolute;right:0;top:100%;z-index:45;width:200px;background:#fff;border:1px solid #d8e1ec;border-radius:8px;padding:8px;box-shadow:0 5px 12px #1d3d6020}
+body.hub.dashboard-selected .rail .rg[data-g=forms].open>.rgb,body.hub.dashboard-selected .rail .rg[data-g=admin].open>.rgb{left:0;right:auto}
 body.hub.dashboard-selected .rail .railtoggle{padding:0;margin:0;display:inline-flex}
 body.hub.dashboard-selected #band{background:transparent!important;color:#455569!important;border:0;padding:0!important;text-align:left;font-size:12px;margin:0}
 body.hub.dashboard-selected #band span{color:#455569!important}
@@ -439,16 +440,42 @@ body.hub.dashboard-selected .file-choice{display:block;font-size:13px;font-weigh
   <script>(function(){
   var rail=document.currentScript.parentNode, KEY='mhpss-rail-groups';
   var saved={}; try{ saved=JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){}
-  rail.querySelectorAll('.rg').forEach(function(g){
+  if(!saved || typeof saved!=='object' || Array.isArray(saved)) saved={};
+  var groups=Array.from(rail.querySelectorAll('.rg'));
+  function setOpen(g,on){
+    g.classList.toggle('open',on);
+    g.querySelector('.rgh').setAttribute('aria-expanded',String(on));
+  }
+  function closeAux(){
+    groups.forEach(function(g){ if(g.getAttribute('data-g')!=='coord') setOpen(g,false); });
+  }
+  /* Dropdowns are transient. Normalize the legacy multi-open preference only;
+     never restore a popup over the dashboard after a navigation or reload. */
+  var migrated=false;
+  groups.forEach(function(g){
     var k=g.getAttribute('data-g'), h=g.querySelector('.rgh');
-    if(!g.classList.contains('here') && k in saved) g.classList.toggle('open', !!saved[k]);
-    h.setAttribute('aria-expanded', g.classList.contains('open'));
+    setOpen(g,k==='coord');
+    if(k!=='coord' && k in saved && saved[k]!==false){ saved[k]=false; migrated=true; }
     h.addEventListener('click', function(){
-      g.classList.toggle('open'); var on=g.classList.contains('open');
-      h.setAttribute('aria-expanded', on); saved[k]=on;
-      try{ localStorage.setItem(KEY, JSON.stringify(saved)); }catch(e){}
+      if(k==='coord') return;
+      var on=!g.classList.contains('open');
+      closeAux(); setOpen(g,on);
     });
   });
+  if(migrated){ try{ localStorage.setItem(KEY,JSON.stringify(saved)); }catch(e){} }
+  document.addEventListener('click',function(e){
+    var g=e.target.closest('.rg');
+    if(!g || !rail.contains(g) || e.target.closest('.rgb a')) closeAux();
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key!=='Escape') return;
+    var open=groups.find(function(g){ return g.getAttribute('data-g')!=='coord' && g.classList.contains('open'); });
+    if(!open) return;
+    var ownsFocus=open.contains(document.activeElement);
+    closeAux();
+    if(ownsFocus){ e.preventDefault(); open.querySelector('.rgh').focus(); }
+  });
+  window.addEventListener('hashchange',closeAux);
   var m=rail.querySelector('.rmenu');
   if(m){ m.addEventListener('click', function(){
     var open=rail.classList.toggle('menu-open'); m.setAttribute('aria-expanded', open); }); }

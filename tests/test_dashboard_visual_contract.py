@@ -24,9 +24,18 @@ class Contract(unittest.TestCase):
   old_guard='if (done || !st || !st.ready) return;'
   new_guard='if (done || !st || !st.ready || !st.user) return;'
   self.assertEqual(len(a),2);self.assertEqual(len(b),3)
-  self.assertEqual(a[0],b[0]);self.assertEqual(a[1].count(old_guard),1)
+  # W40 approved menu-controller interval only; all other rail code stays exact.
+  start="  var saved={};";end="  var m=rail.querySelector('.rmenu');"
+  x,y=a[0],b[0]
+  self.assertEqual(x[:x.index(start)],y[:y.index(start)])
+  self.assertEqual(x[x.index(end):],y[y.index(end):])
+  self.assertEqual(hashlib.sha256(y[y.index(start):y.index(end)].encode()).hexdigest(),'8bf38aa2765c39a5fd052498e062e0f508f21297bb9b68bd73f4ebf453362878')
+  self.assertEqual(a[1].count(old_guard),1)
   self.assertEqual(b[1],a[1].replace(old_guard,new_guard))
   self.assertEqual(hashlib.sha256(b[2].encode()).hexdigest(),'85a7cfca5e4d8fb42822015a90fd65b443a816efeec4379fb3de6d67e9910ed0')
+ def test_changed_menu_or_route_rejected(self):
+  for old,new in [("closeAux(); setOpen(g,on);","setOpen(g,on);"),("hashchange', mark","hashchange', closeAux")]:
+   with self.assertRaises(AssertionError):self.assert_scripts_contract(self.new.replace(old,new,1))
  def test_scripts_byte_exact(self):self.assert_scripts_contract(self.new)
  def test_restored_unsigned_autoconnect_rejected(self):
   with self.assertRaises(AssertionError):self.assert_scripts_contract(self.new.replace('if (done || !st || !st.ready || !st.user) return;','if (done || !st || !st.ready) return;'))
