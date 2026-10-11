@@ -5,7 +5,7 @@ const payload=JSON.parse(fs.readFileSync(path.join(__dirname,'native-wire.json')
 let count=0;function check(n,f){f();count++;console.log('PASS '+n);}const clone=x=>JSON.parse(JSON.stringify(x));
 function page(rows,cursor=null,first=true,time=stamp){return {protocol:'own-current-pages/1',scope:'reporter-own-org-current',rows,nextCursor:cursor,pageComplete:true,snapshotComplete:first&&cursor===null,readTime:time,pageCount:rows.length};}
 let u={uid:'synthetic',emailVerified:true,getIdToken:async()=> 'synthetic-only'},pending=[];const auth={currentUser:()=>u,token:async()=> 'synthetic-only'},reader=context.CURRENT_READER.create(auth);const filters={district:'',from:'',through:''};
-function response(p){return {ok:true,text:async()=>JSON.stringify(p)};}context.fetch=async()=>response(page([clone(base)]));
+function response(p,status=200){return {ok:status>=200&&status<300,status,text:async()=>JSON.stringify(p)};}context.fetch=async()=>response(page([clone(base)]));
 (async()=>{
 await reader.refresh('TPO');check('one valid joint row',()=>assert.equal(reader.filtered(filters).rows.length,1));check('CSV receipt and snapshot metadata',()=>{const s=reader.csv(filters);assert(s.includes(base.event_id)&&s.includes(base.request_sha256)&&s.includes(stamp));});
 for(const [name,change]of Object.entries({nullrev:{revision:null},boolrev:{revision:true},flat:{schema:'mhpss-np-5ws/5ws-np-0.7.0'},test:{document_path:'mhpss5wsTestReportsV1/report-00'},extra:{extra:1},wrongorg:{payload:{...payload,org:'WHO'}}}))check('row refusal '+name,()=>assert.throws(()=>context.CURRENT_READER.validateRow({...clone(base),...change},'TPO')));
@@ -19,5 +19,10 @@ context.fetch=async()=>({ok:false,status:403});await assert.rejects(reader.refre
 const ten=Array.from({length:10},(_,i)=>({...clone(base),id:'report-'+String(i).padStart(2,'0'),document_path:'mhpss5wsReportsV2/report-'+String(i).padStart(2,'0')}));let call=0;context.fetch=async()=>response(call++?page([],null,false,'2026-10-11T04:01:00Z'):page(ten,'a',true));await assert.rejects(reader.refresh('TPO'));check('fixed readTime drift refused',()=>assert.throws(()=>reader.csv(filters)));
 call=0;context.fetch=async()=>response(call++?page([],null,false):page(ten,'a',true));await reader.refresh('TPO');check('exact10 then terminal empty snapshot accepted',()=>assert.equal(reader.view().rows.length,10));
 check('invalid filter range refused',()=>assert.throws(()=>reader.csv({district:'',from:'2027-01-01',through:'2026-01-01'})));
+for(const status of [201,202,204,206,299,301,401,403,500]){
+ context.fetch=async()=>response(page([clone(base)]));await reader.refresh('TPO');
+ context.fetch=async()=>response(page([clone(base)]),status);await assert.rejects(reader.refresh('TPO'));
+ check('exact200 refuses '+status+' and erases view/CSV',()=>{assert.throws(()=>reader.view());assert.throws(()=>reader.csv(filters));});
+}
 console.log(JSON.stringify({completion:'ALL_CASES_COMPLETED',count,scope:'deterministic transport only'}));
 })().catch(e=>{console.error(e);process.exitCode=1;});
