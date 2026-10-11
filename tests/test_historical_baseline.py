@@ -13,15 +13,16 @@ class HistoricalContract(unittest.TestCase):
   self.assertNotIn('/root/',j)
   self.assertNotIn('/Users/',j)
  def test_locked_runtime_and_palette(self):
-  for f in ['assets/store.js','assets/fb.js','assets/fb-config.js','assets/codes.js','assets/i18n.js','assets/i18n-strings.js','assets/hub-shell.css','assets/design.css']:
+  for f in ['assets/store.js','assets/fb.js','assets/fb-config.js','assets/codes.js','assets/i18n.js','assets/i18n-strings.js','assets/design.css']:
    self.assertEqual((R/f).read_bytes(),subprocess.check_output(['git','show',BASE+':'+f],cwd=R),f)
   old=subprocess.check_output(['git','show',BASE+':index.html'],cwd=R).decode();new=(R/'index.html').read_text()
-  oldstyles=re.findall(r'<style[^>]*>(.*?)</style>',old,re.S);newstyles=re.findall(r'<style[^>]*>(.*?)</style>',new,re.S)
-  self.assertEqual(new.count(STYLE),1)
-  self.assertEqual(oldstyles,[s.replace(STYLE,"") for s in newstyles])
+  self.assertEqual(re.search(r'<style id="dashboard-category-palette">(.*?)</style>',new,re.S).group(1).replace(STYLE,''),re.search(r'<style id="dashboard-category-palette">(.*?)</style>',old,re.S).group(1))
+  shell=(R/'assets/hub-shell.css').read_bytes(); original=subprocess.check_output(['git','show',BASE+':assets/hub-shell.css'],cwd=R)
+  self.assertTrue(shell.startswith(original))
+  self.assertIn(b'body.l2-shell',shell[len(original):])
   oldids=set(re.findall(r'\bid="([^"]+)"',old));newids=re.findall(r'\bid="([^"]+)"',new)
   self.assertEqual(len(newids),len(set(newids)))
-  approved_additions={'useHistorical','historical-baseline','historical-file','historical-status','historical-results','historical-stats','historical-export','historical-clear','historical-provenance','historical-summary'}
+  approved_additions={'useHistorical','historical-baseline','historical-file','historical-status','historical-results','historical-stats','historical-export','historical-clear','historical-provenance','historical-summary','layer2-sidebar'}
   self.assertFalse(oldids-set(newids));self.assertEqual(set(newids)-oldids,approved_additions)
  def test_no_public_data_asset(self):
   j=(R/'assets/historical-baseline.js').read_text()

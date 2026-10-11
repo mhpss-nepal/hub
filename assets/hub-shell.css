@@ -171,3 +171,43 @@ body.hub .phead .lede{ font-size: 17px; color: var(--slate); margin: 9px 0 0; ma
   body.hub .topline .in, body.hub .phead .in{ padding: 0 32px; }
   body.hub .phead{ padding: 32px 0 26px; }
 }
+
+/* Owner-approved Layer 2 left navigation; opt-in only, never field forms / Layer 3. */
+body.l2-shell,body.hub.dashboard-selected.l2-shell{box-sizing:border-box;padding-left:248px}
+body.l2-shell .rail{position:fixed;inset:0 auto 0 0;width:248px;height:100dvh;z-index:80;display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;background:#fff;border:0;border-right:1px solid #d5deea;padding:0;color:#24364b;font:14px/1.4 Arial,sans-serif;box-sizing:border-box}
+body.l2-shell .l2-brand{position:relative;padding:28px 20px 22px;border-bottom:1px solid #d5deea;border-top:4px solid #38b3bd}
+body.l2-shell .l2-brand strong{display:block;font-size:20px;color:#143451}
+body.l2-shell .l2-brand>span{display:block;font-size:12px;color:#45546b;margin-top:6px}
+body.l2-shell .rail nav{display:flex;flex-direction:column;padding:12px;gap:4px;overflow:visible;max-height:none}
+body.l2-shell .rail nav a,body.l2-shell .l2-held{display:flex;flex-direction:column;justify-content:center;min-height:52px;box-sizing:border-box;padding:10px 12px;border-radius:8px;white-space:normal;overflow-wrap:break-word;text-decoration:none;color:#24364b;border-left:3px solid transparent}
+body.l2-shell .rail nav a>span{font-weight:700}
+body.l2-shell .rail nav small{display:block;font-size:11px;line-height:1.4;color:#45546b;margin-top:4px}
+body.l2-shell .rail nav a:hover{background:#f0f5fb}
+body.l2-shell .rail nav a[aria-current=page]{background:#edf4ff;border-left-color:#235dc1;color:#173c7d}
+body.l2-shell .l2-navlabel{margin:16px 12px 5px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#45546b}
+body.l2-shell .l2-held{background:#f6f8fa;color:#45546b;cursor:default}
+body.l2-shell .l2-held>span{font-weight:600}
+body.l2-shell .l2-foot{padding:16px 20px;font-size:11px;line-height:1.6;color:#45546b;margin:auto 0 0;border-top:1px solid #d5deea}
+body.l2-shell .l2-menu,body.l2-shell .l2-close,body.l2-shell .l2-backdrop{display:none}
+body.l2-shell .l2-skip{position:absolute;top:-100px;left:260px;z-index:120;background:#fff;padding:12px;color:#143451}
+body.l2-shell .l2-skip:focus{top:8px}
+body.l2-shell .rail :is(a,button):focus-visible,body.l2-shell .l2-menu:focus-visible{outline:3px solid #235dc1;outline-offset:2px}
+body.l2-shell.current-view header{background:linear-gradient(110deg,#143451,#225579);border-bottom:4px solid #38b3bd;padding:22px 28px}
+body.l2-shell.current-view main{min-width:0;padding:16px 28px 48px}
+body.l2-shell.current-view header p{margin:6px 0 0;color:#e0e9f3;font-size:13px}
+body.l2-shell.current-view section{box-shadow:0 3px 12px #18355108;border-color:#d5deea;border-radius:12px}
+body.l2-shell.current-view #signIn,body.l2-shell.current-view #finishLink{background:#1d3d60;color:white}
+body.l2-shell.current-view #delivery{padding:12px;border-left:4px solid #b66623;background:#fff3e8;color:#864516}
+@media(max-width:899px){
+ body.l2-shell,body.hub.dashboard-selected.l2-shell{padding-left:0}
+ body.l2-shell .rail{display:none;width:min(288px,calc(100vw - 24px));box-shadow:8px 0 32px #14345130}
+ body.l2-shell.l2-menu-open .rail{display:flex}
+ body.l2-shell .l2-menu{display:flex;align-items:center;gap:10px;min-height:44px;min-width:44px;background:#fff;border:1px solid #d5deea;border-radius:8px;padding:10px 14px;margin:10px 12px;color:#143451;font:700 14px Arial,sans-serif;cursor:pointer}
+ body.l2-shell .l2-close{display:block;position:absolute;right:8px;top:8px;min-width:44px;min-height:44px;margin:0;background:#fff;border:1px solid #d5deea;border-radius:8px;color:#143451;font:24px Arial,sans-serif;cursor:pointer}
+ body.l2-shell .l2-brand{padding-top:62px}
+ body.l2-shell .l2-backdrop:not([hidden]){display:block;position:fixed;inset:0;background:#14345170;z-index:79}
+ body.l2-shell.l2-menu-open{overflow:hidden}
+ body.l2-shell .l2-skip{left:8px}
+ body.l2-shell.current-view main,body.l2-shell.current-view header{padding:14px}
+ body.l2-shell.current-view h1{font-size:22px}
+}
