@@ -35,6 +35,9 @@
     COLL, window.FB_QUEUE_SCOPE || (/preview|review-/.test(window.location.pathname) ? "preview" : "operational")];
   var QKEY = "mhpss-np-queue-v2:" + encodeURIComponent(JSON.stringify(BINDING));
   var queueError = "", flushing = null;
+  // Page-lifetime recovery is authoritative after a failed durable write.
+  // Never replace it with an older disk body or dispatch it as durable.
+  var recoveryRows = null;
   function legacyQuarantined() {
     try {
       for (var i = 0; i < localStorage.length; i++) if (localStorage.key(i) === LEGACY_QKEY) return true;
@@ -88,6 +91,7 @@
      The queue is the record of truth until the server confirms. An entry
      leaves the queue only once Firestore has acknowledged the write. */
   function queue() {
+    if (recoveryRows !== null) return recoveryRows;
     try {
       var raw = localStorage.getItem(QKEY);
       if (!raw) return window.__fbq || [];
@@ -105,7 +109,7 @@
   function setQueue(q) {
     if (queueError) return false;
     try { localStorage.setItem(QKEY, JSON.stringify({ binding: BINDING, rows: q })); window.__fbq = null; return true; }
-    catch (e) { window.__fbq = q; queueError = "device storage write failed; export source records before leaving"; return false; }
+    catch (e) { recoveryRows = JSON.parse(JSON.stringify(q)); queueError = "device storage write failed; newest outbox is memory-only; export source records before leaving"; return false; }
   }
 
   /* ---------- deterministic id ----------------------------------------
@@ -295,6 +299,7 @@
      write at a time far better than twenty at once. */
   function flush() {
     if (flushing) return flushing;
+    if (recoveryRows !== null || queueError) return Promise.resolve({ sent: 0, left: queue().length, error: queueError });
     if (!state.ready || !navigator.onLine) return Promise.resolve({ sent: 0, left: queue().length });
     var q = queue().slice(), sent = 0;
     flushing = q.reduce(function (chain, r) {
@@ -335,6 +340,7 @@
   async function readKindComplete(kind, options) {
     options = options || {};
     if (!state.ready || !navigator.onLine) throw new Error("incomplete: server unavailable");
+    if (!state.user || typeof state.user.uid !== "string" || !state.user.uid) throw new Error("incomplete: authenticated identity required");
     if (typeof kind !== "string" || !kind) throw new Error("incomplete: explicit kind required");
     var maxRows = options.maxRows === undefined ? 10000 : options.maxRows;
     if (!Number.isInteger(maxRows) || maxRows < 1 || maxRows > 10000) throw new Error("invalid row bound");
