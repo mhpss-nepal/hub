@@ -1,0 +1,253 @@
+/* =====================================================================
+   MHPSS Nepal — the Layer 2 shell
+   ---------------------------------------------------------------------
+   Loaded by the hub's own pages, AFTER app.css and design.css, and by no
+   page in the form repository. Everything is scoped to `body.hub`.
+
+   23 September 2026, the Coordinator: the dashboard follows the FIELD
+   FORMS, not the other way round. The forms are built, reviewed and in
+   people's hands; the coordination screen is the one that should move.
+   So this sheet does not invent a look — it adopts `assets/form.css`,
+   which is already a scoped design system of its own (`body.fx`, the
+   `--fx-*` tokens).
+
+   The two were closer than they looked. Measured, not assumed:
+     --ink   #20313b   identical in both
+     --slate #5b6b76   identical
+     --warn  #b4541f   identical
+     --ok    #2f6b53   identical
+     the four brand blues  #009fe3 / #006996 / #004969 / #eaf7fd  identical
+     body type  15px / 1.55  identical
+   Four things differed, and only those four are changed here: the page
+   wash, the corner radius, the card shadow, and the first font family.
+   Plus two hairlines a shade apart.
+
+   THE TOKEN VALUES BELOW ARE A COPY of the ones declared in form.css.
+   A copy is how the form and the coordination view come to disagree, so
+   it is not left to discipline: tools/fx-token-parity-check.py reads both
+   files and refuses the deploy if any of them drifts. Change form.css and
+   this file will fail the gate until it follows.
+
+   Light only, by the Coordinator's decision of 23 September — no dark
+   mode and no toggle. The hub's shared stylesheets declare no
+   prefers-color-scheme at all, so there is nothing to switch to.
+   ===================================================================== */
+
+/* ---------- the field forms' tokens, adopted --------------------------
+   Redeclared on body.hub rather than :root, so nothing here can reach a
+   page that is not the hub. Every component already reads --bg, --line,
+   --line-s and --r, so remapping the tokens moves the cards, the tables,
+   the stat tiles and the filter panel together, without restyling one of
+   them by hand. */
+body.hub{
+  --bg:#eef3f6;                     /* --fx-bg */
+  --line:#d5dde3;                   /* --fx-line */
+  --line-s:#e8eef2;                 /* --fx-line-s */
+  --r:14px;                         /* --fx-r */
+  --r-md:14px;                      /* --fx-r, again: design.css gives .card
+                                       border-radius:var(--r-md), not --r, so
+                                       remapping --r alone left one surface at
+                                       10px among 14s. */
+  --fx-rs:12px;
+  --fx-shadow:0 1px 2px rgba(18,38,52,.06), 0 10px 28px -20px rgba(18,38,52,.35);
+  --fx-blue-d:#006996;
+  --fx-blue-dd:#004969;
+  font-family:"Manrope","Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+/* design.css sets body{background:var(--paper)} and loads after app.css, so
+   remapping --bg alone leaves the page white. --paper is the card surface and
+   must stay white, so the wash is stated here instead. */
+body.hub{ background:var(--bg); }
+
+/* the forms carry their surfaces on a shadow, not a hairline */
+body.hub .card,
+body.hub .stat,
+body.hub .ovcol,
+body.hub .ovfig,
+body.hub .tbl-wrap,
+body.hub .filters{ border:0; box-shadow:var(--fx-shadow); }
+body.hub select, body.hub input[type="date"], body.hub input[type="search"]{ border-radius:var(--fx-rs); }
+body.hub .chipf{ border-radius:999px; }
+
+/* ---------- the rail: same shape, light ----------------------------
+   design.css paints the rail light-on-dark with hard-coded values
+   (#fff, #e2e2e0, #cfd3d6, rgba(255,255,255,.13) and so on). Every one of
+   them is answered here, because a half-converted rail is worse than
+   either: a pale grey meant to read on --hc-ink is invisible on white.
+   The rule of the original is kept — layer 2 is the one you are on, and
+   it is the only filled item. ------------------------------------------ */
+body.hub .rail{ background: var(--paper); border-right: 1px solid var(--line); }
+
+body.hub .rail .railid{ border-bottom: 1px solid var(--line); }
+body.hub .rail .railid b{ color: var(--wh-dd); }
+body.hub .rail .railid i{ color: var(--slate); }
+
+body.hub .rail .where{ border-bottom: 1px solid var(--line); }
+body.hub .rail .wlab{ color: var(--wh-d); }
+
+body.hub .rail .lyr{ color: var(--ink); border-color: transparent; }
+body.hub .rail .lyr b{ background: var(--wh-t); color: var(--wh-dd); }
+body.hub .rail .lyr span{ color: var(--ink); }
+body.hub .rail .lyr i{ color: var(--slate); }
+body.hub .rail .lyr:hover{ background: var(--wh-t); }
+body.hub .rail .lyr.on{ background: var(--wh-dd); }
+body.hub .rail .lyr.on span{ color: #fff; }
+body.hub .rail .lyr.on i{ color: #cfe4ee; }
+body.hub .rail .lyr.on b{ background: #fff; color: var(--wh-dd); }
+
+body.hub .rail .rgh{ color: var(--wh-dd); }
+body.hub .rail .rgh:hover{ background: var(--wh-t); }
+body.hub .rail .rgh em{ color: var(--slate); }
+body.hub .rail .rgh .chev{ border-color: var(--slate); }
+body.hub .rail .rgb a{ color: var(--ink); }
+body.hub .rail .rgb a:hover{ background: var(--wh-t); color: var(--wh-dd); }
+body.hub .rail .rgb a.on{ background: var(--wh-t); color: var(--wh-dd); }
+
+body.hub .rail .rmenu{ border: 1px solid var(--wh-d); color: var(--wh-dd); }
+body.hub .rail .rmenu span{ background: var(--wh-d); box-shadow: 0 -5px 0 var(--wh-d), 0 5px 0 var(--wh-d); }
+
+body.hub .rail .rfoot, body.hub .rail .foot, body.hub .rail p{ color: var(--slate); }
+
+/* ---------- the strip above everything ------------------------------ */
+/* the forms open with a ribbon in --fx-blue-dd; this is the same bar */
+body.hub .topline{ background: var(--fx-blue-dd); color: #fff; }
+body.hub .topline .in{
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  min-height: 38px; padding: 0 16px; max-width: 1480px; margin: 0 auto;
+}
+body.hub .topline .tl{
+  font-size: 12px; letter-spacing: .09em; text-transform: uppercase; font-weight: 600;
+}
+body.hub .topline .sp{ flex: 1 1 auto; }
+
+/* ---------- the masthead: the field forms’ own bar ------------------
+   body.fx .top is a 150deg gradient from --fx-blue-d to --fx-blue-dd with
+   the name in Lora. This is that bar, on the dashboard. */
+body.hub .top{
+  background:linear-gradient(150deg, var(--fx-blue-d), var(--fx-blue-dd));
+  color:#fff;
+  border-bottom:0;
+  box-shadow:0 6px 18px -14px rgba(0,0,0,.6);
+}
+body.hub .top .brand{
+  font-family:"Lora",Georgia,serif; font-weight:700; font-size:19px;
+  letter-spacing:0; line-height:1.2; color:#fff;
+}
+body.hub .top .sub{
+  font-size:10.5px; color:#cfe6f2; letter-spacing:.08em;
+  text-transform:uppercase; font-weight:700; margin-top:3px;
+}
+
+/* ---------- the demonstration band ---------------------------------- */
+/* Its words are a governance notice and are not touched here. Only the
+   weight is: a full-bleed crimson bar was the loudest thing on a screen
+   whose loudest thing should be the coverage gap. */
+body.hub #band{
+  background: var(--warn-t, #fdf4e7) !important;
+  color: var(--warn, #a56208) !important;
+  text-align: left !important;
+  font-weight: 600 !important;
+  border-bottom: 1px solid var(--warn, #a56208);
+  padding: 9px 16px !important;
+}
+body.hub #band span{ color: var(--slate) !important; opacity: 1 !important; }
+
+/* ---------- the page head: one tinted band -------------------------- */
+body.hub .phead{
+  background: var(--who-t);
+  border-bottom: 1px solid #bcdcec;
+  padding: 26px 0 22px;
+  margin: 0 0 24px;
+}
+body.hub .phead .in{ max-width: 1480px; margin: 0 auto; padding: 0 16px; }
+body.hub .phead .eyebrow{
+  font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase;
+  font-weight: 700; color: var(--who-d); margin-bottom: 6px;
+}
+body.hub .phead h1{ font-size: clamp(27px, 3.6vw, 42px); color: var(--who-dd, #004969); margin: 0; }
+body.hub .phead .lede{ font-size: 17px; color: var(--slate); margin: 9px 0 0; max-width: 78ch; }
+
+@media (min-width: 900px){
+  body.hub .topline .in, body.hub .phead .in{ padding: 0 32px; }
+  body.hub .phead{ padding: 32px 0 26px; }
+}
+
+/* Owner-approved Layer 2 left navigation; opt-in only, never field forms / Layer 3. */
+body.l2-shell,body.hub.dashboard-selected.l2-shell{box-sizing:border-box;padding-left:248px}
+body.l2-shell .rail{position:fixed;inset:0 auto 0 0;width:248px;height:100dvh;z-index:80;display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;background:#fff;border:0;border-right:1px solid #d5deea;padding:0;color:#24364b;font:14px/1.4 Arial,sans-serif;box-sizing:border-box}
+body.l2-shell .l2-brand{position:relative;padding:28px 20px 22px;border-bottom:1px solid #d5deea;border-top:4px solid #38b3bd}
+body.l2-shell .l2-brand strong{display:block;font-size:20px;color:#143451}
+body.l2-shell .l2-brand>span{display:block;font-size:12px;color:#45546b;margin-top:6px}
+body.l2-shell .rail nav{display:flex;flex-direction:column;padding:12px;gap:4px;overflow:visible;max-height:none}
+body.l2-shell .rail nav a,body.l2-shell .l2-held{display:flex;flex-direction:column;justify-content:center;min-height:52px;box-sizing:border-box;padding:10px 12px;border-radius:8px;white-space:normal;overflow-wrap:break-word;text-decoration:none;color:#24364b;border-left:3px solid transparent}
+body.l2-shell .rail nav a>span{font-weight:700}
+body.l2-shell .rail nav small{display:block;font-size:11px;line-height:1.4;color:#45546b;margin-top:4px}
+body.l2-shell .rail nav a:hover{background:#f0f5fb}
+body.l2-shell .rail nav a[aria-current=page]{background:#edf4ff;border-left-color:#235dc1;color:#173c7d}
+body.l2-shell .l2-navlabel{margin:16px 12px 5px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#45546b}
+body.l2-shell .l2-held{background:#f6f8fa;color:#45546b;cursor:default}
+body.l2-shell .l2-held>span{font-weight:600}
+body.l2-shell .l2-foot{padding:16px 20px;font-size:11px;line-height:1.6;color:#45546b;margin:auto 0 0;border-top:1px solid #d5deea}
+body.l2-shell .l2-menu,body.l2-shell .l2-close,body.l2-shell .l2-backdrop{display:none}
+body.l2-shell .l2-skip{position:absolute;top:-100px;left:260px;z-index:120;background:#fff;padding:12px;color:#143451}
+body.l2-shell .l2-skip:focus{top:8px}
+body.l2-shell .rail :is(a,button):focus-visible,body.l2-shell .l2-menu:focus-visible{outline:3px solid #235dc1;outline-offset:2px}
+body.l2-shell.current-view header{background:linear-gradient(110deg,#143451,#225579);border-bottom:4px solid #38b3bd;padding:22px 28px}
+body.l2-shell.current-view main{min-width:0;padding:16px 28px 48px}
+body.l2-shell.current-view header p{margin:6px 0 0;color:#e0e9f3;font-size:13px}
+body.l2-shell.current-view section{box-shadow:0 3px 12px #18355108;border-color:#d5deea;border-radius:12px}
+body.l2-shell.current-view #signIn,body.l2-shell.current-view #finishLink{background:#1d3d60;color:white}
+body.l2-shell.current-view #delivery{padding:12px;border-left:4px solid #b66623;background:#fff3e8;color:#864516}
+@media(max-width:899px){
+ body.l2-shell,body.hub.dashboard-selected.l2-shell{padding-left:0}
+ body.l2-shell .rail{display:none;width:min(288px,calc(100vw - 24px));box-shadow:8px 0 32px #14345130}
+ body.l2-shell.l2-menu-open .rail{display:flex}
+ body.l2-shell .l2-menu{display:flex;align-items:center;gap:10px;min-height:44px;min-width:44px;background:#fff;border:1px solid #d5deea;border-radius:8px;padding:10px 14px;margin:10px 12px;color:#143451;font:700 14px Arial,sans-serif;cursor:pointer}
+ body.l2-shell .l2-close{display:block;position:absolute;right:8px;top:8px;min-width:44px;min-height:44px;margin:0;background:#fff;border:1px solid #d5deea;border-radius:8px;color:#143451;font:24px Arial,sans-serif;cursor:pointer}
+ body.l2-shell .l2-brand{padding-top:62px}
+ body.l2-shell .l2-backdrop:not([hidden]){display:block;position:fixed;inset:0;background:#14345170;z-index:79}
+ body.l2-shell.l2-menu-open{overflow:hidden}
+ body.l2-shell .l2-skip{left:8px}
+ body.l2-shell.current-view main,body.l2-shell.current-view header{padding:14px}
+ body.l2-shell.current-view h1{font-size:22px}
+}
+
+/* Visible-shell correction: one branded workspace, task-first navigation. */
+body.l2-shell .l2-brand{padding:26px 20px 24px;background:linear-gradient(135deg,#143451,#225579);border:0;border-top:4px solid #38b3bd}
+body.l2-shell .l2-brand strong{font-size:22px;letter-spacing:-.4px;color:#fff;line-height:1.3}
+body.l2-shell .l2-brand>span{font-size:12px;color:#dceaf3;line-height:1.5}
+body.l2-shell .rail nav{gap:6px;padding:14px 12px}
+body.l2-shell .rail nav a{min-height:64px;padding:12px 14px;border:1px solid transparent;border-left:4px solid transparent;transition:background .12s ease}
+body.l2-shell .rail nav a>span{font-size:14px;line-height:1.4;letter-spacing:0}
+body.l2-shell .rail nav small{font-size:12px;line-height:1.5;margin-top:4px}
+body.l2-shell .rail nav a[aria-current=page]{background:#e8f1fb;border-color:#d5e4f5;border-left-color:#2878b9;color:#143451}
+body.l2-shell .l2-navlabel{font-size:11px;letter-spacing:.08em;margin-top:18px;color:#52647a}
+body.l2-shell .l2-held{padding:10px 14px;min-height:54px;background:transparent;border-radius:8px;color:#52647a}
+body.l2-shell .l2-held>span{font-size:13px;line-height:1.5}
+body.l2-shell .l2-held small{font-size:11px;color:#52647a}
+body.l2-shell .l2-foot{font-size:12px;padding:16px 20px;color:#52647a;background:#f7f9fc}
+body.l2-shell main{min-width:0}
+body.hub.dashboard-selected.l2-shell #historical-login{width:min(100%,480px);max-width:480px;margin:20px 0 24px;padding:28px;border:1px solid #d5deea;border-top:4px solid #2878b9;box-shadow:0 8px 24px #1434510c}
+body.hub.dashboard-selected.l2-shell #historical-login h3{font-size:24px;line-height:1.3;margin-bottom:12px}
+body.hub.dashboard-selected.l2-shell #historical-login p{line-height:1.6;color:#455569}
+body.hub.dashboard-selected.l2-shell #historical-login input{min-height:48px;border:1px solid #8295a8;border-radius:9px;padding:10px 12px;font:inherit}
+body.hub.dashboard-selected.l2-shell #historical-signin{min-height:48px;background:#1d3d60;border-color:#1d3d60;border-radius:9px;font-weight:700}
+body.hub.dashboard-selected.l2-shell #historical-password-options{border-top:1px solid #e1e7ef;margin-top:20px;padding-top:14px}
+body.hub.dashboard-selected.l2-shell #historical-password-options>summary{min-height:44px;cursor:pointer;color:#244769;font-weight:600}
+body.hub.dashboard-selected.l2-shell #historical-status{max-width:70ch}
+body.l2-shell .source-note{max-width:85ch;line-height:1.6}
+body.l2-shell.current-view main{max-width:1280px;margin:0 auto}
+body.l2-shell.current-view section[aria-label=Authentication]{max-width:520px;padding:24px;border-top:4px solid #2878b9}
+body.l2-shell.current-view section[aria-label=Authentication] label{display:flex;margin-right:0}
+body.l2-shell.current-view section[aria-label=Authentication] input{width:100%;min-height:48px;margin-top:6px}
+body.l2-shell.current-view #signIn,body.l2-shell.current-view #finishLink{width:100%;margin:12px 0 0;min-height:48px;font-weight:700}
+body.l2-shell.current-view section[aria-label=Read\ selection],body.l2-shell.current-view section[aria-label=Reporting\ access]{box-shadow:none;background:transparent;border:0;padding:0}
+@media(max-width:899px){
+ body.l2-shell .l2-brand{padding:26px 64px 24px 20px}
+ body.l2-shell .l2-brand strong{font-size:20px}
+ body.l2-shell .l2-close{background:#fff;color:#143451}
+ body.hub.dashboard-selected.l2-shell #historical-login{margin:16px 0;padding:20px}
+ body.hub.dashboard-selected.l2-shell #historical-login h3{font-size:22px}
+ body.l2-shell.current-view section[aria-label=Authentication]{padding:20px}
+}
+@media(prefers-reduced-motion:reduce){body.l2-shell .rail nav a{transition:none}}
