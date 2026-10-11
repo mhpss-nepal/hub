@@ -1,0 +1,153 @@
+{
+  "schema": "mhpss-5ws-session/0.4.0-approved-joint-review",
+  "jointSexAgeVersion": "nepal-joint-sex-age/1-approved-review",
+  "reviewMode": "GUIDE_ALIGNMENT_REVIEW",
+  "reportingTypeVersion": "sormas-20260929-reporting-type/1-review",
+  "reportingType": "COMMUNITY_OUTREACH",
+  "serviceSettingVersion": "edcd-20260917-setting/1-retained",
+  "serviceSetting": "COM",
+  "deliveryModeVersion": "sormas-20260929-delivery/1-review",
+  "healthFacility": null,
+  "ageBandVersion": "nepal-age-04-5to9-10to17-18to59-60/1",
+  "sexDisaggregationVersion": "nepal-sex-female-male-other-unknown/1",
+  "status": "PROPOSAL_REVIEW",
+  "org": "TPO",
+  "province": "Bagmati",
+  "district": "NUW",
+  "palika": "NP0328301",
+  "site": null,
+  "ward": null,
+  "modality": "COM",
+  "deliveryMode": "GROUP_IN_PERSON",
+  "dateAD": "2026-10-06",
+  "dateBS": null,
+  "sessionTime": "10:00",
+  "backdateAcknowledged": true,
+  "attendance": 30,
+  "sessionJointSexAge": {
+    "female": {
+      "age04": 2,
+      "age5to9": 3,
+      "age10to17": 5,
+      "age18to59": 6,
+      "age60": 2
+    },
+    "male": {
+      "age04": 1,
+      "age5to9": 2,
+      "age10to17": 2,
+      "age18to59": 4,
+      "age60": 3
+    },
+    "other": {
+      "age04": 0,
+      "age5to9": 0,
+      "age10to17": 0,
+      "age18to59": 0,
+      "age60": 0
+    },
+    "unknown": {
+      "age04": 0,
+      "age5to9": 0,
+      "age10to17": 0,
+      "age18to59": 0,
+      "age60": 0
+    }
+  },
+  "activities": [
+    {
+      "code": "2.1",
+      "attendance": 14,
+      "jointSexAge": {
+        "female": {
+          "age04": 1,
+          "age5to9": 1,
+          "age10to17": 2,
+          "age18to59": 3,
+          "age60": 1
+        },
+        "male": {
+          "age04": 0,
+          "age5to9": 1,
+          "age10to17": 1,
+          "age18to59": 2,
+          "age60": 2
+        },
+        "other": {
+          "age04": 0,
+          "age5to9": 0,
+          "age10to17": 0,
+          "age18to59": 0,
+          "age60": 0
+        },
+        "unknown": {
+          "age04": 0,
+          "age5to9": 0,
+          "age10to17": 0,
+          "age18to59": 0,
+          "age60": 0
+        }
+      }
+    },
+    {
+      "code": "3.1",
+      "attendance": 20,
+      "jointSexAge": {
+        "female": {
+          "age04": 1,
+          "age5to9": 2,
+          "age10to17": 3,
+          "age18to59": 4,
+          "age60": 2
+        },
+        "male": {
+          "age04": 1,
+          "age5to9": 1,
+          "age10to17": 1,
+          "age18to59": 3,
+          "age60": 2
+        },
+        "other": {
+          "age04": 0,
+          "age5to9": 0,
+          "age10to17": 0,
+          "age18to59": 0,
+          "age60": 0
+        },
+        "unknown": {
+          "age04": 0,
+          "age5to9": 0,
+          "age10to17": 0,
+          "age18to59": 0,
+          "age60": 0
+        }
+      }
+    }
+  ],
+  "cadres": [
+    {
+      "code": "PSC",
+      "count": 2
+    },
+    {
+      "code": "VOL",
+      "count": 3
+    }
+  ],
+  "targetGroups": [
+    "TG-COM"
+  ],
+  "partners": [],
+  "activityStatus": "CMP",
+  "description": "",
+  "coordinationNotes": "",
+  "disability": null,
+  "ofWhom": {
+    "ofChildAlone": null,
+    "ofPreg": null,
+    "ofPwd": null,
+    "ofInjured": null,
+    "ofDistress": null
+  },
+  "siteOther": "SYNTHETIC community venue"
+}
