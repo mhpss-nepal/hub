@@ -14,7 +14,7 @@
    ===================================================================== */
 
 const KEY = "mhpss-np-4ws-v1";
-const SCHEMA_VERSION = "5ws-np-0.7.0";  /* 0.2.0: four age bands · 0.3.0: donors list, partners, palika, iascSub, 16 Sep 2026 · 0.4.0: five age groups, settings, cadre list, "Other" text fields, funding source off the form — EDCD review 17 Sep 2026 · 0.5.0 (17 Sep 2026, afternoon): the instrument is the 5Ws; activity list v3 (layer.item codes, IASC terms in the backend only); one report per session with its attendance — countBasis no longer asked, always CONTACTS; sessionTime in the record id */
+const SCHEMA_VERSION = "5ws-np-0.8.0";  /* 0.2.0: four age bands · 0.3.0: donors list, partners, palika, iascSub, 16 Sep 2026 · 0.4.0: five age groups, settings, cadre list, "Other" text fields, funding source off the form — EDCD review 17 Sep 2026 · 0.8.0 (11 Oct 2026): age bands 0-4 / 5-9 / 10-17 / 18-59 / 60+ so under-18 is derivable, the 10-19 generation kept for reading; new-people-today required; lead-or-partner control on joint activities · 0.5.0 (17 Sep 2026, afternoon): the instrument is the 5Ws; activity list v3 (layer.item codes, IASC terms in the backend only); one report per session with its attendance — countBasis no longer asked, always CONTACTS; sessionTime in the record id */
 
 /* ---------------------------------------------------------------------
    Deterministic record id.
@@ -178,14 +178,27 @@ function active() {
    still fold, at 18, through BANDS_V03. Any page that needs the fold calls
    fold(); nothing else knows the shapes.
    ------------------------------------------------------------------- */
+/* The bands the form collects (Adib, 11 Oct 2026): the third band stops at
+   17 and the fourth starts at 18, so the under-18 figure the NDRRMA 5W and the
+   IASC indicators ask for is derivable from what the form collects. The
+   10-19 / 20-59 generation could not give it: 10-19 straddles 18. */
 const BANDS = [
+  { key: "04",     lo: 0,  hi: 4,    label: "0\u20134",   f: "f04",     m: "m04",     o: "o04",     child: true  },
+  { key: "5to9",   lo: 5,  hi: 9,    label: "5\u20139",   f: "f5to9",   m: "m5to9",   o: "o5to9",   child: true  },
+  { key: "10to17", lo: 10, hi: 17,   label: "10\u201317", f: "f10to17", m: "m10to17", o: "o10to17", child: true  },
+  { key: "18to59", lo: 18, hi: 59,   label: "18\u201359", f: "f18to59", m: "m18to59", o: "o18to59", child: false },
+  { key: "60",     lo: 60, hi: null, label: "60+",   f: "f60",     m: "m60",     o: "o60",     child: false },
+];
+const FOLD_BOUNDARY = 18;   /* child: true means younger than this */
+/* Schema 0.7.0 and earlier (21 Sep - 11 Oct 2026): the set SORMAS asked for.
+   Kept so those records still read and fold at 20; never offered on the form. */
+const BANDS_V05 = [
   { key: "04",     lo: 0,  hi: 4,    label: "0\u20134",   f: "f04",     m: "m04",     o: "o04",     child: true  },
   { key: "5to9",   lo: 5,  hi: 9,    label: "5\u20139",   f: "f5to9",   m: "m5to9",   o: "o5to9",   child: true  },
   { key: "10to19", lo: 10, hi: 19,   label: "10\u201319", f: "f10to19", m: "m10to19", o: "o10to19", child: false },
   { key: "20to59", lo: 20, hi: 59,   label: "20\u201359", f: "f20to59", m: "m20to59", o: "o20to59", child: false },
   { key: "60",     lo: 60, hi: null, label: "60+",   f: "f60",     m: "m60",     o: "o60",     child: false },
 ];
-const FOLD_BOUNDARY = 20;   /* child: true means younger than this */
 
 const BANDS_V04 = [
   { key: "04",   lo: 0,  hi: 4,    label: "0–4",   f: "f04",   m: "m04",   o: "o04",   child: true  },
@@ -195,6 +208,7 @@ const BANDS_V04 = [
   { key: "60",   lo: 60, hi: null, label: "60+",   f: "f60",   m: "m60",   o: "o60",   child: false },
 ];
 const PART_IDS = BANDS.reduce((a, b) => a.concat([b.f, b.m, b.o]), []);
+const PART_IDS_V05 = BANDS_V05.reduce((a, b) => a.concat([b.f, b.m, b.o]), []);
 
 /* Schema 0.3.0 (16–17 Sep 2026): kept so those records still read and
    fold; never offered on the form. */
@@ -272,14 +286,15 @@ const OF_WHOM_LABEL = {
    from the schema version when neither is filled. */
 function ageShape(r) {
   const has = (k) => num(r[k]) !== null;
-  const v05only = ["f5to9", "m5to9", "o5to9", "f10to19", "m10to19", "o10to19",
-                   "f20to59", "m20to59", "o20to59"];
+  const v06only = ["f10to17", "m10to17", "o10to17", "f18to59", "m18to59", "o18to59"];
+  const v05only = ["f10to19", "m10to19", "o10to19", "f20to59", "m20to59", "o20to59"];
   const v04only = ["f514", "m514", "o514", "f1549", "m1549", "o1549", "f5059", "m5059", "o5059"];
   const v03only = ["f517", "m517", "o517", "f1859", "m1859", "o1859"];
+  if (v06only.some(has)) return "v06";
   if (v05only.some(has)) return "v05";
   if (v04only.some(has)) return "v04";
   if (v03only.some(has)) return "v03";
-  if (PART_IDS.some(has)) return /-0\.([4-9]|\d\d)\./.test(r.schemaVersion || "") || !(r.schemaVersion) ? "v05" : "v03";
+  if (PART_IDS.some(has)) return /-0\.([4-9]|\d\d)\./.test(r.schemaVersion || "") || !(r.schemaVersion) ? "v06" : "v03";
   return "pair";
 }
 
@@ -298,14 +313,14 @@ function fold(r) {
     };
     return withAliases(d);
   }
-  const bands = shape === "v05" ? BANDS : shape === "v04" ? BANDS_V04 : BANDS_V03;
+  const bands = shape === "v06" ? BANDS : shape === "v05" ? BANDS_V05 : shape === "v04" ? BANDS_V04 : BANDS_V03;
   const g = (k) => num(r[k]) || 0;
   const kids = bands.filter((b) => b.child), adults = bands.filter((b) => !b.child);
   const s = (set, sex) => set.reduce((a, b) => a + g(b[sex]), 0);
   const d = {
     fLow: s(kids, "f"),    mLow: s(kids, "m"),    oLow: s(kids, "o"),
     fHigh: s(adults, "f"), mHigh: s(adults, "m"), oHigh: s(adults, "o"),
-    boundary: shape === "v05" ? FOLD_BOUNDARY : 18, banded: true, shape,
+    boundary: shape === "v06" ? FOLD_BOUNDARY : shape === "v05" ? 20 : 18, banded: true, shape,
   };
   return withAliases(d);
 }
@@ -368,8 +383,25 @@ function validate(r) {
   if (r.dateAD && r.dateAD > todayLocal()) p.push("Date is in the future");
   if (!(r.targetGroups || []).length) p.push("Select at least one target group");
 
+  /* Who reports the figures. On a joint activity only the lead fills counts
+     (Adib, 27 Sep 2026): a partner report names the lead and carries no
+     numbers, so one session cannot be counted twice. */
+  if (!r.reportingRole) p.push("Say whether you led this activity or took part");
+  else if (!["LEAD", "PARTNER"].includes(r.reportingRole)) p.push("Say whether you led this activity or took part");
+  const partnerReport = r.reportingRole === "PARTNER";
   const t = num(r.reachedTotal);
-  if (t === null) p.push("Attendance is required (enter 0 if nobody came)");
+  if (partnerReport) {
+    if (!(r.partners || []).length) p.push("Name the organisation that led this activity");
+    const typed = [["reachedTotal", t], ["New people today", num(r.newToday)]]
+      .filter(([, v]) => v !== null).length + PART_IDS.filter((k) => num(r[k]) !== null).length
+      + OF_WHOM.filter((k) => num(r[k]) !== null).length + DISABILITY.filter((k) => num(r[k]) !== null).length;
+    if (typed) p.push("A partner report carries no counts: the lead organisation reports the figures");
+  } else {
+    if (t === null) p.push("Attendance is required (enter 0 if nobody came)");
+    const nt = num(r.newToday);
+    if (nt === null) p.push("New people today is required (enter 0 if nobody was new)");
+    else if (t !== null && nt > t) p.push(`New people today (${nt}) is more than the total of ${t}`);
+  }
   /* Since 17 Sep 2026 (afternoon) the form does not ask what the figure
      counts: a report is one session, and its figure is the attendance --
      everyone who took part, once for that session. Across sessions that is
@@ -420,12 +452,17 @@ const CSV_COLUMNS = [
      layer and 4Ws subcode -- computed at export from codes.js, never typed */
   "activity", "activityLabel", "activityLayer", "iascSub", "iascReading", "activityOther", "modality", "modalityOther", "status", "targetGroups", "targetGroupOther", "districtOther", "description",
   "reachedTotal", "countBasis", "distinctPeople",
+  /* 0.8.0: people taking part for the first time, and who reports the figures
+     on a joint activity -- only the lead fills counts, so one session is never
+     counted twice. */
+  "newToday", "reportingRole", "countsHeldByLead",
   /* the five groups as collected (0.4.0) and the four bands of 0.3.0, so a
      record of either vintage exports in full */
   /* 0.6.0: the Ministry's groups. The 0.4.0 middle ids stay listed so a
      record filed under them still exports in full. */
-  "f04", "m04", "o04", "f5to9", "m5to9", "o5to9", "f10to19", "m10to19", "o10to19",
-  "f20to59", "m20to59", "o20to59", "f60", "m60", "o60",
+  "f04", "m04", "o04", "f5to9", "m5to9", "o5to9",
+  "f10to17", "m10to17", "o10to17", "f18to59", "m18to59", "o18to59",
+  "f10to19", "m10to19", "o10to19", "f20to59", "m20to59", "o20to59", "f60", "m60", "o60",
   "f514", "m514", "o514", "f1549", "m1549", "o1549", "f5059", "m5059", "o5059",
   "f517", "m517", "o517", "f1859", "m1859", "o1859",
   /* folded to two at export, never stored; foldBoundary says whether the
@@ -511,7 +548,7 @@ function donorsOf(r) {
 
 /* Global for the same reason as codes.js — see the note there. */
 window.STORE = {
-  SCHEMA_VERSION, CSV_COLUMNS, BANDS, BANDS_V04, BANDS_V03, PART_IDS, PART_IDS_V03, FOLD_BOUNDARY, OF_WHOM, OF_WHOM_LABEL, DISABILITY, DISABILITY_ASKED, DISABILITY_LABEL, disabilityTotal, fold, ageShape, disaggTotal, donorsOf, todayLocal, registerBody, activityReadings,
+  SCHEMA_VERSION, CSV_COLUMNS, BANDS, BANDS_V05, BANDS_V04, BANDS_V03, PART_IDS, PART_IDS_V05, PART_IDS_V03, FOLD_BOUNDARY, OF_WHOM, OF_WHOM_LABEL, DISABILITY, DISABILITY_ASKED, DISABILITY_LABEL, disabilityTotal, fold, ageShape, disaggTotal, donorsOf, todayLocal, registerBody, activityReadings,
   recordId, all, active, save, archive,
   validate, toCSV, download, stamp, clearAll
 };

@@ -1261,7 +1261,7 @@ const TARGET_GROUPS = [
   { code: "TG-COM", name: "Affected community, general", np: "प्रभावित समुदाय, सामान्य", np_src: "draft" },
   { code: "TG-CHI", name: "Children and adolescents", np: "बालबालिका र किशोरकिशोरी", np_src: "draft" },
   { code: "TG-OLD", name: "Older people", np: "ज्येष्ठ नागरिक", np_src: "draft", np_note: "the statutory term in Nepal -- confirm it is what MoH wants on a form" },
-  { code: "TG-PWD", name: "People with disabilities", np: "अपाङ्गता भएका व्यक्ति", np_src: "draft", np_note: "check against the Act Relating to Rights of Persons with Disabilities 2017 wording" },
+  { code: "TG-PWD", name: "Persons with disabilities", np: "अपाङ्गता भएका व्यक्ति", np_src: "draft", np_note: "check against the Act Relating to Rights of Persons with Disabilities 2017 wording" },
   { code: "TG-PEX", name: "People with a pre-existing mental health condition", np: "पहिलेदेखि मानसिक स्वास्थ्य समस्या भएका व्यक्ति", np_src: "draft" },
   { code: "TG-RES", name: "Frontline responders (SAR, army, police, volunteers, forensic, health)", np: "अग्रपङ्क्तिका कार्यकर्ता (खोज-उद्धार, सेना, प्रहरी, स्वयंसेवक, फोरेन्सिक, स्वास्थ्य)", np_src: "draft" },
   { code: "TG-PRG", name: "Pregnant and postpartum women", np: "गर्भवती र सुत्केरी महिला", np_src: "draft" },
