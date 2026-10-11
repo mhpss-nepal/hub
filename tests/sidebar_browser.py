@@ -96,7 +96,17 @@ try:
     pg.locator('.l2-form-link').click();pg.wait_for_load_state('load')
     check('/form/' in pg.url,f'{width} actual canonical forms click')
     pg.locator('a[href="../hub/"]').first.click();pg.wait_for_load_state('networkidle')
-    check('/hub/review-current-v51/' in pg.url,f'{width} canonical forms returns current dashboard')
+    check(urlsplit(pg.url).path=='/hub/',f'{width} canonical forms returns bilingual dashboard home')
+    check(pg.evaluate("document.documentElement.getAttribute('data-lang')") in ['en','ne'],f'{width} canonical dashboard retains language engine')
+    if width<900:pg.locator('.l2-menu').click()
+    pg.locator('.rail [data-destination=current]').click();pg.wait_for_load_state('networkidle')
+    check('/hub/review-current-v51/' in pg.url,f'{width} current reports reachable from canonical dashboard')
+    pg.goto(origin+'/hub/?source=current',wait_until='networkidle')
+    check('/hub/review-current-v51/' in pg.url,f'{width} explicit current alias remains available')
+    pg.goto(origin+'/hub/?source=historical',wait_until='networkidle')
+    check('/hub/review-analytics-v48/' in pg.url,f'{width} explicit historical alias remains available')
+    pg.goto(origin+'/hub/review-current-v51/',wait_until='networkidle')
+    check(pg.locator('#result').is_hidden(),f'{width} signed-out alias never exposes data')
     # Returning synthetic verified identity: automatic own-profile/current read,
     # empty operational snapshot, then explicit no-grant and baseline refusal.
     pg.evaluate("localStorage.setItem('sidebar-qa-auth','yes')")

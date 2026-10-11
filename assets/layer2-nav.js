@@ -3,7 +3,10 @@
   'use strict';
   // Canonical arrival aliases preserve every Auth action parameter and hash.
   var arrival = new URL(location.href), source = arrival.searchParams.get('source');
-  if (!/\/review-(?:current-v51|analytics-v48)\//.test(arrival.pathname) && (!source || source === 'historical')) {
+  // Keep ordinary root arrivals on the existing bilingual dashboard. Only
+  // explicit data destinations and Auth callbacks are arrival aliases.
+  var authArrival = arrival.searchParams.has('oobCode') && arrival.searchParams.get('mode') === 'signIn';
+  if (!/\/review-(?:current-v51|analytics-v48)\//.test(arrival.pathname) && (source === 'current' || source === 'historical' || authArrival)) {
     var destination = new URL(source === 'historical' ? 'review-analytics-v48/' : 'review-current-v51/', arrival);
     destination.search = arrival.search; destination.hash = arrival.hash;
     location.replace(destination.href); return;
