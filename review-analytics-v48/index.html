@@ -19,7 +19,7 @@
      by the hub's pages only: design.css is loaded by every field form too,
      so the rail and the masthead cannot be repainted there without
      repainting Layer 1. Scoped to body.hub throughout. -->
-<link rel="stylesheet" href="../assets/hub-shell.css">
+<link rel="stylesheet" href="../assets/dashboard-shell-fd41a652ea98.css">
 <style>
   .tabs{display:flex; gap:4px; border-bottom:2px solid var(--line); margin:22px 0 16px; flex-wrap:wrap}
   .tab{font:inherit; font-size:13px; font-weight:700; background:none; border:0; border-bottom:3px solid transparent;
@@ -453,12 +453,12 @@ body.hub.dashboard-selected #historical-results .analysis-detail>summary{backgro
 <div class="l2-backdrop" hidden></div>
 <aside class="rail" id="layer2-sidebar" aria-label="Layer 2 navigation">
  <div class="l2-brand"><strong>MHPSS Nepal</strong><span>Coordination dashboard</span><button class="l2-close" type="button" aria-label="Close menu">×</button></div>
- <nav aria-label="Dashboard sections"><p class="l2-navlabel">Data sources</p><a data-destination="current" href="../review-current-v51/"><span>5Ws Reports</span><small>Live reader · activation held</small></a><a data-destination="historical" href="../review-analytics-v48/?source=historical"><span>Historical Baseline</span><small>Static · private retained records</small></a><a data-destination="sample" href="../?source=demo"><span>Sample Data</span><small>Static · synthetic examples</small></a><p class="l2-navlabel">Future sections</p><span class="l2-held" aria-disabled="true"><span>Individual Contacts</span><small>Not wired · restricted</small></span><span class="l2-held" aria-disabled="true"><span>Referrals</span><small>Not wired · restricted tracking</small></span><span class="l2-held" aria-disabled="true"><span>PHQ-9 Follow-up</span><small>Not wired · restricted respondents</small></span><span class="l2-held" aria-disabled="true"><span>Admin Audit</span><small>Held · Adib-only entitlement required</small></span><p class="l2-navlabel">Field entry</p><a class="l2-form-link" href="../../form/">All field forms ↗</a></nav>
- <p class="l2-foot">Restricted coordination · source units and access remain separate.</p>
+ <nav aria-label="Dashboard sections"><p class="l2-navlabel">Reports and data</p><a data-destination="current" href="../review-current-v51/"><span>5Ws Reports</span><small>Current reports · pilot not open</small></a><a data-destination="historical" href="../review-analytics-v48/?source=historical"><span>Historical Baseline</span><small>Retained records · private</small></a><a data-destination="sample" href="../?source=demo"><span>Sample Data</span><small>Fixed demonstration examples</small></a><p class="l2-navlabel">Coming next</p><span class="l2-held" aria-disabled="true"><span>Individual Contacts</span><small>Not available yet</small></span><span class="l2-held" aria-disabled="true"><span>Referrals</span><small>Not available yet</small></span><span class="l2-held" aria-disabled="true"><span>PHQ-9 Follow-up</span><small>Not available yet</small></span><span class="l2-held" aria-disabled="true"><span>Admin Audit</span><small>Not available yet · Adib only</small></span><p class="l2-navlabel">Field entry</p><a class="l2-form-link" href="../../form/">All field forms ↗</a></nav>
+ <p class="l2-foot">Private workspace · access follows your role.</p>
 </aside>
 <!--/NAV-->
 <main class="wrap wide" id="dashboard-main">
-  <p class="source-note">Historical data retains source gaps. The demo is synthetic and never fills missing historical fields; its figures and units are not a performance comparison.</p>
+  <p class="source-note">Retained historical reports, separate from current reporting and demonstration data.</p>
   <section id="historical-baseline" aria-label="Private historical baseline" hidden>
     <div class="historical-heading"><h2>Historical baseline</h2><span class="xs">Private · read-only</span></div>
     <div id="historical-login" class="card" hidden>
