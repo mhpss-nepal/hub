@@ -238,7 +238,7 @@ const PART_IDS_V03 = BANDS_V03.reduce((a, b) => a.concat([b.f, b.m, b.o]), []);
    persons with disabilities. Two distinct things, deliberately not merged:
 
    `disAsked` is the ONE question each agency was asked to add -- the person
-   says whether they identify as a person with disability. Optional, and
+   says whether they identify as a person with a disability. Optional, and
    blank is kept distinct from "No": a worker who judges that asking is
    unsafe or inappropriate leaves it blank, and the data then says "not
    asked" rather than inventing a refusal or a denial.
@@ -257,10 +257,10 @@ const PART_IDS_V03 = BANDS_V03.reduce((a, b) => a.concat([b.f, b.m, b.o]), []);
 const DISABILITY = ["disF0_17", "disM0_17", "disF18", "disM18"];
 const DISABILITY_ASKED = "disAsked";
 const DISABILITY_LABEL = {
-  disF0_17: "Female, under 18, person with disability",
-  disM0_17: "Male, under 18, person with disability",
-  disF18:   "Female, 18 and over, person with disability",
-  disM18:   "Male, 18 and over, person with disability",
+  disF0_17: "Female, under 18, with a disability",
+  disM0_17: "Male, under 18, with a disability",
+  disF18:   "Female, 18 and over, with a disability",
+  disM18:   "Male, 18 and over, with a disability",
 };
 
 /* The four counts, or null when none was entered -- null matters, because a
