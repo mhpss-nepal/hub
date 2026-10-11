@@ -125,6 +125,10 @@ RAIL_JS = """(function(){
 })();"""
 
 def rail_block(key):
+    if key in {"hubindex", "hubcurrent", "hubhistorical"}:
+        prefix = "" if key == "hubindex" else "../"
+        with open(os.path.join(ROOT, "tools/layer2-rail.html"), encoding="utf-8") as f:
+            return f.read().strip().replace("{prefix}", prefix)
     here_group = PAGE_GROUP.get(key)
     if here_group is None:
         for gk, glabel, layer, em, items in GROUPS:
@@ -174,7 +178,7 @@ MARK = re.compile(r'<!--NAV:(rail) ([a-z0-9]+)-->.*?<!--/NAV-->', re.S)
 def pages():
     found = []
     for dirpath, dirnames, filenames in os.walk(ROOT):
-        dirnames[:] = [d for d in dirnames if d not in (".git", "tools", "node_modules", "data", "docs")]
+        dirnames[:] = [d for d in dirnames if d not in (".git", "tools", "node_modules", "data", "docs", "design-preview", "ref4-evidence", "review-dashboard-noon-v35")]
         for fn in sorted(filenames):
             if not fn.endswith(".html"):
                 continue

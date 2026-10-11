@@ -332,10 +332,16 @@ class HubTrialScopeTest(unittest.TestCase):
     def test_default_rail_offers_only_the_approved_5ws_form(self):
         for page in RAIL_PAGES:
             html = (ROOT / page).read_text(encoding="utf-8")
-            self.assertEqual(
-                APPROVED_FORMS_GROUP, rail_group_hrefs(html, "forms"),
-                "%s: the Field forms rail group is not the trial scope" % page,
-            )
+            if page == "index.html":
+                self.assertEqual(html.count('class="l2-form-link" href="../form/"'), 1)
+                self.assertEqual(html.count('data-destination='), 3)
+                self.assertEqual(html.count('aria-disabled="true"'), 4)
+                self.assertNotIn('href="access.html"', html.split('<!--/NAV-->')[0])
+            else:
+                self.assertEqual(
+                    APPROVED_FORMS_GROUP, rail_group_hrefs(html, "forms"),
+                    "%s: the Field forms rail group is not the trial scope" % page,
+                )
             self.assertIsNotNone(
                 rail_module().MARK.search(html), "%s carries no rail marker" % page
             )

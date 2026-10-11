@@ -6,7 +6,7 @@
 <meta name="referrer" content="no-referrer">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://mhpss5ws-tdp3xtfnsq-as.a.run.app https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com; frame-src https://mhpss-nepal-hub.firebaseapp.com; object-src 'none'; base-uri 'self'; form-action 'self'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Private dashboard verification — MHPSS Nepal</title>
+<title>Historical Baseline — MHPSS Nepal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- Lora + Manrope. design.css declares Georgia / system fallbacks, so a
@@ -19,7 +19,7 @@
      by the hub's pages only: design.css is loaded by every field form too,
      so the rail and the masthead cannot be repainted there without
      repainting Layer 1. Scoped to body.hub throughout. -->
-<link rel="stylesheet" href="assets/hub-shell.css">
+<link rel="stylesheet" href="../assets/hub-shell.css">
 <style>
   .tabs{display:flex; gap:4px; border-bottom:2px solid var(--line); margin:22px 0 16px; flex-wrap:wrap}
   .tab{font:inherit; font-size:13px; font-weight:700; background:none; border:0; border-bottom:3px solid transparent;
@@ -287,25 +287,11 @@ body.hub.dashboard-selected .time-card th{white-space:normal}
 body.hub.dashboard-selected .ovcols .ovcol:last-child{grid-column:auto}
 @media(max-width:650px){body.hub.dashboard-selected .primary-grid,body.hub.dashboard-selected .ovcols{grid-template-columns:minmax(0,1fr)}}
 
-/* Reference4 entry correction: page-local horizontal shell, no shared CSS. */
-body.hub.dashboard-selected{padding-left:0;--who:#2d79d7;--who-d:#1d3d60;--who-dd:#1d3d60}
+/* Reference4 dashboard content; navigation uses the shared Layer 2 shell. */
+body.hub.dashboard-selected{--who:#2d79d7;--who-d:#1d3d60;--who-dd:#1d3d60}
 body.hub.dashboard-selected .top{padding:18px 28px;background:#1d3d60;display:flex;align-items:center}
 body.hub.dashboard-selected .top h1{margin:0;font:700 25px/1.25 Arial,sans-serif;color:#fff}
 body.hub.dashboard-selected .top .sub{margin-top:5px;font-size:13px;letter-spacing:0;text-transform:none;font-weight:400}
-body.hub.dashboard-selected .rail{position:static;inset:auto;width:auto;overflow:visible;display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:0 28px;background:white;border:0;border-bottom:1px solid #d8e1ec}
-body.hub.dashboard-selected .rail :is(.railid,.where,.rmenu,.rfoot){display:none}
-body.hub.dashboard-selected .rail nav{display:flex;flex:1 1 auto;flex-direction:row;align-items:center;flex-wrap:wrap;padding:0;max-height:none;overflow:visible;gap:4px}
-body.hub.dashboard-selected .rail .rg{margin:0;position:relative}
-body.hub.dashboard-selected .rail .rg[data-g=coord]>.rgh{display:none}
-body.hub.dashboard-selected .rail .rgb{border:0;margin:0;padding:0}
-body.hub.dashboard-selected .rail .rg.open>.rgb{display:flex;flex-wrap:wrap;gap:2px}
-body.hub.dashboard-selected .rail .rgb>a{padding:11px 10px;font-size:12px;min-height:44px;display:inline-flex;align-items:center;border-radius:0;box-shadow:none;white-space:normal}
-body.hub.dashboard-selected .rail .rgb>a.on{background:#edf4fa;box-shadow:inset 0 -3px #2d79d7}
-body.hub.dashboard-selected .rail .rgh{min-height:44px;padding:8px 10px;font-size:12px}
-body.hub.dashboard-selected .rail .rgh :is(em,.dot){display:none}
-body.hub.dashboard-selected .rail .rg:not([data-g=coord]).open>.rgb{position:absolute;right:0;top:100%;z-index:45;width:200px;background:#fff;border:1px solid #d8e1ec;border-radius:8px;padding:8px;box-shadow:0 5px 12px #1d3d6020}
-body.hub.dashboard-selected .rail .rg[data-g=forms].open>.rgb,body.hub.dashboard-selected .rail .rg[data-g=admin].open>.rgb{left:0;right:auto}
-body.hub.dashboard-selected .rail .railtoggle{padding:0;margin:0;display:inline-flex}
 body.hub.dashboard-selected #band{background:transparent!important;color:#455569!important;border:0;padding:0!important;text-align:left;font-size:12px;margin:0}
 body.hub.dashboard-selected #band span{color:#455569!important}
 body.hub.dashboard-selected .wrap.wide{max-width:1600px;margin:0 auto;padding:16px 28px 48px}
@@ -355,10 +341,6 @@ body.hub.dashboard-selected #fbbar:not([data-observational=true]){padding:8px 28
 @media(max-width:1100px){body.hub.dashboard-selected .filters .grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:650px){
  body.hub.dashboard-selected .top{padding:16px 12px}body.hub.dashboard-selected .top h1{font-size:21px}
- body.hub.dashboard-selected .rail{padding:0 12px;gap:0}body.hub.dashboard-selected .rail nav{flex-basis:100%;gap:0}
- body.hub.dashboard-selected .rail .rgb>a{font-size:11px;padding:9px 7px}
- body.hub.dashboard-selected .rail .rg[data-g=coord]{flex-basis:100%}
- body.hub.dashboard-selected .rail .railtoggle{margin-left:auto}
  body.hub.dashboard-selected .wrap.wide{padding:12px}
  body.hub.dashboard-selected .source-start{align-items:flex-start;gap:8px}
  body.hub.dashboard-selected .source-start .btn{width:100%}
@@ -376,11 +358,10 @@ body.hub.dashboard-selected #fbbar:not([data-observational=true]){padding:8px 28
 body.hub.dashboard-selected .filters .grid{grid-template-columns:repeat(7,minmax(0,1fr))}
 body.hub.dashboard-selected .filter-more>summary{font-size:12px;min-height:44px;padding:10px 0 0}
 body.hub.dashboard-selected .filter-more .grid{grid-template-columns:repeat(6,minmax(0,1fr));padding-top:8px}
-body.hub.dashboard-selected .rail .rgb>a{min-width:0}
 body.hub.dashboard-selected .top>div{min-width:0}
 body.hub.dashboard-selected .entry-filters span{color:#657386;background:#f8fafc;border-style:dashed}
 @media(max-width:1100px){body.hub.dashboard-selected .filters .grid,body.hub.dashboard-selected .filter-more .grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media(max-width:650px){body.hub.dashboard-selected .filters .grid,body.hub.dashboard-selected .filter-more .grid{grid-template-columns:repeat(2,minmax(0,1fr))}body.hub.dashboard-selected .rail .rg[data-g=coord]>.rgb{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%}body.hub.dashboard-selected .rail .rg[data-g=coord]{width:100%;min-width:0}}
+@media(max-width:650px){body.hub.dashboard-selected .filters .grid,body.hub.dashboard-selected .filter-more .grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 body.hub.dashboard-selected p{text-align:left}
 body.hub.dashboard-selected .ovcolh h2{flex-shrink:1;min-width:0;max-width:100%;white-space:normal;overflow-wrap:break-word}
@@ -426,10 +407,6 @@ body.hub.dashboard-selected.historical-entry .dashboard-short-label{display:inli
 body.hub.dashboard-selected.historical-entry .top{padding:12px 16px}
 body.hub.dashboard-selected.historical-entry .top h1{font-size:20px}
 body.hub.dashboard-selected.historical-entry .top .sub{font-size:12px;margin-top:3px}
-body.hub.dashboard-selected.historical-entry .rail{padding:0 16px}
-body.hub.dashboard-selected.historical-entry .rail .rg[data-g=coord] .rgb>a:not([data-default]){display:none}
-body.hub.dashboard-selected.historical-entry .rail .rg[data-g=coord]{flex-basis:auto;width:auto}
-body.hub.dashboard-selected.historical-entry .rail .rg[data-g=coord]>.rgb{display:flex;width:auto}
 body.hub.dashboard-selected #historical-baseline{max-width:1280px;margin:0 auto}
 body.hub.dashboard-selected .historical-heading{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
 body.hub.dashboard-selected .historical-heading h2{font-size:20px;margin:0;color:#1d3d60}
@@ -452,11 +429,6 @@ body.hub.dashboard-selected #source-tools>summary{font-size:13px}
 body.hub.dashboard-selected #historical-results .analysis-detail{padding:0 14px 12px}
 body.hub.dashboard-selected #historical-results .analysis-detail>summary{background:transparent;border:0}
 @media(max-width:650px){
- body.hub.dashboard-selected.historical-entry .rail{padding:0 12px;position:relative}
- body.hub.dashboard-selected.historical-entry .rail .rg[data-g=public]{position:static}
- body.hub.dashboard-selected.historical-entry .rail .rg[data-g=public].open>.rgb{left:12px;right:auto;top:100%}
- body.hub.dashboard-selected.historical-entry .rail nav{flex-basis:auto}
- body.hub.dashboard-selected.historical-entry .rail .railtoggle{margin-left:0}
  body.hub.dashboard-selected.historical-entry .top h1{font-size:18px}
  body.hub.dashboard-selected #historical-login{padding:16px}
  body.hub.dashboard-selected #historical-stats{gap:8px;margin:10px 0}
@@ -473,20 +445,20 @@ body.hub.dashboard-selected #historical-results .analysis-detail>summary{backgro
 </style>
 <link rel="stylesheet" href="assets/historical-analytics.css">
 </head>
-<body class="hub dashboard-selected">
+<body class="hub dashboard-selected l2-shell">
 <a class="skip" href="#dashboard-main">Skip to dashboard</a>
-<header class="top"><div><h1>MHPSS 5Ws — coordination dashboard</h1><div class="sub">Isolated verification · private read-only · default dashboard unchanged</div></div></header>
-<aside class="rail" aria-label="Private dashboard verification">
- <a class="railid" href="./"><span><b>MHPSS Nepal</b><i>Layer 2 · private verification</i></span></a>
- <nav><div class="rg open here" data-g="coord"><div class="rgb"><a class="on" data-default aria-current="page" href="./#historical-baseline">Historical baseline</a></div></div></nav>
- <p class="rfoot">Verification entry, not operational launch.</p>
+<header class="top"><div><h1>MHPSS 5Ws — coordination dashboard</h1><div class="sub">Historical Baseline · static retained source · private read-only</div></div></header>
+<!--NAV:rail hubhistorical-->
+<button class="l2-menu" type="button" aria-controls="layer2-sidebar" aria-expanded="false">☰ <span>Menu</span></button>
+<div class="l2-backdrop" hidden></div>
+<aside class="rail" id="layer2-sidebar" aria-label="Layer 2 navigation">
+ <div class="l2-brand"><strong>MHPSS Nepal</strong><span>Coordination dashboard</span><button class="l2-close" type="button" aria-label="Close menu">×</button></div>
+ <nav aria-label="Dashboard sections"><p class="l2-navlabel">Data sources</p><a data-destination="current" href="../review-current-v51/"><span>5Ws Reports</span><small>Live reader · activation held</small></a><a data-destination="historical" href="../review-analytics-v48/?source=historical"><span>Historical Baseline</span><small>Static · private retained records</small></a><a data-destination="sample" href="../?source=demo"><span>Sample Data</span><small>Static · synthetic examples</small></a><p class="l2-navlabel">Future sections</p><span class="l2-held" aria-disabled="true"><span>Individual Contacts</span><small>Not wired · restricted</small></span><span class="l2-held" aria-disabled="true"><span>Referrals</span><small>Not wired · restricted tracking</small></span><span class="l2-held" aria-disabled="true"><span>PHQ-9 Follow-up</span><small>Not wired · restricted respondents</small></span><span class="l2-held" aria-disabled="true"><span>Admin Audit</span><small>Held · Adib-only entitlement required</small></span><p class="l2-navlabel">Field entry</p><a class="l2-form-link" href="../../form/">All field forms ↗</a></nav>
+ <p class="l2-foot">Restricted coordination · source units and access remain separate.</p>
 </aside>
+<!--/NAV-->
 <main class="wrap wide" id="dashboard-main">
-  <nav class="source-nav" aria-label="Dashboard data sources">
-    <a href="../?source=choose">Dashboard home</a>
-    <a aria-current="page" href="?source=historical">Historical data (real retained records)</a>
-    <a href="../?source=demo">Synthetic demo (generated examples, not real service figures)</a>
-  </nav>
+  <nav class="source-nav" aria-label="Dashboard data sources"><a href="../review-current-v51/">5Ws Reports</a><a aria-current="page" href="?source=historical">Historical Baseline</a><a href="../?source=demo">Sample Data</a></nav>
   <p class="source-note">Historical data retains source gaps. The demo is synthetic and never fills missing historical fields; its figures and units are not a performance comparison.</p>
   <section id="historical-baseline" aria-label="Private historical baseline" hidden>
     <div class="historical-heading"><h2>Historical baseline</h2><span class="xs">Private · read-only</span></div>
@@ -537,4 +509,4 @@ body.hub.dashboard-selected #historical-results .analysis-detail>summary{backgro
 <script src="assets/baseline-auth.js"></script>
 <script src="assets/historical-analytics.js"></script>
 <script src="assets/historical-baseline.js"></script>
-</body></html>
+<script src="../assets/layer2-nav.js"></script></body></html>

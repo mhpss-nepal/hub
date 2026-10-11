@@ -284,25 +284,11 @@ body.hub.dashboard-selected .time-card th{white-space:normal}
 body.hub.dashboard-selected .ovcols .ovcol:last-child{grid-column:auto}
 @media(max-width:650px){body.hub.dashboard-selected .primary-grid,body.hub.dashboard-selected .ovcols{grid-template-columns:minmax(0,1fr)}}
 
-/* Reference4 entry correction: page-local horizontal shell, no shared CSS. */
-body.hub.dashboard-selected{padding-left:0;--who:#2d79d7;--who-d:#1d3d60;--who-dd:#1d3d60}
+/* Reference4 dashboard content; navigation uses the shared Layer 2 shell. */
+body.hub.dashboard-selected{--who:#2d79d7;--who-d:#1d3d60;--who-dd:#1d3d60}
 body.hub.dashboard-selected .top{padding:18px 28px;background:#1d3d60;display:flex;align-items:center}
 body.hub.dashboard-selected .top h1{margin:0;font:700 25px/1.25 Arial,sans-serif;color:#fff}
 body.hub.dashboard-selected .top .sub{margin-top:5px;font-size:13px;letter-spacing:0;text-transform:none;font-weight:400}
-body.hub.dashboard-selected .rail{position:static;inset:auto;width:auto;overflow:visible;display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:0 28px;background:white;border:0;border-bottom:1px solid #d8e1ec}
-body.hub.dashboard-selected .rail :is(.railid,.where,.rmenu,.rfoot){display:none}
-body.hub.dashboard-selected .rail nav{display:flex;flex:1 1 auto;flex-direction:row;align-items:center;flex-wrap:wrap;padding:0;max-height:none;overflow:visible;gap:4px}
-body.hub.dashboard-selected .rail .rg{margin:0;position:relative}
-body.hub.dashboard-selected .rail .rg[data-g=coord]>.rgh{display:none}
-body.hub.dashboard-selected .rail .rgb{border:0;margin:0;padding:0}
-body.hub.dashboard-selected .rail .rg.open>.rgb{display:flex;flex-wrap:wrap;gap:2px}
-body.hub.dashboard-selected .rail .rgb>a{padding:11px 10px;font-size:12px;min-height:44px;display:inline-flex;align-items:center;border-radius:0;box-shadow:none;white-space:normal}
-body.hub.dashboard-selected .rail .rgb>a.on{background:#edf4fa;box-shadow:inset 0 -3px #2d79d7}
-body.hub.dashboard-selected .rail .rgh{min-height:44px;padding:8px 10px;font-size:12px}
-body.hub.dashboard-selected .rail .rgh :is(em,.dot){display:none}
-body.hub.dashboard-selected .rail .rg:not([data-g=coord]).open>.rgb{position:absolute;right:0;top:100%;z-index:45;width:200px;background:#fff;border:1px solid #d8e1ec;border-radius:8px;padding:8px;box-shadow:0 5px 12px #1d3d6020}
-body.hub.dashboard-selected .rail .rg[data-g=forms].open>.rgb,body.hub.dashboard-selected .rail .rg[data-g=admin].open>.rgb{left:0;right:auto}
-body.hub.dashboard-selected .rail .railtoggle{padding:0;margin:0;display:inline-flex}
 body.hub.dashboard-selected #band{background:transparent!important;color:#455569!important;border:0;padding:0!important;text-align:left;font-size:12px;margin:0}
 body.hub.dashboard-selected #band span{color:#455569!important}
 body.hub.dashboard-selected .wrap.wide{max-width:1600px;margin:0 auto;padding:16px 28px 48px}
@@ -352,10 +338,6 @@ body.hub.dashboard-selected #fbbar:not([data-observational=true]){padding:8px 28
 @media(max-width:1100px){body.hub.dashboard-selected .filters .grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:650px){
  body.hub.dashboard-selected .top{padding:16px 12px}body.hub.dashboard-selected .top h1{font-size:21px}
- body.hub.dashboard-selected .rail{padding:0 12px;gap:0}body.hub.dashboard-selected .rail nav{flex-basis:100%;gap:0}
- body.hub.dashboard-selected .rail .rgb>a{font-size:11px;padding:9px 7px}
- body.hub.dashboard-selected .rail .rg[data-g=coord]{flex-basis:100%}
- body.hub.dashboard-selected .rail .railtoggle{margin-left:auto}
  body.hub.dashboard-selected .wrap.wide{padding:12px}
  body.hub.dashboard-selected .source-start{align-items:flex-start;gap:8px}
  body.hub.dashboard-selected .source-start .btn{width:100%}
@@ -373,11 +355,10 @@ body.hub.dashboard-selected #fbbar:not([data-observational=true]){padding:8px 28
 body.hub.dashboard-selected .filters .grid{grid-template-columns:repeat(7,minmax(0,1fr))}
 body.hub.dashboard-selected .filter-more>summary{font-size:12px;min-height:44px;padding:10px 0 0}
 body.hub.dashboard-selected .filter-more .grid{grid-template-columns:repeat(6,minmax(0,1fr));padding-top:8px}
-body.hub.dashboard-selected .rail .rgb>a{min-width:0}
 body.hub.dashboard-selected .top>div{min-width:0}
 body.hub.dashboard-selected .entry-filters span{color:#657386;background:#f8fafc;border-style:dashed}
 @media(max-width:1100px){body.hub.dashboard-selected .filters .grid,body.hub.dashboard-selected .filter-more .grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media(max-width:650px){body.hub.dashboard-selected .filters .grid,body.hub.dashboard-selected .filter-more .grid{grid-template-columns:repeat(2,minmax(0,1fr))}body.hub.dashboard-selected .rail .rg[data-g=coord]>.rgb{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%}body.hub.dashboard-selected .rail .rg[data-g=coord]{width:100%;min-width:0}}
+@media(max-width:650px){body.hub.dashboard-selected .filters .grid,body.hub.dashboard-selected .filter-more .grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 body.hub.dashboard-selected p{text-align:left}
 body.hub.dashboard-selected .ovcolh h2{flex-shrink:1;min-width:0;max-width:100%;white-space:normal;overflow-wrap:break-word}
@@ -421,144 +402,28 @@ body.hub.dashboard-selected .filters{border-left:4px solid #526e91}
   body.hub.dashboard-selected .source-note{font-size:12px;color:var(--slate);margin:0 0 14px}
 </style>
 </head>
-<body class="hub dashboard-selected">
+<body class="hub dashboard-selected l2-shell">
 <a class="skip" href="#dashboard-main">Skip to dashboard</a>
 
 <header class="top"><div><h1>MHPSS 5Ws — coordination dashboard</h1><div class="sub">Nepal · Rasuwa / Bhote Koshi flood response · restricted coordination</div></div></header>
 
 <!--NAV:rail hubindex-->
-<aside class="rail" aria-label="Coordination hub">
-  <a class="railid" href="./">
-    <span data-mark="30"></span>
-    <span><b>MHPSS Nepal</b><i>Layer 2 &middot; coordination</i></span>
-  </a>
-  <div class="where" aria-label="Where you are in the system">
-    <span class="wlab">Architecture &middot; you are here</span>
-    <a class="lyr" href="../form/"><b>1</b><span>Field forms<i>on phones, works offline</i></span></a>
-    <a class="lyr on" href="./" aria-current="true"><b>2</b><span>Coordination<i>this hub &middot; restricted</i></span></a>
-    <a class="lyr" href="../"><b>3</b><span>Public site<i>published summaries only</i></span></a>
-  </div>
-  <button class="rmenu" type="button" aria-expanded="false"><span></span>Menu</button>
-  <nav>
-    <div class="rg open here" data-g="coord">
-      <button class="rgh" type="button"><span class="dot l2"></span>Coordination<em>layer 2</em><i class="chev"></i></button>
-      <div class="rgb">
-        <a class="on" aria-current="page" data-default href="./#overview">Overview</a>
-        <a href="review-current-v51/">My reports</a>
-        <a href="./#who-is-where">Who is where</a>
-        <a href="./#activities">Activities</a>
-        <a href="./#reports">Reports received</a>
-        <a href="./#publish">Publish</a>
-      </div>
-    </div>
-    <div class="rg" data-g="forms">
-      <button class="rgh" type="button"><span class="dot l1"></span>Field forms<em>outputs</em><i class="chev"></i></button>
-      <div class="rgb">
-        <a href="./#reports">Activity report (5Ws)</a>
-        <a href="forms.html">Form entries</a>
-        <a href="../form/">Open the forms &rarr;</a>
-      </div>
-    </div>
-    <div class="rg" data-g="public">
-      <button class="rgh" type="button"><span class="dot l3"></span>Public site<em>layer 3</em><i class="chev"></i></button>
-      <div class="rgb">
-        <a href="../">Home</a>
-      </div>
-    </div>
-    <div class="rg admin" data-g="admin" hidden>
-      <button class="rgh" type="button"><span class="dot l2"></span>Admin<em>admin only</em><i class="chev"></i></button>
-      <div class="rgb">
-        <a href="access.html">Access &amp; sign-in</a>
-      </div>
-    </div>
-  </nav>
-  <span data-i18n-toggle class="railtoggle"></span>
-  <p class="rfoot">Draft. Figures are provisional.</p>
-  <script>(function(){
-  var rail=document.currentScript.parentNode, KEY='mhpss-rail-groups';
-  var saved={}; try{ saved=JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){}
-  if(!saved || typeof saved!=='object' || Array.isArray(saved)) saved={};
-  var groups=Array.from(rail.querySelectorAll('.rg'));
-  function setOpen(g,on){
-    g.classList.toggle('open',on);
-    g.querySelector('.rgh').setAttribute('aria-expanded',String(on));
-  }
-  function closeAux(){
-    groups.forEach(function(g){ if(g.getAttribute('data-g')!=='coord') setOpen(g,false); });
-  }
-  /* Dropdowns are transient. Normalize the legacy multi-open preference only;
-     never restore a popup over the dashboard after a navigation or reload. */
-  var migrated=false;
-  groups.forEach(function(g){
-    var k=g.getAttribute('data-g'), h=g.querySelector('.rgh');
-    setOpen(g,k==='coord');
-    if(k!=='coord' && k in saved && saved[k]!==false){ saved[k]=false; migrated=true; }
-    h.addEventListener('click', function(){
-      if(k==='coord') return;
-      var on=!g.classList.contains('open');
-      closeAux(); setOpen(g,on);
-    });
-  });
-  if(migrated){ try{ localStorage.setItem(KEY,JSON.stringify(saved)); }catch(e){} }
-  document.addEventListener('click',function(e){
-    var g=e.target.closest('.rg');
-    if(!g || !rail.contains(g) || e.target.closest('.rgb a')) closeAux();
-  });
-  document.addEventListener('keydown',function(e){
-    if(e.key!=='Escape') return;
-    var open=groups.find(function(g){ return g.getAttribute('data-g')!=='coord' && g.classList.contains('open'); });
-    if(!open) return;
-    var ownsFocus=open.contains(document.activeElement);
-    closeAux();
-    if(ownsFocus){ e.preventDefault(); open.querySelector('.rgh').focus(); }
-  });
-  window.addEventListener('hashchange',closeAux);
-  var m=rail.querySelector('.rmenu');
-  if(m){ m.addEventListener('click', function(){
-    var open=rail.classList.toggle('menu-open'); m.setAttribute('aria-expanded', open); }); }
-  /* The lit item follows the address: a hub page's sections are hashes, and
-     the same section can be reached from two groups (the activity report's
-     output home IS the dashboard's Reports received), so every link that
-     matches is lit, not just one. */
-  function mark(){
-    var path=location.pathname.split('/').pop()||'index.html', hash=location.hash||'';
-    rail.querySelectorAll('.rgb > a').forEach(function(a){
-      var href=a.getAttribute('href'); if(href.indexOf('../')===0) return;
-      var file=href.split('#')[0], ah=href.indexOf('#')>=0 ? href.slice(href.indexOf('#')) : '';
-      if(file==='./'||file==='') file='index.html';
-      var on = file===path && (hash ? ah===hash : a.hasAttribute('data-default'));
-      a.classList.toggle('on', on);
-      if(on) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current');
-    });
-    if(rail.classList.contains('menu-open')){ rail.classList.remove('menu-open'); if(m) m.setAttribute('aria-expanded', false); }
-  }
-  window.addEventListener('hashchange', mark);
-  document.addEventListener('DOMContentLoaded', mark);
-  window.__railMark = mark;
-  /* Admin is drawn only for an admin account. The bridge (assets/fb.js)
-     loads after the rail, so the question is asked once the page is
-     complete; a page without the bridge simply never shows it. */
-  var adm=rail.querySelector('.rg.admin');
-  if(adm){ document.addEventListener('DOMContentLoaded', function(){
-    if(!(window.FB && window.FB.onStatus)) return;
-    window.FB.onStatus(function(st){
-      if(!(st && st.user && window.FB.myRole)){ adm.hidden=true; return; }
-      window.FB.myRole().then(function(r){ adm.hidden = !(r && r.role==='admin'); }).catch(function(){ adm.hidden=true; });
-    });
-  }); }
-})();</script>
+<button class="l2-menu" type="button" aria-controls="layer2-sidebar" aria-expanded="false">☰ <span>Menu</span></button>
+<div class="l2-backdrop" hidden></div>
+<aside class="rail" id="layer2-sidebar" aria-label="Layer 2 navigation">
+ <div class="l2-brand"><strong>MHPSS Nepal</strong><span>Coordination dashboard</span><button class="l2-close" type="button" aria-label="Close menu">×</button></div>
+ <nav aria-label="Dashboard sections"><p class="l2-navlabel">Data sources</p><a data-destination="current" href="review-current-v51/"><span>5Ws Reports</span><small>Live reader · activation held</small></a><a data-destination="historical" href="review-analytics-v48/?source=historical"><span>Historical Baseline</span><small>Static · private retained records</small></a><a data-destination="sample" href="?source=demo"><span>Sample Data</span><small>Static · synthetic examples</small></a><p class="l2-navlabel">Future sections</p><span class="l2-held" aria-disabled="true"><span>Individual Contacts</span><small>Not wired · restricted</small></span><span class="l2-held" aria-disabled="true"><span>Referrals</span><small>Not wired · restricted tracking</small></span><span class="l2-held" aria-disabled="true"><span>PHQ-9 Follow-up</span><small>Not wired · restricted respondents</small></span><span class="l2-held" aria-disabled="true"><span>Admin Audit</span><small>Held · Adib-only entitlement required</small></span><p class="l2-navlabel">Field entry</p><a class="l2-form-link" href="../form/">All field forms ↗</a></nav>
+ <p class="l2-foot">Restricted coordination · source units and access remain separate.</p>
 </aside>
 <!--/NAV-->
 
 <main class="wrap wide" id="dashboard-main">
-  <details class="source-options">
-    <summary>About the data and demonstration</summary>
-    <nav class="source-nav" aria-label="Dashboard data sources">
-      <a href="review-analytics-v48/?source=historical">Historical reports</a>
-      <a href="?source=demo">Try the demo</a>
-    </nav>
-    <p class="source-note">Historical reports contain retained real records and source gaps. The demo contains generated examples, never operational totals or a replacement for missing data.</p>
-  </details>
+  <nav class="source-nav" aria-label="Dashboard data sources">
+    <a href="review-current-v51/">5Ws Reports</a>
+    <a href="review-analytics-v48/?source=historical">Historical Baseline</a>
+    <a href="?source=demo">Sample Data</a>
+  </nav>
+  <p class="source-note">Separate sources: current own reports (activation held), private static historical baseline, and fixed synthetic sample. Never combined.</p>
 
   <div class="card" id="loader">
     <div class="source-start">
@@ -2579,5 +2444,5 @@ body.hub.dashboard-selected .filters{border-left:4px solid #526e91}
 })();
 </script>
 <script src="assets/historical-baseline.js"></script>
-</body>
+<script src="assets/layer2-nav.js"></script></body>
 </html>
