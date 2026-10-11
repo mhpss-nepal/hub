@@ -4,6 +4,7 @@ for(const id of ['iuPreviewNotice','iuSyncStatus'])document.getElementById(id).t
 const ribbon=document.querySelector('.ribbon');if(ribbon)ribbon.textContent='5Ws field report · no client names or individual clinical information';
 document.querySelector('[data-iu-operational-copy="offline"]').textContent='Keep this page open if the connection fails. Pending submitted requests are retained on this browser for the same signed-in account. Offline page reload is not certified. Reconnect and sign in to retry. Do not clear browser storage.';
 document.querySelector('[data-iu-operational-copy="save"]').textContent='Submit validates and saves an immutable request on this device, then requests a storage receipt. A network success alone is not delivery.';
+const org=document.getElementById('org');document.getElementById('f').addEventListener('reset',()=>{const assigned=org.value;setTimeout(()=>{org.value=assigned;org.disabled=true;},0);});
 const sample=document.getElementById('syntheticExample');sample.hidden=true;
 for(const x of document.querySelectorAll('button[type=submit]'))x.textContent='Save and send report';
 const notice=document.createElement('p');notice.id='authenticatedSubmitState';notice.setAttribute('role','status');form.after(notice);

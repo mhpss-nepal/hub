@@ -443,7 +443,8 @@ body.hub.dashboard-selected .filters{border-left:4px solid #526e91}
     <div class="rg open here" data-g="coord">
       <button class="rgh" type="button"><span class="dot l2"></span>Coordination<em>layer 2</em><i class="chev"></i></button>
       <div class="rgb">
-        <a class="on" aria-current="page" data-default href="./#overview">Dashboard &middot; overview</a>
+        <a class="on" aria-current="page" data-default href="./#overview">Overview</a>
+        <a href="review-current-v51/">My reports</a>
         <a href="./#who-is-where">Who is where</a>
         <a href="./#activities">Activities</a>
         <a href="./#reports">Reports received</a>
@@ -550,12 +551,14 @@ body.hub.dashboard-selected .filters{border-left:4px solid #526e91}
 <!--/NAV-->
 
 <main class="wrap wide" id="dashboard-main">
-  <nav class="source-nav" aria-label="Dashboard data sources">
-    <a href="?source=choose">Dashboard home</a>
-    <a href="review-analytics-v48/?source=historical">Historical data (real retained records)</a>
-    <a href="?source=demo">Synthetic demo (generated examples, not real service figures)</a>
-  </nav>
-  <p class="source-note">Historical data retains source gaps. The demo is synthetic and never fills missing historical fields; its figures and units are not a performance comparison.</p>
+  <details class="source-options">
+    <summary>About the data and demonstration</summary>
+    <nav class="source-nav" aria-label="Dashboard data sources">
+      <a href="review-analytics-v48/?source=historical">Historical reports</a>
+      <a href="?source=demo">Try the demo</a>
+    </nav>
+    <p class="source-note">Historical reports contain retained real records and source gaps. The demo contains generated examples, never operational totals or a replacement for missing data.</p>
+  </details>
 
   <div class="card" id="loader">
     <div class="source-start">

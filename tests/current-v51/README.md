@@ -13,4 +13,8 @@ node tests/current-v51/reader.cjs
 node tests/current-v51/packaging.cjs
 ```
 
+SE-1 browser lifecycle regression:
+
+`simple-entry-e2e.py <owned-evidence-directory>` uses the existing W45 Python venv, genuine demo-only Firebase Auth/Firestore, the accepted native form, and loopback-only routing. Run from the repository root. The evidence directory must be absent beneath `51-operational-closure`; no production credentials are needed or allowed. The existing 46 assertions remain separate from nine deterministic lifecycle regressions: held current response with native already loaded, repeated real SDK callback notifications, hidden stale pending retry controls, retained same-owner editor epoch, clean late-read rejection, same-browser email link, deferred native load, and late prior-owner isolation. Network response gates are released by explicit state predicates, not extra sleep/retry. Activation true exists only in the synthetic HTTP fixture; shipped activation remains false. On failure, `FAILURE.json` and `PARTIAL.json` capture control/status/readiness/queue-state/HTTP diagnostics without report payloads, tokens or private content; cleanup is recorded on both outcomes.
+
 The packaging regression exports the committed route and test directory with `git archive` into the configured private `TMPDIR`, then executes the reader suite there. It fails when a fixture is present only in an ignored local working file. It also verifies the synthetic marker and absence of test-fixture imports in committed runtime files. It removes only its own scratch directory.
