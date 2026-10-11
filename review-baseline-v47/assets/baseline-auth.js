@@ -5,6 +5,12 @@
   var SDK = 'https://www.gstatic.com/firebasejs/10.13.0/', auth, api, user = null, callbacks = [], ready = false, error = '';
   var signedOutIntent = false, lifecycle = 0, pendingLink = false;
   var restoration = 'restoring', errorCode = '', failureStage = '';
+  var authTail = Promise.resolve();
+  function serializeAuth(operation) {
+    var job = authTail.then(operation);
+    authTail = job.catch(function () {});
+    return job;
+  }
   var safeCodes = ['auth/invalid-action-code', 'auth/expired-action-code', 'auth/invalid-email', 'auth/network-request-failed', 'auth/web-storage-unsupported', 'auth/operation-not-allowed', 'auth/unauthorized-domain', 'auth/user-disabled', 'auth/invalid-credential', 'auth/too-many-requests'];
   function state() { return { ready: ready, error: error, linkPending: pendingLink, restoration: restoration, errorCode: errorCode, failureStage: failureStage }; }
   function clearFailure() { error = ''; errorCode = ''; failureStage = ''; }
@@ -27,21 +33,34 @@
   }
   function currentUser() { return signedOutIntent ? null : user; }
   function notify() { callbacks.forEach(function (f) { f(currentUser(), state()); }); }
+  function commitSignIn(operation, mine, stage) {
+    return serializeAuth(async function () {
+      if (mine !== lifecycle) throw Error('Sign-in cancelled by newer account action');
+      var credential;
+      try { credential = await operation(); }
+      catch (e) { if (mine === lifecycle) fail(e, stage); throw e; }
+      // Provider completion itself writes persistent credentials. Clear that late
+      // write before this lane may admit any later deliberate sign-in.
+      if (mine !== lifecycle) {
+        await api.signOut(auth);
+        user = null; restoration = 'signed-out'; notify();
+        throw Error('Sign-in cancelled by newer account action');
+      }
+      var nextUser = credential && credential.user || user;
+      if (nextUser && typeof nextUser.getIdToken === 'function') {
+        user = nextUser; signedOutIntent = false; restoration = 'signed-in'; clearFailure(); notify();
+      }
+      return credential;
+    });
+  }
   async function completeSignIn(operation) {
     var mine = lifecycle;
     await initialized;
     if (!ready) throw Error(error);
-    var credential;
-    try { credential = await operation(); }
-    catch (e) { fail(e, pendingLink ? 'email-link' : 'sign-in'); throw e; }
-    var nextUser = credential && credential.user || user;
-    // Only an explicit successful sign-in may release intent. A later sign-out wins.
-    if (mine === lifecycle && nextUser && typeof nextUser.getIdToken === 'function') {
-      user = nextUser; signedOutIntent = false; restoration = 'signed-in'; clearFailure(); notify();
-    }
-    return credential;
+    return commitSignIn(operation, mine, pendingLink ? 'email-link' : 'sign-in');
   }
   var initialized = (async function () {
+    var initialLifecycle = lifecycle;
     try {
       var app = await import(SDK + 'firebase-app.js');
       api = await import(SDK + 'firebase-auth.js');
@@ -56,11 +75,12 @@
           user = value || null; restoration = currentUser() ? 'signed-in' : 'signed-out'; notify(); resolve();
         }, reject);
       });
-      if (pendingLink) {
+      if (pendingLink && initialLifecycle === lifecycle && !signedOutIntent) {
         var email = storedEmail();
         if (email) {
-          try { await consumeLink(email); clearFailure(); }
-          catch (e) { fail(e, 'email-link'); }
+          var automaticLifecycle = initialLifecycle;
+          try { await commitSignIn(function () { return consumeLink(email); }, automaticLifecycle, 'email-link'); }
+          catch (e) { /* commitSignIn preserves safe failure and sign-out precedence. */ }
         } else {
           error = 'Enter the email address that requested this link and choose Complete email sign-in. No new link has been requested.';
         }
@@ -83,8 +103,14 @@
     signIn: function (email, password) { return completeSignIn(function () { return api.signInWithEmailAndPassword(auth, email, password); }); },
     signOut: async function () {
       signedOutIntent = true; lifecycle += 1; restoration = 'signed-out'; notify();
+      // Clear immediately; a late provider completion is cleared again by its lane.
+      if (ready) {
+        var immediate = api.signOut(auth);
+        serializeAuth(function () { return api.signOut(auth); }).catch(function (e) { fail(e, 'sign-out'); });
+        return immediate;
+      }
       await initialized;
-      if (ready) return api.signOut(auth);
+      if (ready) return serializeAuth(function () { return api.signOut(auth); });
     },
     finishLink: function (email) {
       return completeSignIn(function () {

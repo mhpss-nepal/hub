@@ -171,7 +171,8 @@
       $('historical-signin').textContent = linkPending ? 'Complete email sign-in' : 'Send sign-in link';
       $('historical-signout').hidden = !user;
       syncActions(user);
-      if (user && !panel.hidden) refresh();
+      // Do not erase a pending-link failure with an automatic read status.
+      if (user && !state.error && !linkPending && !panel.hidden) refresh();
     });
     window.addEventListener('offline', function () { clear('Private baseline unavailable offline. Refresh after reconnecting.'); });
     window.addEventListener('online', function () { if (!panel.hidden) refresh(); });
