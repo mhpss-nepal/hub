@@ -1,6 +1,6 @@
 (function(){'use strict';
 const $=id=>document.getElementById(id),reader=CURRENT_READER.create(BaselineAuth);
-let authority=0,profile=null,reading=null;
+let authority=0,profile=null,reading=null,authState={};
 const notice=t=>{$('status').textContent=t;};
 function clear(){authority++;profile=null;reading=null;reader.invalidate();$('org').value='';$('fieldPanel').hidden=true;$('result').hidden=true;$('rows').replaceChildren();$('metrics').textContent='';$('source').textContent='';$('export').disabled=true;}
 const filters=()=>({district:$('district').value,from:$('from').value,through:$('through').value});
@@ -36,8 +36,8 @@ const requestRefresh=()=>refresh().catch(()=>{});
 $('refresh').onclick=requestRefresh;for(const id of ['district','from','through'])$(id).onchange=()=>{try{paint();}catch(e){}};
 $('export').onclick=()=>{try{const text=reader.csv(filters()),url=URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='own-current-joint.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){clear();window.dispatchEvent(new Event('reporting-access-lost'));notice(String(e));}};
 $('signIn').onclick=()=>BaselineAuth.sendLink($('email').value).then(()=>notice('Email sign-in link requested. Reporter access still requires your assigned grant.')).catch(()=>notice('Could not request sign-in link.'));
-$('finishLink').onclick=()=>BaselineAuth.finishLink($('email').value).catch(()=>notice('Email sign-in link could not be completed.'));
+$('finishLink').onclick=()=>BaselineAuth.finishLink($('email').value).catch(()=>notice(authState.error||'Email sign-in could not complete (auth/unknown). Existing sign-in has not been cleared.'));
 $('signOut').onclick=()=>{clear();BaselineAuth.signOut().catch(()=>notice('Sign-out provider unavailable; reader remains cleared.'));};
-BaselineAuth.onChange((u,s)=>{if(!u||s.linkPending){clear();window.dispatchEvent(new Event('reporting-access-lost'));}$('signIn').hidden=!!u||!!s.linkPending;$('email').hidden=!!u;$('finishLink').hidden=!s.linkPending;$('signOut').hidden=!u;if(u&&!s.linkPending)requestRefresh();else notice(s.error||(u?'Signed in. Discovering reporting access…':'Sign in required. No current report data loaded.'));});
+BaselineAuth.onChange((u,s)=>{authState=s;const restoring=s.restoration==='restoring';$('signIn').disabled=restoring||!s.ready;$('finishLink').disabled=restoring||!s.ready;if(!u||s.linkPending){clear();window.dispatchEvent(new Event('reporting-access-lost'));}$('signIn').hidden=!!u||!!s.linkPending;$('email').hidden=!!u;$('finishLink').hidden=!s.linkPending;$('signOut').hidden=!u;if(u&&!s.linkPending)requestRefresh();else notice(s.error||(restoring?'Restoring your browser sign-in… No new email link is needed while this check runs.':u?'Signed in. Discovering reporting access…':'Sign in required. No current report data loaded.'));});
 window.addEventListener('offline',()=>{clear();window.dispatchEvent(new Event('reporting-access-lost'));notice('Offline. No cached current success or CSV available.');});setInterval(()=>{if($('result').hidden)return;try{reader.view();}catch(e){clear();window.dispatchEvent(new Event('reporting-access-lost'));notice('Snapshot expired or sign-in changed. Refresh before viewing or exporting.');}},1000);
 window.CURRENT_UI=Object.freeze({refresh,reader,clear,paint,profile:()=>profile,state:()=>({generation:authority,reading:!!reading,ready:!!profile,ownerCurrent:!!profile&&profile.owner===BaselineAuth.currentUser()})});})();

@@ -2,6 +2,7 @@
    No operational collector, record store, queue, register reader or publisher is called. */
 (function () {
   'use strict';
+  var authFailure = '';
   var $ = function (id) { return document.getElementById(id); };
   var panel = $('historical-baseline'), current = null, generation = 0, controller = null, readAt = null;
   var ENDPOINT = 'https://mhpss5ws-tdp3xtfnsq-as.a.run.app/admin/baseline/analytics';
@@ -109,7 +110,7 @@
         setStatus('Sign-in link requested. Open it in this browser.');
       }
     }
-    catch (e) { clear('Sign-in failed. Check your account and try again.'); setStatus($('historical-status').textContent, true); }
+    catch (e) { clear(authFailure || 'Sign-in could not complete (auth/unknown). Existing sign-in has not been cleared.'); setStatus($('historical-status').textContent, true); }
     finally { $('historical-password').value = ''; }
   });
   $('historical-link').addEventListener('click', async function () {
@@ -140,7 +141,9 @@
   else hide();
   if (window.BaselineAuth) {
     window.BaselineAuth.onChange(function (user, state) {
-      clear(state.error || (user ? 'Reading the private historical backend…' : 'Sign in with the enabled primary administrator account to read the private baseline.'));
+      authFailure = state.error;
+      clear(state.error || (state.restoration === 'restoring' ? 'Restoring your browser sign-in… No new email link is needed while this check runs.' : user ? 'Reading the private historical backend…' : 'Sign in with the enabled primary administrator account to read the private baseline.'));
+      $('historical-signin').disabled = state.restoration === 'restoring' || !state.ready;
       linkPending = !!state.linkPending;
       $('historical-login').hidden = !!user && !linkPending;
       $('historical-signin').textContent = linkPending ? 'Complete email sign-in' : 'Send sign-in link';
