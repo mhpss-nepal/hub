@@ -89,7 +89,14 @@ function save(rec) {
   const id = recordId(rec);
   const now = new Date().toISOString();
   const idx = list.findIndex((x) => x.id === id);
-  const out = { ...rec, id, schemaVersion: SCHEMA_VERSION };
+  // A partial correction must not discard unedited source fields.
+  const out = { ...(idx >= 0 ? list[idx] : {}), ...rec, id, schemaVersion: SCHEMA_VERSION };
+  if (window.FB && typeof window.FB.rid === "function") {
+    // Existing local reports keep their original bridge identity, including
+    // the legacy content-hash basis. Never rewrite the ambiguous old outbox.
+    const original = idx >= 0 ? (list[idx].previous && list[idx].previous[0] || list[idx]) : out;
+    out._rid = idx >= 0 ? (list[idx]._rid || window.FB.legacyRid(registerBody(original))) : window.FB.rid(registerBody(out));
+  }
 
   if (idx >= 0) {
     // Same report again: keep the original creation time, record the revision.

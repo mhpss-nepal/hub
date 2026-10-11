@@ -15,7 +15,7 @@
       record may be retried many times — on reconnect, on reload, on a
       second device that has the same export. addDoc would create a new
       document every time and silently inflate the count. setDoc with an
-      id derived from the record's own content writes the same document
+      stable source id (or an explicitly retained legacy ID) writes the same document
       again instead, so retrying is safe and de-duplication happens for
       free at the database.
 
@@ -28,7 +28,25 @@
   var SDK = "https://www.gstatic.com/firebasejs/10.13.0/";
   var cfg = window.FB_CONFIG || {};
   var COLL = window.FB_COLLECTION || "submissions";
-  var QKEY = "mhpss-np-queue-v1";
+  var LEGACY_QKEY = "mhpss-np-queue-v1";
+  // Capture the destination BEFORE SDK initialization or any reconnect handler.
+  // Never load/migrate another queue body. Legacy detection inspects key names only.
+  var BINDING = [window.location.origin, cfg.projectId || "unconfigured",
+    COLL, window.FB_QUEUE_SCOPE || (/preview|review-/.test(window.location.pathname) ? "preview" : "operational")];
+  var QKEY = "mhpss-np-queue-v2:" + encodeURIComponent(JSON.stringify(BINDING));
+  var queueError = "", flushing = null;
+  function legacyQuarantined() {
+    try {
+      for (var i = 0; i < localStorage.length; i++) if (localStorage.key(i) === LEGACY_QKEY) return true;
+      return false;
+    } catch (e) { return true; }
+  }
+  function exportLegacyQueue(consent) {
+    if (consent !== true || !window.confirm("Export the unchanged private legacy outbox? Keep the file private; do not upload or clear it. Destination review is still required.")) {
+      throw new Error("explicit private-export consent required");
+    }
+    return localStorage.getItem(LEGACY_QKEY);
+  }
   var LKEY = "mhpss-np-linkmail";
   /* Kept in step with isOwner() in the security rules. The rules are what
      enforce it; this copy only lets a page explain itself without a read. */
@@ -59,7 +77,10 @@
       error: state.error,
       online: navigator.onLine,
       user: state.user ? { email: state.user.email, uid: state.user.uid } : null,
-      pending: queue().length
+      pending: queue().length,
+      queueError: queueError,
+      legacyQuarantined: legacyQuarantined(),
+      binding: BINDING.slice()
     };
   }
 
@@ -67,11 +88,24 @@
      The queue is the record of truth until the server confirms. An entry
      leaves the queue only once Firestore has acknowledged the write. */
   function queue() {
-    try { return JSON.parse(localStorage.getItem(QKEY) || "[]"); } catch (e) { return []; }
+    try {
+      var raw = localStorage.getItem(QKEY);
+      if (!raw) return window.__fbq || [];
+      var envelope = JSON.parse(raw);
+      if (JSON.stringify(envelope.binding) !== JSON.stringify(BINDING) || !Array.isArray(envelope.rows)) {
+        throw new Error("outbox binding mismatch");
+      }
+      if (!envelope.rows.every(function (r) { return r && typeof r === "object" && typeof r._rid === "string" && r._rid && typeof r._device_ts === "string"; })) {
+        throw new Error("invalid bound outbox entry");
+      }
+      queueError = "";
+      return envelope.rows;
+    } catch (e) { queueError = "outbox quarantined: " + e.message; return []; }
   }
   function setQueue(q) {
-    try { localStorage.setItem(QKEY, JSON.stringify(q)); return true; }
-    catch (e) { window.__fbq = q; return false; }
+    if (queueError) return false;
+    try { localStorage.setItem(QKEY, JSON.stringify({ binding: BINDING, rows: q })); window.__fbq = null; return true; }
+    catch (e) { window.__fbq = q; queueError = "device storage write failed; export source records before leaving"; return false; }
   }
 
   /* ---------- deterministic id ----------------------------------------
@@ -79,6 +113,15 @@
      the same record produce the same id; two genuinely different records
      do not. Timestamps added by the device are excluded on purpose. */
   function rid(rec) {
+    if (typeof rec._rid === "string" && rec._rid) return rec._rid;
+    // Stable source identity for NEW writes; legacy pending IDs are never read
+    // or rewritten. Mutable attendance/answers must not fork a source report.
+    if (typeof rec.id === "string" && rec.id) {
+      return (rec.kind || "rec") + "_source_" + encodeURIComponent(rec.id);
+    }
+    return legacyRid(rec);
+  }
+  function legacyRid(rec) {
     /* The 4Ws activity report names its fields dateAD / activity / modality
        (camelCase, from store.js), not date_ad / service like the l1.js
        forms. Until 16 Sep 2026 this basis read only the snake_case names,
@@ -125,6 +168,8 @@
           query: fsMod.query, where: fsMod.where, orderBy: fsMod.orderBy,
           limit: fsMod.limit, onSnapshot: fsMod.onSnapshot, getDocs: fsMod.getDocs,
           getDoc: fsMod.getDoc, deleteDoc: fsMod.deleteDoc,
+          getDocsFromServer: fsMod.getDocsFromServer,
+          startAfter: fsMod.startAfter, documentId: fsMod.documentId,
           serverTimestamp: fsMod.serverTimestamp,
           signIn: auMod.signInWithEmailAndPassword, signOut: auMod.signOut,
           onAuth: auMod.onAuthStateChanged,
@@ -187,6 +232,7 @@
     r._rid = rid(r);
     r._device_ts = new Date().toISOString();
     var q = queue();
+    if (queueError) return Promise.resolve({ local: false, persisted: false, remote: false, error: queueError });
     /* already queued and unsent? replace rather than add a second copy */
     var at = -1;
     for (var i = 0; i < q.length; i++) { if (q[i]._rid === r._rid) { at = i; break; } }
@@ -194,16 +240,18 @@
     var persisted = setQueue(q);
 
     var out = { local: true, persisted: persisted, rid: r._rid, remote: false, error: "" };
-    if (!state.ready) {
+    if (!state.ready || !navigator.onLine || !persisted) {
       out.error = state.configured ? (state.error || "not connected yet") : "not configured";
       announce();
       return Promise.resolve(out);
     }
-    return push(r).then(function () {
-      out.remote = true; drop(r._rid); announce(); return out;
-    }).catch(function (e) {
-      out.error = e && e.message ? e.message : String(e);
-      announce(); return out;
+    return flush().then(function () {
+      // A correction may have arrived while the preceding revision was in flight.
+      if (queue().some(function (x) { return x._rid === r._rid && JSON.stringify(x) === JSON.stringify(r); })) return flush();
+    }).then(function () {
+      out.remote = !queue().some(function (x) { return x._rid === r._rid; });
+      if (!out.remote) out.error = "delivery pending";
+      return out;
     });
   }
 
@@ -237,25 +285,29 @@
     return api.setDoc(api.doc(db, COLL, r._rid), body);
   }
 
-  function drop(id) {
-    setQueue(queue().filter(function (x) { return x._rid !== id; }));
+  function drop(r) {
+    // An old acknowledgment must not retire a correction queued in flight.
+    setQueue(queue().filter(function (x) { return JSON.stringify(x) !== JSON.stringify(r); }));
   }
 
   /* ---------- flush ---------------------------------------------------
      Sequential, not parallel: a phone on one bar of signal handles one
      write at a time far better than twenty at once. */
   function flush() {
+    if (flushing) return flushing;
     if (!state.ready || !navigator.onLine) return Promise.resolve({ sent: 0, left: queue().length });
     var q = queue().slice(), sent = 0;
-    return q.reduce(function (chain, r) {
+    flushing = q.reduce(function (chain, r) {
       return chain.then(function () {
-        return push(r).then(function () { sent++; drop(r._rid); })
+        return push(r).then(function () { sent++; drop(r); })
                       .catch(function () { /* stays queued */ });
       });
     }, Promise.resolve()).then(function () {
       announce();
+      flushing = null;
       return { sent: sent, left: queue().length };
     });
+    return flushing;
   }
 
   window.addEventListener("online", function () { flush(); announce(); });
@@ -263,38 +315,91 @@
 
   /* ---------- read (coordination side, needs a signed-in user) -------- */
   function watch(cb, onErr) {
-    if (!state.ready) { if (onErr) onErr("not connected"); return function () {}; }
-    var qq = api.query(api.collection(db, COLL), api.orderBy("server_ts", "desc"), api.limit(2000));
-    return api.onSnapshot(qq, function (snap) {
-      var rows = [];
-      snap.forEach(function (d) { var o = d.data(); o._id = d.id; rows.push(o); });
-      cb(rows);
-    }, function (e) { if (onErr) onErr(e && e.message ? e.message : String(e)); });
+    if (onErr) onErr("incomplete: unscoped register reads disabled; use watchKind");
+    return function () {};
   }
 
-  /* watchKind -- the listen an UNAUTHENTICATED reader has to use.
+  /* watchKind -- the scoped query every reader has to use.
      Rules v3 opens one kind of record and only that kind, and Firestore
      evaluates a query against its POTENTIAL result set: "security rules are
      not filters ... queries are all or nothing". So an anonymous reader must
      name the kind in the query itself; watch() above, which names nothing, is
      refused outright even when every document in the collection would pass.
 
-     No orderBy here, deliberately. Single-field indexes are automatic;
-     combinations of fields are not, and an equality filter plus an orderBy on
-     a different field is a combination. Dropping the sort keeps this path
-     working with no composite index to create in the console, and costs
-     nothing: every page that consumes these rows sorts them itself.
-     If the collection ever outgrows the limit, the fix is the composite index
-     on (kind, server_ts) -- Firestore returns the error with a link to build
-     it -- not a larger limit. */
-  function watchKind(kind, cb, onErr) {
-    if (!state.ready) { if (onErr) onErr("not connected"); return function () {}; }
-    var qq = api.query(api.collection(db, COLL), api.where("kind", "==", kind), api.limit(2000));
-    return api.onSnapshot(qq, function (snap) {
-      var rows = [];
-      snap.forEach(function (d) { var o = d.data(); o._id = d.id; rows.push(o); });
-      cb(rows);
-    }, function (e) { if (onErr) onErr(e && e.message ? e.message : String(e)); });
+     Enumeration orders by document ID, not an optional timestamp; every page
+     retains the exact same kind filter. Missing indexes/permission/network
+     errors refuse the complete view, never fall back to a partial subset. */
+  // Authorized, server-only, bounded enumeration. Document-ID ordering includes
+  // documents without server_ts and needs no new composite-index grant.
+  // Two identical scans detect observed drift, NOT an atomic Firestore snapshot.
+  async function readKindComplete(kind, options) {
+    options = options || {};
+    if (!state.ready || !navigator.onLine) throw new Error("incomplete: server unavailable");
+    if (typeof kind !== "string" || !kind) throw new Error("incomplete: explicit kind required");
+    var maxRows = options.maxRows === undefined ? 10000 : options.maxRows;
+    if (!Number.isInteger(maxRows) || maxRows < 1 || maxRows > 10000) throw new Error("invalid row bound");
+    var user = state.user && state.user.uid, deadline = Date.now() + 30000;
+    async function scan() {
+      var rows = [], cursor = null, seen = new Set();
+      while (true) {
+        if ((state.user && state.user.uid) !== user) throw new Error("incomplete: session changed");
+        var terms = [api.where("kind", "==", kind), api.orderBy(api.documentId()), api.limit(500)];
+        if (cursor) terms.push(api.startAfter(cursor));
+        var remaining = deadline - Date.now(), timeout;
+        if (remaining <= 0) throw new Error("incomplete: read deadline exceeded");
+        var snap;
+        try {
+          snap = await Promise.race([
+            api.getDocsFromServer(api.query(api.collection(db, COLL), ...terms)),
+            new Promise(function (_, reject) { timeout = setTimeout(function () { reject(new Error("incomplete: read deadline exceeded")); }, remaining); })
+          ]);
+        } finally { clearTimeout(timeout); }
+        if (!snap.metadata || snap.metadata.fromCache || snap.metadata.hasPendingWrites) throw new Error("incomplete: unconfirmed server page");
+        if (snap.size > 500) throw new Error("incomplete: invalid page size");
+        for (var d of snap.docs) {
+          if (seen.has(d.id) || (cursor && d.id <= cursor.id)) throw new Error("incomplete: cursor drift");
+          var o = d.data();
+          if (o.kind !== kind) throw new Error("incomplete: scope mismatch");
+          seen.add(d.id); rows.push(Object.assign({}, o, { _id: d.id }));
+          if (rows.length > maxRows) throw new Error("incomplete: row bound exceeded (" + maxRows + ")");
+          cursor = d;
+        }
+        if (snap.size < 500) return rows;
+      }
+    }
+    function canonical(value) {
+      if (Array.isArray(value)) return value.map(canonical);
+      if (value && typeof value === "object") {
+        var out = {}; Object.keys(value).sort().forEach(function (key) { out[key] = canonical(value[key]); }); return out;
+      }
+      return value;
+    }
+    var first = await scan(), second = await scan();
+    if (JSON.stringify(canonical(first)) !== JSON.stringify(canonical(second))) throw new Error("incomplete: register drift; retry a quiet interval");
+    if ((state.user && state.user.uid) !== user) throw new Error("incomplete: session changed");
+    return { rows: second, complete: true, count: second.length, maxRows: maxRows,
+      consistency: "two matching server enumerations; not atomic", capturedAt: new Date().toISOString() };
+  }
+
+  function watchKind(kind, cb, onErr, onState) {
+    var stopped = false, busy = false;
+    async function refresh() {
+      if (stopped || busy) return;
+      busy = true;
+      if (onState) onState({ complete: false, reason: "Reading and validating all authorized pages" });
+      try {
+        var result = await readKindComplete(kind);
+        if (!stopped) { if (onState) onState(result); cb(result.rows, result); }
+      } catch (e) {
+        if (!stopped) {
+          if (onState) onState({ complete: false, reason: e.message });
+          if (onErr) onErr(e && e.message ? e.message : String(e));
+        }
+      } finally { busy = false; }
+    }
+    refresh();
+    var timer = setInterval(refresh, 60000);
+    return function () { stopped = true; clearInterval(timer); };
   }
 
   function signIn(email, pass) {
@@ -355,7 +460,24 @@
               (st.user ? " Signed in as " + st.user.email + "." : "");
       }
       bar.className = cls;
+      if (st.legacyQuarantined || st.queueError) {
+        bar.className = "warn";
+        msg += " <b>Legacy/invalid outbox quarantined unchanged.</b> It is NOT sent or counted as delivered. Private export and destination review are required.";
+      }
       bar.innerHTML = '<span class="m">' + msg + "</span>";
+      if (st.legacyQuarantined) {
+        var ex = document.createElement("button");
+        ex.type = "button"; ex.textContent = "Export private legacy outbox";
+        ex.onclick = function () {
+          var raw;
+          try { raw = exportLegacyQueue(true); } catch (e) { return; }
+          if (raw === null) return;
+          var url = URL.createObjectURL(new Blob([raw], { type: "application/octet-stream" }));
+          var link = document.createElement("a"); link.href = url; link.download = "mhpss-private-legacy-outbox.json";
+          link.click(); setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+        };
+        bar.appendChild(ex);
+      }
       if (st.configured && st.pending && st.online) {
         var b = document.createElement("button");
         b.type = "button"; b.textContent = "Send now";
@@ -455,7 +577,8 @@
     sendLink: sendLink, OWNER: OWNER, ROLES: ROLE_LIST,
     onStatus: function (f) { stateCbs.push(f); f(status()); },
     onUser: function (f) { userCbs.push(f); f(state.user); },
-    submit: submit, flush: flush, queue: queue, rid: rid,
+    submit: submit, flush: flush, queue: queue, rid: rid, legacyRid: legacyRid, exportLegacyQueue: exportLegacyQueue,
+    readKindComplete: readKindComplete,
     watch: watch, watchKind: watchKind, signIn: signIn, signOut: signOutNow,
     clearQueue: function () { setQueue([]); announce(); }
   };

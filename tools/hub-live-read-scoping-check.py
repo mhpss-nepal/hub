@@ -54,12 +54,12 @@ def _text(path: Path, broken: bool) -> str:
     t = path.read_text(encoding="utf-8")
     if broken:
         # Re-introduce the defect: an unfiltered listen.
-        t = t.replace('window.FB.watchKind("activity", ok, err)',
-                      'window.FB.watch(ok, err)')
-        t = t.replace('window.FB.watchKind(k, function (rows) { mergeKind(k, rows); }, onErr);',
-                      'window.FB.watch(function (rows) { mergeKind(k, rows); }, onErr);')
-        t = t.replace('window.FB.watchKind(KINDS[0], function (rows) {',
-                      'window.FB.watch(KINDS[0], function (rows) {')
+        # Match the call boundary, not the old callback arity/formatting.
+        # Completeness metadata must not silently disable the negative control.
+        t, injected = re.subn(r'window\.FB\.watchKind\(\s*(?:"activity"|k|KINDS\[0\])\s*,',
+                              'window.FB.watch(', t)
+        if not injected:
+            raise GuardError(f"{path.name}: negative control did not reach a real scoped call")
     return t
 
 

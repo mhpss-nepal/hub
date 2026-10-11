@@ -1397,6 +1397,24 @@ body.hub.dashboard-selected .filters{border-left:4px solid #526e91}
      clicking Connect again used to paint "attaching the listener..." over the
      one screen that explained what was actually wrong. */
   var LIVE_ON = false, LIVE_AT = null, LIVE_TICK = null, WANT_LIVE = false, REFUSED = false;
+  var LIVE_STOP = null, LIVE_COMPLETE = false;
+  function liveCompleteness(meta) {
+    LIVE_COMPLETE = !!(meta && meta.complete);
+    if (LIVE_COMPLETE) return;
+    $("app").hidden = true;
+    $("loader").hidden = false;
+    $("livePanel").hidden = false;
+    $("livePanel").innerHTML = '<div class="banner warn" role="status"><b>Incomplete register view — outputs blocked.</b> ' +
+      esc(meta && meta.reason || "Waiting for complete authorized pages") + '</div>';
+  }
+  // Capture-phase guard also blocks programmatic clicks on hidden exports.
+  document.addEventListener("click", function (event) {
+    var target = event.target.closest && event.target.closest("button");
+    if (WANT_LIVE && !LIVE_COMPLETE && target && (/^exp/.test(target.id) || /^pub(Preview|Go)$/.test(target.id))) {
+      event.preventDefault(); event.stopImmediatePropagation();
+      toast("Incomplete register view — exports blocked", true);
+    }
+  }, true);
   /* Q_KINDS -- which record kinds the live listen actually asked the SERVER for.
      THE READ IS THE BOUNDARY, NOT THE FILTER. Firestore rules are not filters,
      and rules v4 scopes /submissions reads BY KIND: an unfiltered listen is
@@ -1413,7 +1431,9 @@ body.hub.dashboard-selected .filters{border-left:4px solid #526e91}
   var OPEN_MODE = false, OPEN_TRIED = false;
   var WINDOW_ENDS = "30 September 2026";
 
-  function liveApply(rows) {
+  function liveApply(rows, meta) {
+    if (!meta || !meta.complete) { liveCompleteness(meta); return; }
+    LIVE_COMPLETE = true;
     /* The listen asks the server for ONE kind (liveListen() -> watchKind).
        The filter below is a display guard, not the boundary: it also stops a
        hand-loaded file, or any future broader query, from inflating the page. */
@@ -1439,7 +1459,7 @@ body.hub.dashboard-selected .filters{border-left:4px solid #526e91}
     var clock = hh(t.getHours()) + ":" + hh(t.getMinutes()) + ":" + hh(t.getSeconds());
     var other = (total || 0) - (acts || 0);
     el.innerHTML = '<span class="dot" aria-hidden="true"></span>' +
-      '<span><b>Live</b> — recomputed on the register\u2019s own changes, not on a schedule.</span>' +
+      '<span><b>Complete bounded server view</b> — two matching enumerations, not an atomic snapshot. Revalidated every 60 seconds; outputs blocked during validation.</span>' +
       (OPEN_MODE ? '<span class="openwin">Open demonstration window — activity reports only, ' +
         'readable without an account until <b>' + WINDOW_ENDS + '</b></span>' : '') +
       '<span class="asof">as of <b>' + clock + '</b> <span id="liveAge"></span></span>' +
@@ -1519,7 +1539,8 @@ body.hub.dashboard-selected .filters{border-left:4px solid #526e91}
   function liveListen(ok, err) {
     if (!window.FB || !window.FB.watchKind) return false;
     Q_KINDS = ["activity"];
-    window.FB.watchKind("activity", ok, err);
+    if (LIVE_STOP) LIVE_STOP();
+    LIVE_STOP = window.FB.watchKind("activity", ok, err, liveCompleteness);
     return true;
   }
 
@@ -1529,9 +1550,9 @@ body.hub.dashboard-selected .filters{border-left:4px solid #526e91}
     if (!st.ready || st.user) return;          /* signed in -> use the full path */
     if (!window.FB.watchKind) return;
     OPEN_TRIED = true;
-    liveListen(function (rows) {
+    liveListen(function (rows, meta) {
       OPEN_MODE = true;
-      liveApply(rows);
+      liveApply(rows, meta);
     }, function () {
       /* The window is shut, or this build predates it. Not an error worth
          showing: fall back to asking who you are. */
@@ -1570,7 +1591,11 @@ body.hub.dashboard-selected .filters{border-left:4px solid #526e91}
   if (window.FB) {
     window.FB.onStatus(function (st) {
       if (!WANT_LIVE) return;
-      if (!st.user && !OPEN_MODE) { LIVE_ON = false; clearInterval(LIVE_TICK); $("liveStrip").hidden = true; }
+      if (!st.user && !OPEN_MODE) {
+        if (LIVE_STOP) LIVE_STOP(); LIVE_STOP = null;
+        LIVE_ON = false; liveCompleteness({ complete: false, reason: "Session unavailable" });
+        clearInterval(LIVE_TICK); $("liveStrip").hidden = true;
+      }
       if (!$("loader").hidden && !OPEN_MODE) { livePaint(st); }
       liveAttach();
     });
@@ -1637,6 +1662,8 @@ body.hub.dashboard-selected .filters{border-left:4px solid #526e91}
   });
   $("useDemo").addEventListener("click", function () { load(demo(), "Synthetic demonstration data"); });
   function resetSource() {
+    if (LIVE_STOP) LIVE_STOP();
+    LIVE_STOP = null; LIVE_COMPLETE = false;
     $("app").hidden = true; $("loader").hidden = false;
     /* Leaving the live view stops the clock and hides the strip, so a stale
        "as of" time can never sit over a file's figures. */

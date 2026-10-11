@@ -219,9 +219,9 @@
        off the source. fb.js itself is untouched on disk. */
     if (typeof window.FB.watchKind === "function") {
       var wk = window.FB.watchKind;
-      window.FB.watchKind = function (kind, ok, err) {
+      window.FB.watchKind = function (kind, ok, err, onState) {
         state.asks.push(kind);
-        return wk.call(window.FB, kind, ok, err);
+        return wk.call(window.FB, kind, ok, err, onState);
       };
     }
   }
@@ -287,7 +287,9 @@
     }).join("");
   }
 
+  var stopRead = null;
   function read() {
+    if (stopRead) stopRead();
     var msg = $("readMsg");
     if (!window.FB || typeof window.FB.watchKind !== "function") {
       state.error = "the bridge is not available on this page";
@@ -303,7 +305,8 @@
        the evidence of a widened query. */
     state.error = ""; state.rows = []; state.ok = false;
 
-    window.FB.watchKind(KINDS[0], function (rows) {
+    stopRead = window.FB.watchKind(KINDS[0], function (rows, meta) {
+      if (!meta || !meta.complete) return;
       state.rows = (rows || []).map(function (r) {
         var o = JSON.parse(JSON.stringify(r));
         o.id = o.id || o._id || "";
@@ -314,11 +317,16 @@
       msg.textContent = state.rows.length + " activity report(s) read from the register.";
       settled = true;
     }, function (err) {
-      state.ok = false; state.error = String(err || "refused"); state.at = new Date();
+      state.rows = []; state.ok = false; state.error = String(err || "refused"); state.at = new Date();
       render();
       msg.textContent = "The register refused the read. Signing in proves who you are; it does not " +
         "grant sight of the records. An admin adds the address on the Access page.";
       settled = true;
+    }, function (meta) {
+      if (!meta.complete) {
+        state.rows = []; state.ok = false; state.error = "incomplete: " + (meta.reason || "validating pages");
+        render(); msg.textContent = state.error;
+      }
     });
 
     /* A listener that neither answers nor refuses is a state of its own:

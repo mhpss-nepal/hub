@@ -623,6 +623,7 @@
               "knows_where", "could_reach", "lat", "lon", "_file", "_saved"];
   document.querySelectorAll("button.exp").forEach(function (b) {
     b.addEventListener("click", function () {
+      if (watching && !liveOk[b.dataset.k]) return;
       var k = b.dataset.k, rows = ofKind(k);
       if (!rows.length) return;
       L.download("mhpss_np_" + k + "_" + L.stamp() + ".csv", L.toCSV(rows, COLS), "text/csv");
@@ -638,7 +639,7 @@
      here are exactly the kinds this page renders; do not add a kind without
      adding it to LIVE_KINDS. */
   var LIVE_KINDS = ["service_contact", "referral", "phq9", "self_report"];
-  var liveByKind = {}, liveOk = {};
+  var liveByKind = {}, liveOk = {}, liveStops = [];
   function mergeKind(kind, rows) {
     liveOk[kind] = true;
     liveByKind[kind] = rows || [];
@@ -661,9 +662,9 @@
     var n = LIVE.length, act = LIVE.filter(function (r) { return r._kind === "activity"; }).length;
     var mine = n - act;
     $("stripTxt").innerHTML = n
-      ? "<b>Live.</b> " + mine + " entry(ies) from these four forms in the register, updating as workers submit" +
+      ? "<b>Bounded server view.</b> " + mine + " entry(ies). Each kind is validated separately with two matching enumerations, not an atomic snapshot; rechecked every 60 seconds. Incomplete kinds are withheld." +
         (act ? ' · <span class="xs">' + act + ' activity report(s) are on the <a href="./#reports">dashboard</a></span>' : "")
-      : "<b>Live.</b> No entry from these four forms has reached the register yet.";
+      : "<b>Register view.</b> No complete entries available. Incomplete/refused kinds are withheld, not counted as zero received.";
   }
   function paintLive(st) {
     var el = $("livePanel");
@@ -728,11 +729,23 @@
           onErr("this build cannot scope the read to a record kind");
         } else {
           LIVE_KINDS.forEach(function (k) {
-            window.FB.watchKind(k, function (rows) { mergeKind(k, rows); }, onErr);
+            liveStops.push(window.FB.watchKind(k, function (rows, meta) {
+              if (meta && meta.complete) mergeKind(k, rows);
+            }, onErr, function (meta) {
+              if (!meta.complete) {
+                delete liveOk[k]; delete liveByKind[k];
+                var rows = []; LIVE_KINDS.forEach(function (kind) { rows = rows.concat(liveByKind[kind] || []); });
+                mergeLive(rows);
+                $("stripTxt").textContent = "Incomplete " + k + " — its register rows and exports are blocked. " + (meta.reason || "Validating pages");
+              }
+            }));
           });
         }
       }
-      if (!st.user) { watching = false; LIVE = []; render(); }
+      if (!st.user) {
+        liveStops.forEach(function (stop) { stop(); }); liveStops = [];
+        watching = false; liveOk = {}; liveByKind = {}; LIVE = []; render();
+      }
     });
   } else {
     paintLive({ configured: false });
