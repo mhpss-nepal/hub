@@ -1,0 +1,21 @@
+'use strict';
+// Explicit synthetic transport fixtures; these are NOT provider receipts.
+const fs=require('fs'),vm=require('vm'),assert=require('node:assert/strict');
+const {webcrypto}=require('crypto');
+const ctx={window:{},TextEncoder,crypto:webcrypto,AbortController,setTimeout,clearTimeout,URL,console};vm.createContext(ctx);
+const path=require('path').join(__dirname,'../assets/training-api.js');
+assert.ok(fs.existsSync(path),'training transport must exist in actual Hub source');vm.runInContext(fs.readFileSync(path,'utf8'),ctx);
+(async()=>{const T=ctx.window.TRAINING_API,store=new Map(),storage={getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},user={uid:'synthetic-A',emailVerified:true};let current=user,calls=[],failure=true;
+const auth={currentUser:()=>current,token:async()=> 'SYNTHETIC-NOT-PROVIDER-TOKEN'};
+ctx.fetch=async(url,o)=>{calls.push({url,body:o.body});if(failure)throw Error('fixture offline');const b=JSON.parse(o.body);return {status:200,text:async()=>JSON.stringify({protocol:'training-receipt/1',reportId:b.reportId,revision:b.revision,request_sha256:await T.hash(b.payload),stored:true})};};
+const api=T.create(auth,storage),p={kind:'training',title:'SYNTHETIC ONLY',participants:[{female:1,male:0,other:0,total:1}]};
+const first=await api.enqueue(p);assert.match(first.body.reportId,/^[A-Za-z0-9_-]+$/);await assert.rejects(api.send(first.body.reportId));assert.equal(api.outbox().length,1);assert.equal(api.outbox()[0].receipt,null);
+failure=false;await api.send(first.body.reportId);assert.equal(calls[0].body,calls[1].body);assert.equal(api.outbox()[0].receipt.stored,true);const again=await api.enqueue(p);assert.equal(again.body.reportId,first.body.reportId);assert.equal(api.outbox().length,1);
+current={uid:'synthetic-B',emailVerified:true};assert.equal(api.outbox().length,0);assert.ok([...store.keys()].some(k=>k.endsWith('synthetic-A')));current=user;
+ctx.fetch=async()=>({status:200,text:async()=>JSON.stringify({protocol:'training-receipt/1',reportId:first.body.reportId,revision:1,request_sha256:'0'.repeat(64),stored:true})});await assert.rejects(api.send(first.body.reportId));assert.equal(api.outbox()[0].receipt.stored,true);
+assert.equal(await T.hash({b:1,a:'नेपाली'}),await T.hash({a:'नेपाली',b:1}));
+const sample=JSON.parse(fs.readFileSync(require('path').join(__dirname,'../../non5ws-integration/non5ws_bridge/evidence/browser.json'),'utf8'))[0].records;const full=Object.values(sample)[0][0];const row={reportId:'tr_fixture',revision:1,request_sha256:await T.hash(full),subject:user.uid,org:full.org,createdAt:'2026-10-12T00:00:00Z',updatedAt:'2026-10-12T00:00:00Z',payload:full};T.validateRow(row,true,user.uid);assert.throws(()=>T.validateRow({...row,payload:{...full,unexpected:'no'}},true,user.uid));assert.throws(()=>T.validateRow({...row,payload:{...full,under_18:99}},true,user.uid));
+let page=0;ctx.fetch=async(url,o)=>({status:200,text:async()=>JSON.stringify({protocol:'training-list/1',rows:[{...row,reportId:'tr_'+(++page)}],complete:page===2,nextCursor:page===2?null:'fixture-cursor'})});const loaded=await api.entries();assert.equal(loaded.rows.length,2);assert.equal(loaded.complete,true);
+page=0;ctx.fetch=async()=>({status:200,text:async()=>JSON.stringify({protocol:'training-list/1',rows:[row],complete:false,nextCursor:'repeated-fixture'})});await assert.rejects(api.entries());current={uid:'synthetic-C',emailVerified:false};await assert.rejects(api.enqueue(p));current=user;
+console.log('PASS synthetic transport: durable queue, exact retry, same-event reuse, UID isolation, mismatched ACK refused, canonical Unicode hash');
+})().catch(e=>{console.error(e);process.exitCode=1;});
