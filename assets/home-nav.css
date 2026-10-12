@@ -1,0 +1,3 @@
+/* Home is the canonical six-card landing, never browser history. */
+a[data-home-link]{display:inline-flex!important;align-items:center;min-height:44px!important;max-width:100%;box-sizing:border-box;padding:10px 16px;margin:12px;border:1px solid #9db7cc;border-radius:9px;background:#fff;color:#173e61;font:600 15px/1.4 system-ui,sans-serif;text-decoration:none;position:relative;z-index:1}
+a[data-home-link]:focus-visible{outline:3px solid #277fa3;outline-offset:3px}
