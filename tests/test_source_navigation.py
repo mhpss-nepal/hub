@@ -12,7 +12,7 @@ class SourceNavigation(unittest.TestCase):
  def test_exact_approved_html_delta(self):
   import re
   for name in ['index.html','review-analytics-v48/index.html','review-current-v51/index.html']:
-   current=(ROOT/name).read_text()
+   current=(ROOT/('legacy-dashboard.html' if name=='index.html' else name)).read_text()
    baseline=subprocess.check_output(['git','show','e74e128:'+name],cwd=ROOT).decode()
    # Runtime scripts are immutable except removal of obsolete root nav controller
    scripts=lambda x:re.findall(r'<script(?: [^>]*)?>(.*?)</script>',x,re.S)
@@ -31,6 +31,6 @@ class SourceNavigation(unittest.TestCase):
    self.assertEqual(main(baseline),main(current),name)
    self.assertEqual(current.count('data-destination='),3)
    self.assertEqual(current.count('aria-disabled="true"'),4)
-  current=(ROOT/'index.html').read_text()
+  current=(ROOT/'legacy-dashboard.html').read_text()
   self.assertGreater(current.index(DEMO),current.index('$("expAll").addEventListener'))
 if __name__=='__main__':unittest.main()

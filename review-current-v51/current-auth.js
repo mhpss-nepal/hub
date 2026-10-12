@@ -28,7 +28,7 @@
   async function consumeLink(email) {
     var credential = await api.signInWithEmailLink(auth, email, location.href);
     pendingLink = false; forgetEmail();
-    history.replaceState({}, document.title, location.pathname + '?source=current');
+    history.replaceState({}, document.title, window.STAFF_AUTH_RETURN ? new URL(window.STAFF_AUTH_RETURN).pathname + new URL(window.STAFF_AUTH_RETURN).search : location.pathname + '?source=current');
     return credential;
   }
   function currentUser() { return signedOutIntent ? null : user; }
@@ -121,7 +121,7 @@
     },
     sendLink: async function (email) {
       await initialized; if (!ready) throw Error(error);
-      await api.sendSignInLinkToEmail(auth, email, { url: location.origin + location.pathname + '?source=current', handleCodeInApp: true });
+      await api.sendSignInLinkToEmail(auth, email, { url: window.STAFF_AUTH_RETURN || location.origin + location.pathname + '?source=current', handleCodeInApp: true });
       try { localStorage.setItem('mhpss-np-linkmail', email); } catch (e) { /* Re-enter the address in the receiving browser. */ }
     }
   });

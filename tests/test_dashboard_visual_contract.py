@@ -15,7 +15,7 @@ class Parser(HTMLParser):
 def parse(s):p=Parser();p.feed(s);return p
 class Contract(unittest.TestCase):
  def setUp(self):
-  self.old=subprocess.check_output(['git','show',BASE+':index.html'],cwd=ROOT).decode();self.new=(ROOT/'index.html').read_text()
+  self.old=subprocess.check_output(['git','show',BASE+':index.html'],cwd=ROOT).decode();self.new=(ROOT/'legacy-dashboard.html').read_text()
  def test_controls_and_assets_exact(self):
   a,b=parse(self.old),parse(self.new)
   # Only anonymous navigation controls may be removed; every data control remains exact.

@@ -1,0 +1,1 @@
+[{"name": "durable registration invoked once", "pass": true}, {"name": "exact profile fields no role authority", "pass": true}, {"name": "draft cleared only after profile readback", "pass": true}, {"name": "manager request no dashboard grant", "pass": true}, {"name": "other email draft does not register", "pass": true}]

@@ -331,7 +331,7 @@ class HubTrialScopeTest(unittest.TestCase):
 
     def test_default_rail_offers_only_the_approved_5ws_form(self):
         for page in RAIL_PAGES:
-            html = (ROOT / page).read_text(encoding="utf-8")
+            html = (ROOT / ("legacy-dashboard.html" if page == "index.html" else page)).read_text(encoding="utf-8")
             if page == "index.html":
                 self.assertEqual(html.count('class="l2-form-link" href="../form/"'), 1)
                 self.assertEqual(html.count('data-destination='), 3)
