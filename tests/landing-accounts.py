@@ -20,6 +20,7 @@ with sync_playwright() as p:
    def api(r):
     path=r.request.url.split('.app')[-1];requests.append({'path':path,'method':r.request.method,'headers':r.request.headers})
     data=state if path=='/account/profile' else {'protocol':'staff-entries/1','complete':True,'rows':[{'id':'entry-fixture','form':'5ws','enteredAt':'2026-10-11T04:00:00Z','updatedAt':'2026-10-11T04:00:00Z','status':'received','revision':2}]} if path=='/account/entries' else {'protocol':'staff-dashboard/1','section':'5ws','rows':[row],'complete':True,'scope':state['scope']} if path=='/dashboard/5ws' else {'protocol':'staff-admin-entries/1','rows':[],'complete':True}
+    if path!='/account/profile':data['nextCursor']=None
     r.fulfill(json=data,headers={'Cache-Control':'no-store'})
    page.route('https://mhpss5ws-tdp3xtfnsq-as.a.run.app/**',api)
    page.goto(origin+'/?view=login');page.wait_for_selector('#entries:not([hidden])' if role=='field' else '#dashboard:not([hidden])')
@@ -27,7 +28,7 @@ with sync_playwright() as p:
     page.locator('[data-period="all"]').click();page.wait_for_selector('#entryRows tr');check(f'{width} field own history', 'entry-fixture' in page.locator('#entryRows').inner_text());check(f'{width} no manager nav',page.locator('#dashNav button').count()==0)
    else:
     page.wait_for_function("document.getElementById('dashboardStatus').textContent.startsWith('Complete authorized')")
-    page.wait_for_function("document.getElementById('dashboardFrame').contentDocument?.getElementById('stats')?.textContent.includes('Confirmed reports')")
+    page.wait_for_function("document.getElementById('dashboardFrame').contentDocument?.getElementById('stats')?.textContent.includes('Reports loaded')")
     if role=='manager':print('CHART GEOMETRY',page.locator('#dashboardFrame').evaluate("f=>[...f.contentDocument.querySelectorAll('#analysis-primary>*,#ovcols>*')].map(x=>({cls:x.className,display:getComputedStyle(x).display,rect:x.getBoundingClientRect().toJSON()}))"))
     check(f'{width} {role} sidebar exact',page.locator('#dashNav button').count()==len(sections));check(f'{width} {role} no shell overflow',page.locator('#dashboardFrame').evaluate('(f)=>f.contentDocument.documentElement.scrollWidth===f.contentWindow.innerWidth'))
     if role=='coordinator':

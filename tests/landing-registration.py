@@ -14,7 +14,7 @@ with sync_playwright() as p:
   path=route.request.url.split('.app')[-1]
   if path=='/account/register':
    profile=route.request.post_data_json;saved.append(profile);data={'protocol':'staff-registration/1','status':'pending'}
-  elif path=='/account/entries':data={'protocol':'staff-entries/1','rows':[],'complete':True}
+  elif path=='/account/entries':data={'protocol':'staff-entries/1','rows':[],'complete':True,'nextCursor':None}
   else:data={'protocol':'staff-account/1','status':'pending' if profile else 'unregistered','role':None,'scope':{'org':None,'cluster':None},'sections':[],'profile':profile,'reportingAccess':False}
   route.fulfill(json=data)
  page.route('**/review-current-v51/current-auth.js',lambda r:r.fulfill(body=stub,content_type='text/javascript'));page.route('https://mhpss5ws-tdp3xtfnsq-as.a.run.app/**',api)
