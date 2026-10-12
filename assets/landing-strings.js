@@ -1,0 +1,21 @@
+/* Interface-only additions. Nepali is a machine draft; English authoritative.
+ * Existing dictionary, protected clinical prefixes and legacy pages untouched. */
+(function(){'use strict';const s=window.I18N_STRINGS;
+const pairs={
+ title:['Choose what you need to do','तपाईंले गर्नुपर्ने काम छान्नुहोस्'],
+ intro:['Register once. Record your work, check your entries, or open the dashboard available to your account.','एक पटक दर्ता गर्नुहोस्। आफ्नो काम अभिलेख गर्नुहोस्, आफ्ना प्रविष्टिहरू हेर्नुहोस् वा आफ्नो खातामा उपलब्ध ड्यासबोर्ड खोल्नुहोस्।'],
+ register:['Register','दर्ता गर्नुहोस्'],signin:['Sign in','साइन इन गर्नुहोस्'],mine:['My Dashboard','मेरो ड्यासबोर्ड'],forms:['All forms','सबै फारमहरू'],guide:['How to get started','कसरी सुरु गर्ने'],
+ create:['Create my account →','मेरो खाता बनाउनुहोस् →'],login:['Sign in →','साइन इन गर्नुहोस् →'],history:['View my entry history →','मेरो प्रविष्टि इतिहास हेर्नुहोस् →'],choose:['Choose a form →','फारम छान्नुहोस् →'],open:['Open 5Ws →','5Ws खोल्नुहोस् →'],read:['Read the quick guide →','छोटो मार्गदर्शन पढ्नुहोस् →'],
+ first:['FIRST VISIT','पहिलो भ्रमण'],returning:['RETURNING USERS','फर्कने प्रयोगकर्ताहरू'],own:['MY ENTRIES ONLY','मेरा प्रविष्टिहरू मात्र'],field:['FIELD ENTRY','क्षेत्रीय प्रविष्टि'],processed:['PROCESSED DATA','प्रशोधित तथ्याङ्क'],quick:['QUICK GUIDE','छोटो मार्गदर्शन'],
+ back:['← Back to the hub','← केन्द्रमा फर्कनुहोस्'],fullName:['Full name','पूरा नाम'],email:['Work email','कार्यस्थलको इमेल'],role:['Registering as','दर्ता गर्ने भूमिका'],organisation:['Organisation','संस्था'],profession:['Profession / field function','पेशा / क्षेत्रीय कार्य'],subcluster:['Sub-cluster / coordination area','उपसमूह / समन्वय क्षेत्र'],province:['Province','प्रदेश'],district:['District','जिल्ला'],palika:['Municipality / rural municipality','नगरपालिका / गाउँपालिका'],base:['Service point / work location (optional)','सेवा स्थान / कार्यस्थल (ऐच्छिक)'],service:['Main service / activity','मुख्य सेवा / गतिविधि'],other:['Other','अन्य'],otherOrg:['Other organisation name','अन्य संस्थाको नाम'],otherCluster:['Other coordination area','अन्य समन्वय क्षेत्र'],submit:['Register and continue','दर्ता गरी अगाडि बढ्नुहोस्'],signout:['Sign out','साइन आउट गर्नुहोस्'],
+ registerDesc:['One staff profile: your role, organisation, sub-cluster, work location and services.','एउटै कर्मचारी परिचय: तपाईंको भूमिका, संस्था, उपसमूह, कार्यस्थल र सेवाहरू।'],
+ signinDesc:['Enter the main dashboard with the sections allowed for your verified role. Entry-only staff open their personal My Dashboard.','प्रमाणित भूमिकाले अनुमति दिएका खण्डहरू भएको मुख्य ड्यासबोर्ड खोल्नुहोस्। प्रविष्टि मात्र गर्ने कर्मचारीले आफ्नो व्यक्तिगत ड्यासबोर्ड खोल्छन्।'],
+ mineDesc:['Read your received 5Ws reports from today or previous days. Other form histories and device drafts are not shown.','आज वा अघिल्ला दिनका प्राप्त 5Ws प्रतिवेदनहरू हेर्नुहोस्। अन्य फारमको इतिहास र उपकरणका मस्यौदाहरू देखाइँदैनन्।'],
+ formsDesc:['Choose the right form. Reporting and sensitive forms follow your verified permissions.','उचित फारम छान्नुहोस्। प्रतिवेदन र संवेदनशील फारमहरू तपाईंको प्रमाणित अनुमतिअनुसार चल्छन्।'],
+ dashboardDesc:['View current reports, activities and service coverage. Cards populate as confirmed reports arrive.','हालका प्रतिवेदन, गतिविधि र सेवाको पहुँच हेर्नुहोस्। पुष्टि भएका प्रतिवेदन आएपछि कार्डहरू भरिन्छन्।'],
+ guideDesc:['Register, verify your account and choose a form. Check delivery in your own entry history.','दर्ता गर्नुहोस्, खाता प्रमाणित गर्नुहोस् र फारम छान्नुहोस्। आफ्नै प्रविष्टि इतिहासमा प्राप्ति जाँच गर्नुहोस्।']
+};
+for(const [k,[en,ne]] of Object.entries(pairs)){const key='staffLanding.'+k;s.en[key]=en;s.ne[key]=ne;s._meta.source.machine.push(key);}
+// Exact interface text matches only; no clinical/instrument content translated.
+function keyNodes(){const lookup=new Map(Object.entries(pairs).map(([k,v])=>[v[0],'staffLanding.'+k]));for(const node of document.querySelectorAll('h1,h2,p,span,label,button,option')){if(node.children.length||node.hasAttribute('data-i18n'))continue;const key=lookup.get(node.textContent.trim());if(key)node.setAttribute('data-i18n',key);}const intro=document.querySelector('.hero>p');if(intro){intro.textContent=pairs.intro[0];intro.setAttribute('data-i18n','staffLanding.intro');}}
+keyNodes();})();

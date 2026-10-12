@@ -1,0 +1,46 @@
+{
+  "fixture": true,
+  "production_access": false,
+  "checks": [
+    {
+      "name": "390 six task cards",
+      "pass": true
+    },
+    {
+      "name": "390 no role simulation",
+      "pass": true
+    },
+    {
+      "name": "390 no overflow",
+      "pass": true
+    },
+    {
+      "name": "390 canonical form directory",
+      "pass": true
+    },
+    {
+      "name": "390 no routine developer reader",
+      "pass": true
+    },
+    {
+      "name": "1280 six task cards",
+      "pass": true
+    },
+    {
+      "name": "1280 no role simulation",
+      "pass": true
+    },
+    {
+      "name": "1280 no overflow",
+      "pass": true
+    },
+    {
+      "name": "1280 canonical form directory",
+      "pass": true
+    },
+    {
+      "name": "1280 no routine developer reader",
+      "pass": true
+    }
+  ]
+}

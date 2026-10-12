@@ -1,0 +1,280 @@
+CHART GEOMETRY [{'cls': 'ovcol', 'display': 'flex', 'rect': {'x': 12, 'y': 524.46875, 'width': 366, 'height': 487.28125, 'top': 524.46875, 'right': 378, 'bottom': 1011.75, 'left': 12}}, {'cls': 'ovcol time-card', 'display': 'flex', 'rect': {'x': 12, 'y': 1025.75, 'width': 366, 'height': 240, 'top': 1025.75, 'right': 378, 'bottom': 1265.75, 'left': 12}}, {'cls': 'ovcol', 'display': 'flex', 'rect': {'x': 12, 'y': 1281.75, 'width': 366, 'height': 222, 'top': 1281.75, 'right': 378, 'bottom': 1503.75, 'left': 12}}, {'cls': 'ovcol', 'display': 'flex', 'rect': {'x': 12, 'y': 1517.75, 'width': 366, 'height': 350.28125, 'top': 1517.75, 'right': 378, 'bottom': 1868.03125, 'left': 12}}]
+CHART GEOMETRY [{'cls': 'ovcol', 'display': 'flex', 'rect': {'x': 28, 'y': 291.1875, 'width': 481, 'height': 460.390625, 'top': 291.1875, 'right': 509, 'bottom': 751.578125, 'left': 28}}, {'cls': 'ovcol time-card', 'display': 'flex', 'rect': {'x': 523, 'y': 291.1875, 'width': 481, 'height': 460.390625, 'top': 291.1875, 'right': 1004, 'bottom': 751.578125, 'left': 523}}, {'cls': 'ovcol', 'display': 'flex', 'rect': {'x': 28, 'y': 767.578125, 'width': 481, 'height': 232, 'top': 767.578125, 'right': 509, 'bottom': 999.578125, 'left': 28}}, {'cls': 'ovcol', 'display': 'flex', 'rect': {'x': 523, 'y': 767.578125, 'width': 481, 'height': 356.28125, 'top': 767.578125, 'right': 1004, 'bottom': 1123.859375, 'left': 523}}]
+SCRIPT ERRORS []
+{
+  "fixture": true,
+  "production_access": false,
+  "checks": [
+    {
+      "name": "390 field own history",
+      "pass": true
+    },
+    {
+      "name": "390 no manager nav",
+      "pass": true
+    },
+    {
+      "name": "390 field no document overflow",
+      "pass": true
+    },
+    {
+      "name": "390 field signout clears frame",
+      "pass": true
+    },
+    {
+      "name": "390 manager sidebar exact",
+      "pass": true
+    },
+    {
+      "name": "390 manager no shell overflow",
+      "pass": true
+    },
+    {
+      "name": "390 manager no document overflow",
+      "pass": true
+    },
+    {
+      "name": "390 manager signout clears frame",
+      "pass": true
+    },
+    {
+      "name": "390 coordinator sidebar exact",
+      "pass": true
+    },
+    {
+      "name": "390 coordinator no shell overflow",
+      "pass": true
+    },
+    {
+      "name": "390 gbv not self granted",
+      "pass": true
+    },
+    {
+      "name": "390 coordinator no document overflow",
+      "pass": true
+    },
+    {
+      "name": "390 coordinator signout clears frame",
+      "pass": true
+    },
+    {
+      "name": "390 partner sidebar exact",
+      "pass": true
+    },
+    {
+      "name": "390 partner no shell overflow",
+      "pass": true
+    },
+    {
+      "name": "390 partner no document overflow",
+      "pass": true
+    },
+    {
+      "name": "390 partner signout clears frame",
+      "pass": true
+    },
+    {
+      "name": "390 admin sidebar exact",
+      "pass": true
+    },
+    {
+      "name": "390 admin no shell overflow",
+      "pass": true
+    },
+    {
+      "name": "390 admin no document overflow",
+      "pass": true
+    },
+    {
+      "name": "390 admin signout clears frame",
+      "pass": true
+    },
+    {
+      "name": "1280 field own history",
+      "pass": true
+    },
+    {
+      "name": "1280 no manager nav",
+      "pass": true
+    },
+    {
+      "name": "1280 field no document overflow",
+      "pass": true
+    },
+    {
+      "name": "1280 field signout clears frame",
+      "pass": true
+    },
+    {
+      "name": "1280 manager sidebar exact",
+      "pass": true
+    },
+    {
+      "name": "1280 manager no shell overflow",
+      "pass": true
+    },
+    {
+      "name": "1280 manager no document overflow",
+      "pass": true
+    },
+    {
+      "name": "1280 manager signout clears frame",
+      "pass": true
+    },
+    {
+      "name": "1280 coordinator sidebar exact",
+      "pass": true
+    },
+    {
+      "name": "1280 coordinator no shell overflow",
+      "pass": true
+    },
+    {
+      "name": "1280 gbv not self granted",
+      "pass": true
+    },
+    {
+      "name": "1280 coordinator no document overflow",
+      "pass": true
+    },
+    {
+      "name": "1280 coordinator signout clears frame",
+      "pass": true
+    },
+    {
+      "name": "1280 partner sidebar exact",
+      "pass": true
+    },
+    {
+      "name": "1280 partner no shell overflow",
+      "pass": true
+    },
+    {
+      "name": "1280 partner no document overflow",
+      "pass": true
+    },
+    {
+      "name": "1280 partner signout clears frame",
+      "pass": true
+    },
+    {
+      "name": "1280 admin sidebar exact",
+      "pass": true
+    },
+    {
+      "name": "1280 admin no shell overflow",
+      "pass": true
+    },
+    {
+      "name": "1280 admin no document overflow",
+      "pass": true
+    },
+    {
+      "name": "1280 admin signout clears frame",
+      "pass": true
+    },
+    {
+      "name": "503 no fake entries",
+      "pass": true
+    },
+    {
+      "name": "no browser script errors",
+      "pass": true
+    },
+    {
+      "name": "API no scope headers",
+      "pass": true
+    }
+  ],
+  "errors": [],
+  "requests": [
+    {
+      "path": "/account/profile",
+      "method": "GET"
+    },
+    {
+      "path": "/account/entries",
+      "method": "GET"
+    },
+    {
+      "path": "/account/profile",
+      "method": "GET"
+    },
+    {
+      "path": "/dashboard/5ws",
+      "method": "GET"
+    },
+    {
+      "path": "/account/profile",
+      "method": "GET"
+    },
+    {
+      "path": "/dashboard/5ws",
+      "method": "GET"
+    },
+    {
+      "path": "/account/profile",
+      "method": "GET"
+    },
+    {
+      "path": "/dashboard/5ws",
+      "method": "GET"
+    },
+    {
+      "path": "/account/profile",
+      "method": "GET"
+    },
+    {
+      "path": "/dashboard/5ws",
+      "method": "GET"
+    },
+    {
+      "path": "/admin/entries",
+      "method": "GET"
+    },
+    {
+      "path": "/account/profile",
+      "method": "GET"
+    },
+    {
+      "path": "/account/entries",
+      "method": "GET"
+    },
+    {
+      "path": "/account/profile",
+      "method": "GET"
+    },
+    {
+      "path": "/dashboard/5ws",
+      "method": "GET"
+    },
+    {
+      "path": "/account/profile",
+      "method": "GET"
+    },
+    {
+      "path": "/dashboard/5ws",
+      "method": "GET"
+    },
+    {
+      "path": "/account/profile",
+      "method": "GET"
+    },
+    {
+      "path": "/dashboard/5ws",
+      "method": "GET"
+    },
+    {
+      "path": "/account/profile",
+      "method": "GET"
+    },
+    {
+      "path": "/dashboard/5ws",
+      "method": "GET"
+    },
+    {
+      "path": "/admin/entries",
+      "method": "GET"
+    }
+  ]
+}

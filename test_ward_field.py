@@ -513,7 +513,7 @@ class LayerTwoTreatmentTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.index = (ROOT / "index.html").read_text(encoding="utf-8")
+        cls.index = (ROOT / "legacy-dashboard.html").read_text(encoding="utf-8")
         cls.model = (ROOT / "docs" / "DATA_MODEL.md").read_text(encoding="utf-8")
 
     def test_no_closed_field_list_rejects_an_unknown_field(self):

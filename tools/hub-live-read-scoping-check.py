@@ -36,7 +36,7 @@ HUB = Path(__file__).resolve().parent.parent
 # kind-scoped" is a claim about a listed set and not about whatever files happen
 # to be present.
 SURFACES = {
-    "index.html": {"declared": "Q_KINDS"},
+    "legacy-dashboard.html": {"declared": "Q_KINDS"},
     "forms.html": {"declared": "LIVE_KINDS"},
     "field-output-home.html": {"declared": "KINDS"},
 }
@@ -87,6 +87,11 @@ def _watched_kinds(txt: str, declared) -> set[str]:
 
 def check(broken: bool = False) -> int:
     failures = []
+    landing=(HUB/"index.html").read_text()
+    if "assets/fb.js" in landing or "assets/store.js" in landing:
+        failures.append("landing must not load legacy persistence/read bridge")
+    if "assets/staff-api.js" not in landing:
+        failures.append("landing must use bounded staff API")
     for name, spec in SURFACES.items():
         p = HUB / name
         if not p.exists():

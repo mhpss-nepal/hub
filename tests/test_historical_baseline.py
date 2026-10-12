@@ -5,7 +5,7 @@ R=Path(__file__).resolve().parents[1]
 BASE='47f66df13198345907ace5c314f2fbe6f9d1db58'
 class HistoricalContract(unittest.TestCase):
  def test_private_source_exists(self):
-  h=(R/'index.html').read_text();self.assertIn('id="historical-baseline"',h);self.assertIn('assets/historical-baseline.js',h)
+  h=(R/'legacy-dashboard.html').read_text();self.assertIn('id="historical-baseline"',h);self.assertIn('assets/historical-baseline.js',h)
   j=(R/'assets/historical-baseline.js').read_text()
   for x in ['localStorage','sessionStorage','indexedDB','fetch(','XMLHttpRequest','sendBeacon','FB.','S.']:self.assertNotIn(x,j)
   self.assertNotRegex(j,r'(?:backlog|activity)_[0-9a-f]{10,}')
@@ -15,7 +15,7 @@ class HistoricalContract(unittest.TestCase):
  def test_locked_runtime_and_palette(self):
   for f in ['assets/store.js','assets/fb.js','assets/fb-config.js','assets/codes.js','assets/i18n.js','assets/i18n-strings.js','assets/design.css']:
    self.assertEqual((R/f).read_bytes(),subprocess.check_output(['git','show',BASE+':'+f],cwd=R),f)
-  old=subprocess.check_output(['git','show',BASE+':index.html'],cwd=R).decode();new=(R/'index.html').read_text()
+  old=subprocess.check_output(['git','show',BASE+':index.html'],cwd=R).decode();new=(R/'legacy-dashboard.html').read_text()
   self.assertEqual(re.search(r'<style id="dashboard-category-palette">(.*?)</style>',new,re.S).group(1).replace(STYLE,''),re.search(r'<style id="dashboard-category-palette">(.*?)</style>',old,re.S).group(1))
   shell=(R/'assets/hub-shell.css').read_bytes(); original=subprocess.check_output(['git','show',BASE+':assets/hub-shell.css'],cwd=R)
   self.assertTrue(shell.startswith(original))

@@ -1,0 +1,31 @@
+PASS one valid joint row
+PASS CSV receipt and snapshot metadata
+PASS row refusal nullrev
+PASS row refusal boolrev
+PASS row refusal flat
+PASS row refusal test
+PASS row refusal extra
+PASS row refusal wrongorg
+PASS failed incomplete invalidates CSV
+PASS failed duplicate invalidates CSV
+PASS failed cursorShort invalidates CSV
+PASS failed count invalidates CSV
+PASS failed extra invalidates CSV
+PASS failed badrow invalidates CSV
+PASS reverse response cannot replace new snapshot
+PASS Auth change refuses in-flight
+PASS null principal zero requests
+PASS 403 leaves no cached success
+PASS fixed readTime drift refused
+PASS exact10 then terminal empty snapshot accepted
+PASS invalid filter range refused
+PASS exact200 refuses 201 and erases view/CSV
+PASS exact200 refuses 202 and erases view/CSV
+PASS exact200 refuses 204 and erases view/CSV
+PASS exact200 refuses 206 and erases view/CSV
+PASS exact200 refuses 299 and erases view/CSV
+PASS exact200 refuses 301 and erases view/CSV
+PASS exact200 refuses 401 and erases view/CSV
+PASS exact200 refuses 403 and erases view/CSV
+PASS exact200 refuses 500 and erases view/CSV
+{"completion":"ALL_CASES_COMPLETED","count":30,"scope":"deterministic transport only"}
