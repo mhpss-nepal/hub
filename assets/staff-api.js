@@ -1,6 +1,6 @@
 /* Additive staff contract: profile descriptions never grant authority. */
 (function(root){'use strict';
-const BASE='https://mhpss5ws-tdp3xtfnsq-as.a.run.app',SECTIONS=['5ws','contacts','referrals','phq9','gbv','baseline','sample'],FIELDS=['name','organisation','profession','subcluster','province','district','palika','base','service','requestedRole'],OPTIONAL=['otherOrganisation','otherSubcluster'];
+const BASE='https://mhpss5ws-tdp3xtfnsq-as.a.run.app',SECTIONS=['5ws','contacts','referrals','phq9','selfreport','training','providers','servicepoints','gbv','baseline','sample'],FIELDS=['name','organisation','profession','subcluster','province','district','palika','base','service','requestedRole'],OPTIONAL=['otherOrganisation','otherSubcluster'];
 const exact=(o,k)=>o&&typeof o==='object'&&!Array.isArray(o)&&Object.keys(o).sort().join(',')===k.slice().sort().join(',');
 const text=(v,n=220)=>typeof v==='string'&&v.length<=n&&!/[\u0000-\u001f\u007f]/.test(v);
 const stamp=v=>typeof v==='string'&&/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|\+00:00)$/.test(v)&&Number.isFinite(Date.parse(v));
