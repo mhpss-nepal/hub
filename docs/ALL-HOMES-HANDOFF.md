@@ -12,7 +12,7 @@ Apply with backend candidate `3fd05578f8588786410ca42c6a0275bb0ac2cfe9` and `51-
 
 `staff-account/1` top-level shape unchanged. Exact accepted ordered sections: `5ws, contacts, referrals, phq9, selfreport, training, providers, servicepoints, gbv, baseline, sample`. The strict decoder's only delta is those four canonical keys; it creates no grant. Server-validated administrator role opens all homes even during the older profile transition with omitted sections. No client email allowlist grants access. Ordinary role scopes and backend enforcement remain unchanged.
 
-Administrator processed training uses `/dashboard/training` across organisations; ordinary approved training readers retain `/training/current`; personal history remains `/training/entries`. Administrator raw view remains existing 5Ws `/admin/entries`, not an all-form raw reader. Unsupported clinical/Self-report/directory destinations say authorised but not connected, never zero or another approval request. Backup administrator baseline is a precise current-reader implementation limitation, not a new grant requirement; primary continues its existing direct reader. No clinical data is read or activation inferred.
+Administrator processed training uses `/training/current` across organisations; ordinary approved training readers retain `/training/current`; personal history remains `/training/entries`. Administrator raw view remains existing 5Ws `/admin/entries`, not an all-form raw reader. Unsupported clinical/Self-report/directory destinations say authorised but not connected, never zero or another approval request. Backup administrator baseline is a precise current-reader implementation limitation, not a new grant requirement; primary continues its existing direct reader. No clinical data is read or activation inferred.
 
 Frontend-first publication is required before the backend starts returning new keys. Parent alone owns publication, merging and deployment.
 
@@ -22,7 +22,7 @@ No edits to `assets/store.js`, `assets/codes.js`, `assets/i18n-strings.js`, 5Ws 
 
 ## Executed evidence
 
-- `uv run --with playwright python tests/all-homes-browser.py`: actual Chromium, 390 and 1280, eleven destinations, preserved six-card Home, EN→NE→EN switching, current route/Back, separately approved baseline/sample direct destinations, two-page training listing, actual CSV download and structured participant cells, filter selection, read refusal, account switch, sign-out, integrated/standalone history, old and expanded administrator profiles, admin `/dashboard/training` selection. Explicit synthetic Auth/HTTP fixtures ONLY, never provider proof. No outbound POSTs.
+- `uv run --with playwright python tests/all-homes-browser.py`: actual Chromium, 390 and 1280, eleven destinations, preserved six-card Home, EN→NE→EN switching, current route/Back, separately approved baseline/sample direct destinations, two-page training listing, actual CSV download and structured participant cells, filter selection, read refusal, account switch, sign-out, integrated/standalone history, old and expanded administrator profiles, admin `/training/current` selection. Explicit synthetic Auth/HTTP fixtures ONLY, never provider proof. No outbound POSTs.
 - `python tests/test_all_homes_scope.py`: 5 preservation/scope tests pass.
 - `node tests/landing-contract.cjs`, `node tests/landing-correction.cjs`, `node tests/training-journey.cjs`, `node tests/training-cr1.cjs`: pass.
 - Root capable discovery: 35 tests, pass, 1 missing external field-build skip.

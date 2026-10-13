@@ -41,7 +41,7 @@ def run():
     assert r.request.method=='GET','No reader writes permitted'
     if path=='/account/profile':d=dict(protocol='staff-account/1',status='active',role=state['role'],scope={'org':None,'cluster':None},sections=state['sections'],profile=None,reportingAccess=False)
     elif path=='/dashboard/5ws':d=dict(protocol='staff-dashboard/1',section='5ws',rows=[],complete=True,nextCursor=None,scope={'org':None,'cluster':None})
-    elif path in ['/training/current','/training/entries','/dashboard/training']:
+    elif path in ['/training/current','/training/entries']:
      if state['deny'] or r.request.headers.get('authorization','').endswith('fixture-B'):
       r.fulfill(status=403,content_type='application/json',body='{"error":"EXPLICIT SYNTHETIC refusal"}');return
      rows=copy.deepcopy(fixture)
@@ -105,7 +105,7 @@ def run():
    assert 'Not confirmed for this account' not in p.locator('#dashOther').inner_text()
    state['sections']=keys;p.locator('#refreshDashboard').click();p.wait_for_function("document.querySelector('#navScope').textContent.includes('admin')")
    choose('training');p.wait_for_function("document.querySelector('#houseTrainingReadStatus').textContent.includes('Complete')")
-   assert any(x['path']=='/dashboard/training' for x in state['requests'])
+   assert any(x['path']=='/training/current' for x in state['requests']);assert not any(x['path']=='/dashboard/training' for x in state['requests'])
    assert p.locator('#houseTrainingRows tbody tr').count()==2
    # Existing language switch: new explanatory copy is explicitly English fallback.
    p.locator('#i18nbar button').last.click();p.wait_for_function("I18N.lang()==='ne'")

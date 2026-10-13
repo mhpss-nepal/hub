@@ -18,7 +18,7 @@ class Scope(unittest.TestCase):
   self.assertEqual(staff.replace("SECTIONS=['5ws','contacts','referrals','phq9','selfreport','training','providers','servicepoints','gbv','baseline','sample']","SECTIONS=['5ws','contacts','referrals','phq9','gbv','baseline','sample']"),subprocess.check_output(['git','show',BASE+':assets/staff-api.js'],cwd=ROOT).decode())
  def test_training_transport_only_admin_reader_delta(self):
   text=(ROOT/'assets/training-api.js').read_text()
-  for old,new in [("async function pages(own,admin=false){","async function pages(own){"),("own?'/training/entries':admin?'/dashboard/training':'/training/current'","own?'/training/entries':'/training/current'"),("current:(admin=false)=>pages(false,admin===true)","current:()=>pages(false)")]:text=text.replace(old,new)
+  for old,new in [("async function pages(own,admin=false){","async function pages(own){"),("own?'/training/entries':'/training/current'","own?'/training/entries':'/training/current'"),("current:(admin=false)=>pages(false,admin===true)","current:()=>pages(false)")]:text=text.replace(old,new)
   self.assertEqual(text,subprocess.check_output(['git','show',BASE+':assets/training-api.js'],cwd=ROOT).decode())
  def test_no_deleted_clinical_input_routes(self):
   js=(ROOT/'assets/landing.js').read_text()
