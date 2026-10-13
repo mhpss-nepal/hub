@@ -1,0 +1,5 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert/strict');
+const s=fs.readFileSync('assets/landing.js','utf8');const fn=s.slice(s.indexOf('function show('),s.indexOf('\nfunction routeAccount'));
+for(const lang of ['en','ne']){let target;vm.runInNewContext(fn+";show('forms');",{URL,URLSearchParams,location:{href:'https://mhpss-nepal.github.io/hub/?view=forms&lang='+lang,search:'?view=forms&lang='+lang,replace(v){target=v;}},authState:{},I18N:{lang(){return 'en';}}});assert.equal(target,'https://mhpss-nepal.github.io/form/?lang='+lang);}
+for(const search of ['?view=forms&oobCode=synthetic-only','?view=forms&mode=signIn']){let escaped=false;try{vm.runInNewContext(fn+";show('forms');",{URL,URLSearchParams,location:{href:'https://mhpss-nepal.github.io/hub/'+search,search,replace(){escaped=true;}},authState:{},I18N:{lang(){return 'en';}},views:['login'],ALL_HOMES:{clear(){throw Error('kept-auth-route');}}});}catch(e){assert.equal(e.message,'kept-auth-route');}assert.equal(escaped,false);}
+console.log('PASS EN/NE canonical directory redirects and Auth-action preservation');
