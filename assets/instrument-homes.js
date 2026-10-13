@@ -1,5 +1,5 @@
-/* Navigation is not authority. Only TRAINING_API performs a sibling data read.
- * Clinical/directory houses remain data-free until their own approved receiver exists. */
+/* Navigation is not authority. Training and private directory adapters use distinct receivers.
+ * Clinical houses remain data-free; directory credentials/publication remain held. */
 (function(root){'use strict';
 const houses=[
  {key:'5ws',name:'5Ws Reports',ne:'5Ws प्रतिवेदन',section:'5ws',source:'5ws-report.html',unit:'Session attendances, not unique people',state:'Existing reporting scope'},
@@ -19,7 +19,7 @@ let active=null;
 function clear(){if(active){active.destroy();active=null;}}
 function label(h){return root.I18N?.lang()==='ne'?h.ne:h.name;}
 function nav(parent,account,key,choose){parent.replaceChildren();for(const h of houses){const b=el('button');b.type='button';b.dataset.house=h.key;b.className=h.key===key?'active':'';if(h.key===key)b.setAttribute('aria-current','page');const allowed=account?.role==='admin'||account?.sections.includes(h.section);b.append(el('span',label(h)),el('small',h.key==='training'?(account?.role==='admin'?'Administrator · all organisations':'Separate training access'):allowed?'Available · source status inside':h.state));b.onclick=()=>choose(h.key);parent.append(b);}}
-function mount(parent,key,account){clear();const h=houses.find(h=>h.key===key);parent.hidden=false;parent.replaceChildren();if(h.key==='training'){active=root.TrainingSurface.mount(parent,{own:false,admin:account?.role==='admin'});return;}
+function mount(parent,key,account){clear();const h=houses.find(h=>h.key===key);parent.hidden=false;parent.replaceChildren();if(h.key==='training'){active=root.TrainingSurface.mount(parent,{own:false,admin:account?.role==='admin'});return;}if(h.key==='providers'||h.key==='servicepoints'){active=root.DirectorySurface.mount(parent,{kind:h.key,own:account?.role!=='admin'});return;}
  const head=el('header',undefined,'house-heading');head.append(el('div','MHPSS NEPAL / '+(h.key==='providers'||h.key==='servicepoints'?'DIRECTORY':'REPORTING'),'house-eyebrow'),el('h1',label(h)),el('p',h.unit));const cta=el('button','Collection not activated','secondary');cta.disabled=true;cta.title='No parked or clinical form is activated from this home';head.append(cta);parent.append(head);
  const approved=account?.role==='admin'||!!account?.sections.includes(h.section),status=el('p',(account?.role==='admin'?'Authorised administrator · all module homes available. ':approved?'Existing section approved. ':'')+(account?.role==='admin'?(h.key==='selfreport'?'Not configured · receiving model unavailable':h.key==='phq9'?'Clinical activation held · aggregate reader unavailable':'Authorised / not connected'):h.state)+'. Results unavailable until a source is connected; not a measured zero.','house-status');status.setAttribute('role','status');parent.append(status);
  const stats=el('div',undefined,'house-stats');for(const [i,name] of (h.metrics||[]).entries()){const a=el('article',undefined,'house-stat tone-'+i);a.append(el('span',name,'k'),el('strong','—','v'),el('small','Awaiting an approved source','s'));stats.append(a);}parent.append(stats);
