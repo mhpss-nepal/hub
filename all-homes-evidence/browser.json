@@ -1,0 +1,55 @@
+{
+  "proof": "EXPLICIT SYNTHETIC Auth/API fixtures only; NOT production authority or data proof",
+  "results": [
+    {
+      "width": 390,
+      "homes": [
+        "5ws",
+        "contacts",
+        "referrals",
+        "phq9",
+        "selfreport",
+        "training",
+        "providers",
+        "servicepoints",
+        "gbv",
+        "baseline",
+        "sample"
+      ],
+      "real_browser": true,
+      "fixture_csv_rows": 2,
+      "participations": 6,
+      "denied_clear": true,
+      "account_switch_clear": true,
+      "home_six_cards": true,
+      "zero_overflow": true,
+      "module_targets_44px": true,
+      "page_errors": []
+    },
+    {
+      "width": 1280,
+      "homes": [
+        "5ws",
+        "contacts",
+        "referrals",
+        "phq9",
+        "selfreport",
+        "training",
+        "providers",
+        "servicepoints",
+        "gbv",
+        "baseline",
+        "sample"
+      ],
+      "real_browser": true,
+      "fixture_csv_rows": 2,
+      "participations": 6,
+      "denied_clear": true,
+      "account_switch_clear": true,
+      "home_six_cards": true,
+      "zero_overflow": true,
+      "module_targets_44px": true,
+      "page_errors": []
+    }
+  ]
+}

@@ -14,7 +14,7 @@
    ===================================================================== */
 
 const KEY = "mhpss-np-4ws-v1";
-const SCHEMA_VERSION = "5ws-np-0.7.0";  /* 0.2.0: four age bands · 0.3.0: donors list, partners, palika, iascSub, 16 Sep 2026 · 0.4.0: five age groups, settings, cadre list, "Other" text fields, funding source off the form — EDCD review 17 Sep 2026 · 0.5.0 (17 Sep 2026, afternoon): the instrument is the 5Ws; activity list v3 (layer.item codes, IASC terms in the backend only); one report per session with its attendance — countBasis no longer asked, always CONTACTS; sessionTime in the record id */
+const SCHEMA_VERSION = "5ws-np-0.8.0";  /* 0.2.0: four age bands · 0.3.0: donors list, partners, palika, iascSub, 16 Sep 2026 · 0.4.0: five age groups, settings, cadre list, "Other" text fields, funding source off the form — EDCD review 17 Sep 2026 · 0.8.0 (11 Oct 2026): age bands 0-4 / 5-9 / 10-17 / 18-59 / 60+ so under-18 is derivable, the 10-19 generation kept for reading; new-people-today required; lead-or-partner control on joint activities · 0.5.0 (17 Sep 2026, afternoon): the instrument is the 5Ws; activity list v3 (layer.item codes, IASC terms in the backend only); one report per session with its attendance — countBasis no longer asked, always CONTACTS; sessionTime in the record id */
 
 /* ---------------------------------------------------------------------
    Deterministic record id.
@@ -89,7 +89,7 @@ function save(rec) {
   const id = recordId(rec);
   const now = new Date().toISOString();
   const idx = list.findIndex((x) => x.id === id);
-  const out = { ...rec, id, schemaVersion: SCHEMA_VERSION };
+  const out = { ...rec, id, schemaVersion: rec.schemaVersion || (Array.isArray(rec.activities) ? "5ws-np-0.10.0" : SCHEMA_VERSION) };
 
   if (idx >= 0) {
     // Same report again: keep the original creation time, record the revision.
@@ -125,6 +125,8 @@ function save(rec) {
    adds the server timestamp and strips the focal point. Silent when no
    bridge is loaded, so the form still works as a local-only instrument. */
 function syncToRegister(rec) {
+  // Nested 0.10 grids require a separate approved authenticated receiver.
+  if (Array.isArray(rec.activities) || rec.schemaVersion === "5ws-np-0.10.0") return null;
   if (!window.FB || typeof window.FB.submit !== "function") return null;
   return window.FB.submit(registerBody(rec));
 }
@@ -178,14 +180,27 @@ function active() {
    still fold, at 18, through BANDS_V03. Any page that needs the fold calls
    fold(); nothing else knows the shapes.
    ------------------------------------------------------------------- */
+/* The bands the form collects (Adib, 11 Oct 2026): the third band stops at
+   17 and the fourth starts at 18, so the under-18 figure the NDRRMA 5W and the
+   IASC indicators ask for is derivable from what the form collects. The
+   10-19 / 20-59 generation could not give it: 10-19 straddles 18. */
 const BANDS = [
+  { key: "04",     lo: 0,  hi: 4,    label: "0\u20134",   f: "f04",     m: "m04",     o: "o04",     child: true  },
+  { key: "5to9",   lo: 5,  hi: 9,    label: "5\u20139",   f: "f5to9",   m: "m5to9",   o: "o5to9",   child: true  },
+  { key: "10to17", lo: 10, hi: 17,   label: "10\u201317", f: "f10to17", m: "m10to17", o: "o10to17", child: true  },
+  { key: "18to59", lo: 18, hi: 59,   label: "18\u201359", f: "f18to59", m: "m18to59", o: "o18to59", child: false },
+  { key: "60",     lo: 60, hi: null, label: "60+",   f: "f60",     m: "m60",     o: "o60",     child: false },
+];
+const FOLD_BOUNDARY = 18;   /* child: true means younger than this */
+/* Schema 0.7.0 and earlier (21 Sep - 11 Oct 2026): the set SORMAS asked for.
+   Kept so those records still read and fold at 20; never offered on the form. */
+const BANDS_V05 = [
   { key: "04",     lo: 0,  hi: 4,    label: "0\u20134",   f: "f04",     m: "m04",     o: "o04",     child: true  },
   { key: "5to9",   lo: 5,  hi: 9,    label: "5\u20139",   f: "f5to9",   m: "m5to9",   o: "o5to9",   child: true  },
   { key: "10to19", lo: 10, hi: 19,   label: "10\u201319", f: "f10to19", m: "m10to19", o: "o10to19", child: false },
   { key: "20to59", lo: 20, hi: 59,   label: "20\u201359", f: "f20to59", m: "m20to59", o: "o20to59", child: false },
   { key: "60",     lo: 60, hi: null, label: "60+",   f: "f60",     m: "m60",     o: "o60",     child: false },
 ];
-const FOLD_BOUNDARY = 20;   /* child: true means younger than this */
 
 const BANDS_V04 = [
   { key: "04",   lo: 0,  hi: 4,    label: "0–4",   f: "f04",   m: "m04",   o: "o04",   child: true  },
@@ -195,6 +210,7 @@ const BANDS_V04 = [
   { key: "60",   lo: 60, hi: null, label: "60+",   f: "f60",   m: "m60",   o: "o60",   child: false },
 ];
 const PART_IDS = BANDS.reduce((a, b) => a.concat([b.f, b.m, b.o]), []);
+const PART_IDS_V05 = BANDS_V05.reduce((a, b) => a.concat([b.f, b.m, b.o]), []);
 
 /* Schema 0.3.0 (16–17 Sep 2026): kept so those records still read and
    fold; never offered on the form. */
@@ -224,7 +240,7 @@ const PART_IDS_V03 = BANDS_V03.reduce((a, b) => a.concat([b.f, b.m, b.o]), []);
    persons with disabilities. Two distinct things, deliberately not merged:
 
    `disAsked` is the ONE question each agency was asked to add -- the person
-   says whether they identify as a person with disability. Optional, and
+   says whether they identify as a person with a disability. Optional, and
    blank is kept distinct from "No": a worker who judges that asking is
    unsafe or inappropriate leaves it blank, and the data then says "not
    asked" rather than inventing a refusal or a denial.
@@ -243,10 +259,10 @@ const PART_IDS_V03 = BANDS_V03.reduce((a, b) => a.concat([b.f, b.m, b.o]), []);
 const DISABILITY = ["disF0_17", "disM0_17", "disF18", "disM18"];
 const DISABILITY_ASKED = "disAsked";
 const DISABILITY_LABEL = {
-  disF0_17: "Female, under 18, person with disability",
-  disM0_17: "Male, under 18, person with disability",
-  disF18:   "Female, 18 and over, person with disability",
-  disM18:   "Male, 18 and over, person with disability",
+  disF0_17: "Female, under 18, with a disability",
+  disM0_17: "Male, under 18, with a disability",
+  disF18:   "Female, 18 and over, with a disability",
+  disM18:   "Male, 18 and over, with a disability",
 };
 
 /* The four counts, or null when none was entered -- null matters, because a
@@ -272,14 +288,21 @@ const OF_WHOM_LABEL = {
    from the schema version when neither is filled. */
 function ageShape(r) {
   const has = (k) => num(r[k]) !== null;
-  const v05only = ["f5to9", "m5to9", "o5to9", "f10to19", "m10to19", "o10to19",
-                   "f20to59", "m20to59", "o20to59"];
+  const v06only = ["f10to17", "m10to17", "o10to17", "f18to59", "m18to59", "o18to59"];
+  const v05only = ["f10to19", "m10to19", "o10to19", "f20to59", "m20to59", "o20to59"];
   const v04only = ["f514", "m514", "o514", "f1549", "m1549", "o1549", "f5059", "m5059", "o5059"];
   const v03only = ["f517", "m517", "o517", "f1859", "m1859", "o1859"];
+  if (v06only.some(has)) return "v06";
   if (v05only.some(has)) return "v05";
   if (v04only.some(has)) return "v04";
   if (v03only.some(has)) return "v03";
-  if (PART_IDS.some(has)) return /-0\.([4-9]|\d\d)\./.test(r.schemaVersion || "") || !(r.schemaVersion) ? "v05" : "v03";
+  if (PART_IDS.some(has)) {
+    const match = /^5ws-np-0\.(\d+)\./.exec(r.schemaVersion || "");
+    const minor = match ? Number(match[1]) : null;
+    if (minor === 6 || minor === 7) return "v05";
+    if (minor === 4 || minor === 5) return "v04";
+    return minor === null || minor >= 8 ? "v06" : "v03";
+  }
   return "pair";
 }
 
@@ -289,6 +312,7 @@ function ageShape(r) {
    for pages written against 0.3.0 and mean "below the boundary", not
    "under 18", whenever boundary is 15. */
 function fold(r) {
+  if (Array.isArray(r.activities)) return gridFold(r);
   const shape = ageShape(r);
   if (shape === "pair") {
     const d = {
@@ -298,14 +322,14 @@ function fold(r) {
     };
     return withAliases(d);
   }
-  const bands = shape === "v05" ? BANDS : shape === "v04" ? BANDS_V04 : BANDS_V03;
+  const bands = shape === "v06" ? BANDS : shape === "v05" ? BANDS_V05 : shape === "v04" ? BANDS_V04 : BANDS_V03;
   const g = (k) => num(r[k]) || 0;
   const kids = bands.filter((b) => b.child), adults = bands.filter((b) => !b.child);
   const s = (set, sex) => set.reduce((a, b) => a + g(b[sex]), 0);
   const d = {
     fLow: s(kids, "f"),    mLow: s(kids, "m"),    oLow: s(kids, "o"),
     fHigh: s(adults, "f"), mHigh: s(adults, "m"), oHigh: s(adults, "o"),
-    boundary: shape === "v05" ? FOLD_BOUNDARY : 18, banded: true, shape,
+    boundary: shape === "v06" ? FOLD_BOUNDARY : shape === "v05" ? 20 : 18, banded: true, shape,
   };
   return withAliases(d);
 }
@@ -317,6 +341,7 @@ function withAliases(d) {
 
 /* Total disaggregated people in a record, either shape. */
 function disaggTotal(r) {
+  if (Array.isArray(r.activities)) return gridSum(r);
   const d = fold(r);
   return d.fU18 + d.mU18 + d.oU18 + d.f18 + d.m18 + d.o18;
 }
@@ -328,9 +353,62 @@ function disaggTotal(r) {
    form has nowhere to put them. Here they have somewhere, and the parts
    are checked against the total rather than trusted.
    ------------------------------------------------------------------- */
+const ROW_SEX = ["female", "male", "sexNotRecorded"];
+const ROW_AGE = BANDS.map((b) => b.key);
+function hasJoint(a) { return Object.prototype.hasOwnProperty.call(a, "cells"); }
+function cellCount(v) {
+  if (v === "" || v === null || v === undefined) return null;
+  if (typeof v !== "number" && typeof v !== "string") return null;
+  if (typeof v === "string" && !/^\d+$/.test(v)) return null;
+  const n = Number(v);
+  return Number.isSafeInteger(n) && n >= 0 ? n : null;
+}
+function jointCell(a, band, sex) { return cellCount((a.cells || {})[band + "_" + sex]); }
+function rowSex(a) {
+  return hasJoint(a) ? BANDS.reduce((t, b) => t + ["f", "m", "o"].reduce((s, k) => s + (jointCell(a, b.key, k) || 0), 0), 0)
+    : ROW_SEX.reduce((t, k) => t + (num(a[k]) || 0), 0);
+}
+function rowAge(a) { return ROW_AGE.reduce((t, k) => t + (num(a[k]) || 0), 0); }
+function rowFilled(a) { return hasJoint(a) || ROW_SEX.concat(ROW_AGE).some((k) => num(a[k]) !== null); }
+function jointProblems(a) {
+  if (!hasJoint(a)) return [];
+  const p = [], cells = a.cells;
+  if (!cells || typeof cells !== "object" || Array.isArray(cells)) return ["Joint cells must be an object"];
+  const allowed = BANDS.flatMap((b) => ["f", "m", "o"].map((s) => b.key + "_" + s));
+  Object.entries(cells).forEach(([k, v]) => {
+    if (!allowed.includes(k)) p.push("Unknown joint cell: " + k);
+    else if (v !== "" && v !== null && v !== undefined && cellCount(v) === null) p.push("Joint cell must be a non-negative integer: " + k);
+  });
+  const agrees = (key, sum) => {
+    if (a[key] !== "" && a[key] !== null && a[key] !== undefined && cellCount(a[key]) !== sum) p.push("Joint cells do not agree with margin: " + key);
+  };
+  BANDS.forEach((b) => agrees(b.key, ["f", "m", "o"].reduce((t, s) => t + (jointCell(a, b.key, s) || 0), 0)));
+  ROW_SEX.forEach((k, i) => agrees(k, BANDS.reduce((t, b) => t + (jointCell(a, b.key, ["f", "m", "o"][i]) || 0), 0)));
+  return p;
+}
+function gridRows(r) { return Array.isArray(r.activities) ? r.activities : []; }
+function gridLargest(r) { return gridRows(r).reduce((m, a) => Math.max(m, rowSex(a), rowAge(a)), 0); }
+function gridSum(r) { return gridRows(r).reduce((t, a) => t + rowSex(a), 0); }
+/* The age fold of a grid report. It folds ATTENDANCES, not people: a person
+   in three activities is three entries. Labelled as such wherever it shows. */
+function gridFold(r) {
+  const d = { fLow: 0, mLow: 0, oLow: 0, fHigh: 0, mHigh: 0, oHigh: 0, boundary: FOLD_BOUNDARY, banded: true, shape: "grid" };
+  gridRows(r).forEach((a) => {
+    BANDS.forEach((b) => {
+      const side = b.child ? "Low" : "High";
+      if (hasJoint(a)) ["f", "m", "o"].forEach((s) => { d[s + side] += jointCell(a, b.key, s) || 0; });
+      else d["o" + side] += num(a[b.key]) || 0;
+    });
+  });
+  /* Margins alone cannot establish a joint sex/age distribution. */
+  return withAliases(d);
+}
+
+
 function validate(r) {
   const p = [];
-  const need = { org: "Reporting organisation", site: "Site", dateAD: "Date", activity: "Activity", modality: "Modality", focalName: "Focal point name", focalPhone: "Focal point phone" };
+  if (!Array.isArray(r.activities) && !r.activity) p.push("Activity is required");
+  const need = { org: "Reporting organisation", site: "Site", dateAD: "Date", modality: "Modality", focalName: "Focal point name", focalPhone: "Focal point phone" };
   for (const [k, label] of Object.entries(need)) if (!r[k]) p.push(`${label} is required`);
   if (r.org === "OTHER" && !r.orgOther) p.push("Name the organisation");
   if (r.site === "OTHER" && !r.siteOther) p.push("Name the site");
@@ -346,7 +424,7 @@ function validate(r) {
      layer or 9 outside every layer; each needs the description. A code the
      current list does not offer -- a retired one, or a typo -- is refused
      at entry; retired codes exist only so old records resolve. */
-  if (r.activity) {
+  if (r.activity && !Array.isArray(r.activities)) {
     const a = (window.CODES && window.CODES.activityByCode) ? window.CODES.activityByCode[r.activity] : null;
     if (!a || a.retired) p.push("Choose an activity from the current list");
     else if (a.other && !(r.activityOther || "").trim()) p.push("Describe the activity");
@@ -368,8 +446,25 @@ function validate(r) {
   if (r.dateAD && r.dateAD > todayLocal()) p.push("Date is in the future");
   if (!(r.targetGroups || []).length) p.push("Select at least one target group");
 
+  /* Who reports the figures. On a joint activity only the lead fills counts
+     (Adib, 27 Sep 2026): a partner report names the lead and carries no
+     numbers, so one session cannot be counted twice. */
+  if (!r.reportingRole) p.push("Say whether you led this activity or took part");
+  else if (!["LEAD", "PARTNER"].includes(r.reportingRole)) p.push("Say whether you led this activity or took part");
+  const partnerReport = r.reportingRole === "PARTNER";
   const t = num(r.reachedTotal);
-  if (t === null) p.push("Attendance is required (enter 0 if nobody came)");
+  if (partnerReport) {
+    if (!(r.partners || []).length) p.push("Name the organisation that led this activity");
+    const typed = [["reachedTotal", t], ["New people today", num(r.newToday)]]
+      .filter(([, v]) => v !== null).length + gridRows(r).filter(rowFilled).length + PART_IDS.filter((k) => num(r[k]) !== null).length
+      + OF_WHOM.filter((k) => num(r[k]) !== null).length + DISABILITY.filter((k) => num(r[k]) !== null).length;
+    if (typed) p.push("A partner report carries no counts: the lead organisation reports the figures");
+  } else {
+    if (t === null) p.push("Attendance is required (enter 0 if nobody came)");
+    const nt = num(r.newToday);
+    if (nt === null) p.push("New people today is required (enter 0 if nobody was new)");
+    else if (t !== null && nt > t) p.push(`New people today (${nt}) is more than the total of ${t}`);
+  }
   /* Since 17 Sep 2026 (afternoon) the form does not ask what the figure
      counts: a report is one session, and its figure is the attendance --
      everyone who took part, once for that session. Across sessions that is
@@ -381,9 +476,22 @@ function validate(r) {
   const dp = num(r.distinctPeople);
   if (dp !== null && r.countBasis !== "CONTACTS") p.push("Distinct people applies only when the total is a contact count");
   if (dp !== null && t !== null && dp > t) p.push(`Distinct people (${dp}) cannot exceed the attendance of ${t}`);
+  if (Array.isArray(r.activities)) {
+    const rows = gridRows(r).filter(rowFilled);
+    if (!partnerReport && !rows.length) p.push("Enter at least one activity with the people who took part");
+    rows.forEach((a) => {
+      p.push(...jointProblems(a));
+      if (rowSex(a) !== rowAge(a)) p.push("Sex and age do not agree on activity row");
+      const def = window.CODES && window.CODES.activityByCode && window.CODES.activityByCode[a.code];
+      if (def && def.other && !(a.describe || "").trim()) p.push("Describe the activity");
+      if (a.describe && /\d{7,}|@/.test(a.describe)) p.push("Activity descriptions must not contain phone numbers or emails");
+    });
+    if (!partnerReport && t !== null && rows.length && (t < gridLargest(r) || t > gridSum(r))) p.push("Day attendance must be between largest row and sum of activities");
+  } else {
   const sum = disaggTotal(r);
   if (t !== null && sum > t) p.push(`Disaggregated figures add to ${sum}, more than the total of ${t}`);
   if (t !== null && sum > 0 && sum < t) p.push(`Disaggregated figures add to ${sum} of ${t} — ${t - sum} unaccounted. Leave all blank, or account for all.`);
+  }
   /* The "of whom" counts sit INSIDE the total, so each one can be at most
      the total -- but they are not added to it and not added to each other,
      because one person can be in both. */
@@ -418,14 +526,19 @@ const CSV_COLUMNS = [
   /* the two readings of one activity code (list v3, 17 Sep 2026): the code
      and the plain label the form showed, then the backend reading -- IASC
      layer and 4Ws subcode -- computed at export from codes.js, never typed */
-  "activity", "activityLabel", "activityLayer", "iascSub", "iascReading", "activityOther", "modality", "modalityOther", "status", "targetGroups", "targetGroupOther", "districtOther", "description",
+  "activity", "activityLabel", "activityLayer", "iascSub", "iascReading", "activityOther", "reportAttendance", "modality", "modalityOther", "status", "targetGroups", "targetGroupOther", "districtOther", "description",
   "reachedTotal", "countBasis", "distinctPeople",
+  /* 0.8.0: people taking part for the first time, and who reports the figures
+     on a joint activity -- only the lead fills counts, so one session is never
+     counted twice. */
+  "newToday", "reportingRole", "countsHeldByLead",
   /* the five groups as collected (0.4.0) and the four bands of 0.3.0, so a
      record of either vintage exports in full */
   /* 0.6.0: the Ministry's groups. The 0.4.0 middle ids stay listed so a
      record filed under them still exports in full. */
-  "f04", "m04", "o04", "f5to9", "m5to9", "o5to9", "f10to19", "m10to19", "o10to19",
-  "f20to59", "m20to59", "o20to59", "f60", "m60", "o60",
+  "f04", "m04", "o04", "f5to9", "m5to9", "o5to9",
+  "f10to17", "m10to17", "o10to17", "f18to59", "m18to59", "o18to59",
+  "f10to19", "m10to19", "o10to19", "f20to59", "m20to59", "o20to59", "f60", "m60", "o60",
   "f514", "m514", "o514", "f1549", "m1549", "o1549", "f5059", "m5059", "o5059",
   "f517", "m517", "o517", "f1859", "m1859", "o1859",
   /* folded to two at export, never stored; foldBoundary says whether the
@@ -459,6 +572,30 @@ function activityReadings(r) {
   };
 }
 
+function explodeGrid(rows) {
+  const out = [];
+  rows.forEach((r) => {
+    if (!Array.isArray(r.activities) || !r.activities.length) { out.push(r); return; }
+    r.activities.forEach((a) => {
+      const line = { ...r };
+      delete line.activities;
+      line.reportAttendance = r.reachedTotal;
+      line.activity = a.code;
+      line.iascSub = a.iascSub || "";
+      line.activityOther = a.describe || "";
+      ROW_SEX.forEach((k, i) => { line[["f", "m", "o"][i] + "Row"] = a[k]; });
+      BANDS.forEach((b) => {
+        ["f", "m", "o"].forEach((s) => {
+          line[b[s]] = hasJoint(a) ? ((a.cells || {})[b.key + "_" + s] ?? "") : (s === "o" ? a[b.key] : "");
+        });
+      });
+      line.reachedTotal = rowSex(a);
+      out.push(line);
+    });
+  });
+  return out;
+}
+
 function toCSV(rows) {
   const esc = (v) => {
     const s = Array.isArray(v) ? v.join(";") : v === null || v === undefined ? "" : String(v);
@@ -467,7 +604,7 @@ function toCSV(rows) {
   const head = CSV_COLUMNS.join(",");
   /* The folded columns are computed at export, not stored on the record:
      one figure in two places is one figure that can disagree with itself. */
-  const body = rows.map((r) => {
+  const body = explodeGrid(rows).map((r) => {
     const d = fold(r);
     const row = { ...r, ...d, foldBoundary: d.boundary, donors: donorsOf(r), ...activityReadings(r) };
     return CSV_COLUMNS.map((c) => esc(row[c])).join(",");
@@ -511,7 +648,7 @@ function donorsOf(r) {
 
 /* Global for the same reason as codes.js — see the note there. */
 window.STORE = {
-  SCHEMA_VERSION, CSV_COLUMNS, BANDS, BANDS_V04, BANDS_V03, PART_IDS, PART_IDS_V03, FOLD_BOUNDARY, OF_WHOM, OF_WHOM_LABEL, DISABILITY, DISABILITY_ASKED, DISABILITY_LABEL, disabilityTotal, fold, ageShape, disaggTotal, donorsOf, todayLocal, registerBody, activityReadings,
+  SCHEMA_VERSION, CSV_COLUMNS, BANDS, BANDS_V05, BANDS_V04, BANDS_V03, PART_IDS, PART_IDS_V05, PART_IDS_V03, FOLD_BOUNDARY, OF_WHOM, OF_WHOM_LABEL, DISABILITY, DISABILITY_ASKED, DISABILITY_LABEL, disabilityTotal, fold, ageShape, disaggTotal, donorsOf, todayLocal, registerBody, activityReadings,
   recordId, all, active, save, archive,
   validate, toCSV, download, stamp, clearAll
 };
