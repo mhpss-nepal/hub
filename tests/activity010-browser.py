@@ -58,8 +58,7 @@ def main():
    mode['value']='lost';page.locator('button[type=submit][form=f]').click();page.wait_for_function("document.getElementById('activityStatus').textContent.includes('retained; no receipt assumed')")
    assert len(records)==1;first=requests[0];assert page.evaluate('ActivityForm.api.outbox()[0].receipt') is None
    page.locator('#activityRetry').click();page.wait_for_function("document.getElementById('activityStatus').textContent.includes('Verified server received')");assert requests[1]==first
-   page.locator('#activityHistory').click();page.wait_for_function("document.getElementById('activityReceived').textContent.includes('Correct received report')")
-   page.locator('#activityReceived button').click();page.wait_for_function("document.getElementById('activityStatus').textContent.includes('Verified predecessor reopened')")
+   # Correction follows verified Retry ACK directly; no forced history reopen.
    page.locator('#newToday').fill('5');page.locator('#activityStatus').click();page.locator('button[type=submit][form=f]').click();page.wait_for_function("document.getElementById('activityStatus').textContent.includes('revision 2')");assert list(records.values())[0]['revision']==2;assert json.loads(requests[-1])['predecessor']['revision']==1;assert json.loads(requests[-1])['predecessor']['request_sha256']==hashlib.sha256(json.dumps(json.loads(first)['payload'],sort_keys=True,ensure_ascii=False,separators=(',',':')).encode()).hexdigest()
    page.goto(base+'/hub/?view=entries');page.wait_for_function("document.getElementById('activityRows') && document.getElementById('activityRows').textContent.includes('Verified server received')")
    assert 'r2' in page.locator('#activityRows').inner_text()

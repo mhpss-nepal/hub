@@ -7,10 +7,15 @@ def main():
  v=json.load(sys.stdin);origin=v['origin'];token=v['reporter'];errors=[]
  with sync_playwright() as p:
   browser=p.chromium.launch(headless=True);ctx=browser.new_context(service_workers='block',accept_downloads=True);page=ctx.new_page();page.on('pageerror',lambda e:errors.append(str(e)))
+  lost=True;sent=[]
   def route(r):
-   nonlocal token
+   nonlocal token,lost
    path=r.request.url.split(origin)[-1].split('?')[0]
    if not r.request.url.startswith(origin):r.abort();return
+   if path=='/activity/intake':
+    sent.append(r.request.post_data)
+    if lost:
+     lost=False;response=r.fetch();assert response.status==200;r.abort();return
    if path.startswith('/activity/') or path in ['/profile']:r.continue_();return
    if path.startswith('/form/'):f=FORM/path[6:]
    elif path.startswith('/hub/'):f=ROOT/path[5:]
@@ -26,11 +31,11 @@ def main():
    r.fulfill(status=200,content_type=mime,body=source if source is not None else f.read_bytes())
   ctx.route('**/*',route)
   page.goto(origin+'/form/5ws-report.html?lang=en');page.wait_for_function('window.ActivityForm && window.ActivityCollector')
-  payload=v['envelope']['payload'];page.evaluate('(p)=>ActivityCollector.restore(p)',payload);page.locator('button[type=submit][form=f]').click();page.wait_for_function("document.getElementById('activityStatus').textContent.includes('Verified server received')",timeout=10000)
+  payload=v['envelope']['payload'];page.evaluate('(p)=>ActivityCollector.restore(p)',payload);page.locator('button[type=submit][form=f]').click();page.wait_for_function("!ActivityForm.busy() && ActivityForm.api.outbox().length===1",timeout=10000)
+  assert page.evaluate('ActivityForm.api.outbox()[0].receipt') is None
+  page.locator('#activityRetry').click();page.wait_for_function("!ActivityForm.busy() && ActivityForm.api.outbox()[0].receipt",timeout=10000);assert sent[0]==sent[1]
   report=page.evaluate('ActivityForm.api.outbox()[0]');rid=report['body']['reportId'];assert report['receipt']['request_sha256']==report['hash']
-  page.locator('#activityHistory').click();page.wait_for_function("document.getElementById('activityReceived').textContent.includes('Complete') || document.getElementById('activityStatus').textContent.includes('Complete own')")
-  page.get_by_text(rid,exact=False).filter(has=page.get_by_role('button',name='Correct received report')).get_by_role('button').click()
-  page.wait_for_function("document.getElementById('activityStatus').textContent.includes('Verified predecessor reopened')")
+  # Verified ACK immediately binds the next native correction; no history reopen.
   page.locator('#newToday').fill('5');page.locator('#activityStatus').click();page.locator('button[type=submit][form=f]').click();page.wait_for_function("document.getElementById('activityStatus').textContent.includes('revision 2')")
   page.goto(origin+'/hub/?view=entries');page.wait_for_function("document.getElementById('activityReadStatus') && document.getElementById('activityReadStatus').textContent.includes('Complete authorised')")
   assert rid in page.locator('#activityRows').inner_text()
