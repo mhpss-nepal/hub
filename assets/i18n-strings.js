@@ -139,6 +139,25 @@ window.I18N_STRINGS = {
          human   = written or checked by a person
        A key absent from both is simply not translated yet. */
     source: { machine: [
+      /* ==== BEGIN send-card ==== */
+      "send.title",
+      "send.lead",
+      "send.email",
+      "send.password",
+      "send.signin",
+      "send.now",
+      "send.signout",
+      "send.signedAs",
+      "send.waiting",
+      "send.noGrant",
+      "send.otherOrg",
+      "send.none",
+      "send.sending",
+      "send.failed",
+      "send.done",
+      "send.signingIn",
+      "send.signinFailed",
+      /* ==== END send-card ==== */
       /* ==== BEGIN dir-form ==== */
       "dirf.002",
       "dirf.003",
@@ -1542,6 +1561,25 @@ window.I18N_STRINGS = {
   },
 
   en: {
+    /* ==== BEGIN send-card ==== */
+    "send.title": "Send to the server",
+    "send.lead": "Records are saved on this phone first. Sign in with your field account to send them; a record counts as sent only when the server confirms it.",
+    "send.email": "Email",
+    "send.password": "Password",
+    "send.signin": "Sign in",
+    "send.now": "Send saved records",
+    "send.signout": "Sign out",
+    "send.signedAs": "Signed in as",
+    "send.waiting": "records not sent yet:",
+    "send.noGrant": "This account has no reporting access for an organisation yet. Ask the coordination team.",
+    "send.otherOrg": "This record belongs to another organisation than your account:",
+    "send.none": "Nothing waiting: every saved record has been sent.",
+    "send.sending": "Sending…",
+    "send.failed": "Not sent — the record stays on this phone. Reason:",
+    "send.done": "Sent and confirmed by the server:",
+    "send.signingIn": "Signing in…",
+    "send.signinFailed": "Sign-in failed. Check the email and password.",
+    /* ==== END send-card ==== */
     /* ==== BEGIN dir-form ==== */
     "dirf.002": "Layer 1 · Field form · MHPSS Nepal",
     "dirf.003": "Referral Directory — Service Mapping",
@@ -1788,7 +1826,7 @@ window.I18N_STRINGS = {
     "dirf.msg.saved": "Saved on this device:",
     "dirf.msg.updated": "Updated on this device:",
     "dirf.msg.count": "Entries saved here:",
-    "dirf.msg.export": "Until the form is connected, use Export saved (CSV) to pass entries to coordination.",
+    "dirf.msg.export": "Signed in, the record is sent to the server; Export saved (CSV) keeps a copy for your organisation.",
     "dirf.msg.nothing": "Nothing saved yet.",
     /* ==== END dir-form ==== */
     /* ==== BEGIN grief-form ==== */
@@ -3101,6 +3139,25 @@ window.I18N_STRINGS = {
      general translation engine cannot do that, and would invent its own
      vocabulary that then fails to match the national one. */
   ne: {
+    /* ==== BEGIN send-card ==== */
+    "send.title": "सर्भरमा पठाउनुहोस्",
+    "send.lead": "रेकर्डहरू पहिले यही फोनमा सुरक्षित हुन्छन्। पठाउन आफ्नो फिल्ड खाताबाट साइन इन गर्नुहोस्; सर्भरले पुष्टि गरेपछि मात्र रेकर्ड पठाइएको मानिन्छ।",
+    "send.email": "इमेल",
+    "send.password": "पासवर्ड",
+    "send.signin": "साइन इन",
+    "send.now": "सुरक्षित रेकर्डहरू पठाउनुहोस्",
+    "send.signout": "साइन आउट",
+    "send.signedAs": "साइन इन गरिएको खाता:",
+    "send.waiting": "अझै नपठाइएका रेकर्ड:",
+    "send.noGrant": "यो खातालाई अझै कुनै संस्थाका लागि रिपोर्ट गर्ने अनुमति छैन। समन्वय टोलीलाई सोध्नुहोस्।",
+    "send.otherOrg": "यो रेकर्ड तपाईंको खाताभन्दा अर्को संस्थाको हो:",
+    "send.none": "पठाउन बाँकी केही छैन: सुरक्षित सबै रेकर्ड पठाइसकिएको छ।",
+    "send.sending": "पठाउँदै…",
+    "send.failed": "पठाइएन — रेकर्ड यही फोनमा रहन्छ। कारण:",
+    "send.done": "पठाइयो र सर्भरले पुष्टि गर्‍यो:",
+    "send.signingIn": "साइन इन हुँदै…",
+    "send.signinFailed": "साइन इन हुन सकेन। इमेल र पासवर्ड जाँच गर्नुहोस्।",
+    /* ==== END send-card ==== */
     /* ==== BEGIN dir-form ==== */
     "dirf.002": "तह १ · फिल्ड फारम · MHPSS नेपाल",
     "dirf.003": "प्रेषण निर्देशिका — सेवा नक्साङ्कन",
@@ -3342,7 +3399,7 @@ window.I18N_STRINGS = {
     "dirf.msg.saved": "यही उपकरणमा सुरक्षित भयो:",
     "dirf.msg.updated": "यही उपकरणमा अद्यावधिक भयो:",
     "dirf.msg.count": "यहाँ सुरक्षित प्रविष्टिहरू:",
-    "dirf.msg.export": "फारम जोडिएसम्म, प्रविष्टिहरू समन्वयमा पठाउन सुरक्षित गरिएका निर्यात गर्नुहोस् (CSV) प्रयोग गर्नुहोस्।",
+    "dirf.msg.export": "साइन इन भएमा रेकर्ड सर्भरमा पठाइन्छ; सुरक्षित गरिएका निर्यात गर्नुहोस् (CSV) ले तपाईंको संस्थाका लागि एउटा प्रति राख्छ।",
     "dirf.msg.nothing": "अहिलेसम्म केही सुरक्षित गरिएको छैन।",
     /* ==== END dir-form ==== */
     /* ==== BEGIN grief-form ==== */
