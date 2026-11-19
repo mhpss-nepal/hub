@@ -244,4 +244,28 @@ const README=["Referral Directory MHPSS Nepal - first compilation, "+SEED.compil
 $("#csv").onclick=()=>{const l=dbRows();const q=v=>`"${String(v).replace(/"/g,'""')}"`;const rows=[["id","organisation","funding_partners","district","palika","palika_code","services","cadres","latest_bs_date","sources","status"]].concat(l.map(p=>[p.id,p.org,p.funders,p.district,p.palika,p.code,p.services,p.cadres,p.last,p.sources,"unconfirmed"]));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([rows.map(r=>r.map(q).join(",")).join("\n")],{type:"text/csv"}));a.download="referral-directory-unconfirmed-"+SEED.compiled+".csv";a.click()};
 dbOpts();summary();database();
 </script>
+<script src="assets/fb-config.js"></script>
+<script src="review-current-v51/fb-config.js"></script>
+<script>window.STAFF_AUTH_RETURN=location.origin+location.pathname.replace(/[^/]*$/,"team.html");</script>
+<script src="review-current-v51/current-auth.js"></script>
+<script src="assets/access-api.js"></script>
+<script>
+/* Live entries (19 Nov 2026): a signed-in card holder sees the service points sent with the Referral
+   Directory form next to the first compilation. Organisation-level fields only; no contact details. */
+(function(){if(!window.BaselineAuth||!window.AccessAPI)return;var busy=false,C=window.CODES||{};
+var NAMES={"1":"Early childhood development","2":"Group activities for children","3":"Group activities for adults","4":"Safe spaces for women and girls with MHPSS activities","5":"Psychosocial support integrated in education","6":"Mental health integrated with general health care","7":"Psychological interventions","8":"Specialised mental health care outside psychiatric hospitals","9":"Psychiatric hospitals and other institutions","10":"Other MHPSS activity","CM-GBV":"GBV case management","CM-CP":"Child protection case management","LEGAL":"Legal services","SAFEHOUSE":"Safe house / shelter","CHILDSHELTER":"Safe house / shelter","CMR":"Clinical management of rape / OCMC","LJC":"Local Judicial Committee","POLICE":"Police / women and children service centre","HOTLINE":"Hotline / helpline","REHAB":"Rehabilitation centre","TRACING":"Family tracing"};
+[[0,["1","2","3","4","5"]],[1,["7"]],[2,["6","8","9"]],[4,["CMR"]]].forEach(function(x){x[1].forEach(function(c){if(GROUPS[x[0]][2].indexOf(NAMES[c])<0)GROUPS[x[0]][2].push(NAMES[c])})});
+BaselineAuth.onChange(async function(u){if(!u||busy)return;busy=true;
+ try{var me=await AccessAPI.me();if(!me.role||me.forms.indexOf("directory")<0){busy=false;return}
+  var rows=await AccessAPI.dirAll(),waiting=0;
+  rows.forEach(function(r){var p=r.payload,o=(C.orgByCode||{})[p.org],d=((C.DISTRICTS||[]).find(function(x){return x.code===p.district})||{}).name||p.district;
+   var svc=(p.services||[]).concat(p.crossServices||[]).map(function(c){return NAMES[c]||c});if(r.review!=="accepted")waiting++;
+   P.push({id:r.reportId,org:p.org==="OTHER"?(p.orgOther||"Other"):(o?o.name:p.org),funders:p.funder||"",district:d,palika:C.palikaName?C.palikaName(p.palika):p.palika,code:p.palika,services:svc.join(", "),svc:svc,key:p.palika,
+    cadres:(p.cadres||[]).join(", "),places:p.placeName,last:p.savedOn,sources:"Referral Directory form · "+(r.review==="accepted"?"checked":r.review==="returned"?"returned for correction":"waiting for review")})});
+  var sub=document.querySelector("header .sub");if(sub)sub.textContent+=" · plus "+rows.length+" service point"+(rows.length===1?"":"s")+" from the form ("+waiting+" not yet checked)";
+  var D0=[...new Set(P.map(function(p){return p.district}))].sort();
+  document.querySelector("#dChips").innerHTML=[["","All districts"]].concat(D0.map(function(d){return[d,d]})).map(function(x){return '<button type="button" data-d="'+esc(x[0])+'" aria-pressed="'+(x[0]===D)+'">'+esc(x[1])+"</button>"}).join("");
+  dbOpts();summary();database();
+ }catch(e){busy=false}});})();
+</script>
 </body></html>

@@ -95,7 +95,7 @@ body.dashboard-selected .skip:focus{top:8px}
 </aside>
 <!--/NAV-->
 <main class="wrap wide l2x" id="dashboard-main">
-<p class="sample"><b>Sample data &mdash; synthetic, not real.</b> Invented conversations at real palikas show how the page works. Live totals come from the Grief Early Assessment form used by CMC-Nepal field staff once it is connected. Coordination sees totals only, never a single person.</p>
+<p class="sample"><b>Sample data &mdash; synthetic, not real.</b> Invented conversations at real palikas show how the page works. Signed-in coordinators and the coordination team see the real conversations here instead: sign in on <a href="team.html">Team and checking</a>, then come back to this page. This page shows totals only; a palika with fewer than five conversations is not shown by name.</p>
 <div class="gm-bar"><div class="rd-tags" id="gTags"><span class="rd-tag fixed">All palikas</span></div><button type="button" class="rd-clear" id="gClear" hidden>Show all palikas</button></div>
 <div class="kpis" id="kpis"></div>
 <section class="panel2"><h2>By palika</h2><div class="body">
@@ -158,5 +158,26 @@ $("#heat").addEventListener("click",e=>{const r=e.target.closest("tr.hit");if(r)
 $("#heat").addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.closest("tr.hit")){e.preventDefault();choose(e.target.closest("tr.hit").dataset.p)}});
 $("#gTags").addEventListener("click",e=>{if(e.target.closest("button"))choose(SELP)});$("#gClear").onclick=()=>choose(SELP);
 render();
+</script>
+<script src="assets/fb-config.js"></script>
+<script src="review-current-v51/fb-config.js"></script>
+<script>window.STAFF_AUTH_RETURN=location.origin+location.pathname.replace(/[^/]*$/,"team.html");</script>
+<script src="review-current-v51/current-auth.js"></script>
+<script src="assets/access-api.js"></script>
+<script>
+/* Live data (19 Nov 2026): a signed-in card holder sees the conversations within their access scope
+   in place of the sample. Totals only on this page; fewer than five per palika stay hidden (MIN). */
+(function(){if(!window.BaselineAuth||!window.AccessAPI)return;var busy=false;
+BaselineAuth.onChange(async function(u){if(!u||busy)return;busy=true;
+ try{var me=await AccessAPI.me();if(!me.role||me.forms.indexOf("grief")<0){busy=false;return}
+  var g=await AccessAPI.griefEntries(me.role==="admin"?"":me.org);DATA.length=0;var waiting=0;
+  g.rows.forEach(function(r){var p=r.payload;if(r.review!=="accepted")waiting++;
+   if(p.consent!=="yes"){DATA.push({palika:p.palika,consent:p.consent});return}
+   DATA.push({palika:p.palika,consent:"yes",nMissing:p.nMissing,nDied:p.nDied,rites:p.rites,obstacles:p.obstacles||[],rx:p.rx,functioning:p.functioning,needs:p.needs||[],red:p.triage==="redflag"||p.selfharm==="yes",referred:(p.action||[]).some(function(a){return a==="referred"||a==="urgent"})})});
+  var scope=g.scope==="all"?"all organisations":g.scope==="org"?(me.org||""):"your own records";
+  var b=document.querySelector(".sample");if(b){b.style.background="#e6f5ec";b.style.borderColor="#b8e0c9";b.style.color="#1e7a4c";
+   b.innerHTML="<b>Live data</b> &mdash; "+g.rows.length+" record"+(g.rows.length===1?"":"s")+" from the Grief Early Assessment form ("+scope+"), "+waiting+" not yet checked by a coordinator. Totals only; a palika with fewer than five conversations is not shown by name."}
+  SELP="";render();
+ }catch(e){busy=false}});})();
 </script>
 </body></html>
