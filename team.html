@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title data-i18n="team.title">Team and checking — MHPSS Nepal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Manrope:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="assets/design.css">
+<style>
+body{background:#f3f6f9;margin:0;font-family:Manrope,system-ui,sans-serif;color:#1d2b3a}
+.tw{max-width:1280px;margin:0 auto;padding:18px 20px 60px}
+.tw p,.tw li,.tw .note{text-align:justify;hyphens:none;-webkit-hyphens:none;overflow-wrap:normal}
+.tbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin:0 0 14px}
+.tbar h1{font-family:Lora,Georgia,serif;font-size:26px;margin:0;color:#1b3a5f}
+.tbar a{color:#1f6fb2;font-weight:700;text-decoration:none}
+.card{background:#fff;border:1px solid #d6e0ea;border-radius:12px;padding:16px 18px;margin:0 0 16px}
+.card h2{font-size:18px;margin:0 0 10px;color:#1b3a5f}
+.lead{color:#52647a;font-size:14px;margin:0 0 10px}
+label.f{display:block;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#45546b;margin:8px 0 4px}
+input[type=email],input[type=password],select,textarea{width:100%;box-sizing:border-box;font:inherit;font-size:15px;padding:10px 12px;border:1px solid #b9c8d6;border-radius:10px;background:#fff}
+.btn{white-space:nowrap;font:inherit;font-weight:700;font-size:14px;border:0;border-radius:10px;padding:10px 16px;background:#1f6fb2;color:#fff;cursor:pointer}
+.btn.ghost{background:#fff;color:#1f6fb2;border:1px solid #1f6fb2}.btn.red{background:#a3221c}.btn.green{background:#1a7f37}
+.btn[disabled]{opacity:.5;cursor:default}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin:0 0 12px}
+.chip{flex:0 0 auto;font:inherit;font-weight:700;font-size:13px;border:1px solid #b9c8d6;background:#fff;color:#1b3a5f;border-radius:999px;padding:7px 14px;cursor:pointer}
+.chip[aria-pressed=true]{background:#1b3a5f;color:#fff;border-color:#1b3a5f}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0 0 16px}
+@media(min-width:900px){.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.kpi{background:#fff;border:1px solid #d6e0ea;border-top:4px solid var(--c,#1f6fb2);border-radius:12px;padding:14px 16px}
+.kpi b{display:block;font-size:30px;line-height:1.1;color:var(--c,#1f6fb2)}
+.kpi span{display:block;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--c,#1f6fb2);margin-top:4px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}.grid>*{min-width:0}
+@media(min-width:1100px){.grid{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr)}}
+table.t{width:100%;border-collapse:collapse;font-size:13.5px}
+table.t th{background:#1b3a5f;color:#fff;text-align:left;padding:8px 10px;font-size:12px}
+table.t td{font-variant-numeric:tabular-nums;border-bottom:1px solid #e3eaf1;padding:8px 10px;vertical-align:top;text-align:left}
+.scroll{overflow-x:auto}
+tr.none td{background:#fff8e6}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px}
+.pill.pending{color:#8a6d1a;background:#fff4e0}.pill.accepted{color:#1a7f37;background:#e6f5ec}.pill.returned{color:#a3221c;background:#fdecea}
+.rec{border:1px solid #d6e0ea;border-radius:10px;padding:12px 14px;margin:0 0 10px}
+.rec.flag{border-left:4px solid #a3221c}
+.rec .h{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.rec dl{display:grid;grid-template-columns:minmax(110px,max-content) 1fr;gap:3px 12px;font-size:13px;margin:8px 0}
+.rec dt{color:#52647a}.rec dd{margin:0;text-align:left!important}
+.msg{font-size:14px;margin:8px 0 0}
+.hidden{display:none!important}
+@media(max-width:600px){.tw{padding:12px 12px 40px}.tbar h1{font-size:22px}.rec dl{grid-template-columns:minmax(0,38%) minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<div class="tw">
+  <div class="tbar">
+    <h1 data-i18n="team.h1">Team and checking</h1>
+    <div class="actions"><a href="./" data-i18n="team.back">← Dashboard</a><a href="../form/" data-i18n="team.forms">Field forms ↗</a></div>
+  </div>
+
+  <div class="card" id="signedOut">
+    <h2 data-i18n="team.signinH">Sign in</h2>
+    <p class="lead" data-i18n="team.signinLead">For coordinators, focal points and the coordination team. Field staff see their own records on the form itself.</p>
+    <div id="signin"></div>
+  </div>
+
+  <div id="app" class="hidden">
+    <div class="card"><div class="tbar" style="margin:0">
+      <p id="who" style="margin:0"></p>
+      <div class="actions"><button class="btn ghost" id="reload" data-i18n="team.reload">Refresh</button><button class="btn ghost" id="signout" data-i18n="team.signout">Sign out</button></div>
+    </div><p class="msg" id="msg"></p></div>
+
+    <div class="chips" id="formChips" role="group" aria-label="Form"></div>
+    <div class="kpis" id="kpis"></div>
+
+    <div class="grid">
+      <div>
+        <div class="card"><h2 data-i18n="team.progressH">Who has entered</h2>
+          <p class="lead" data-i18n="team.progressLead">Everyone with access to this form, including those who have not entered anything yet (highlighted).</p>
+          <div class="scroll"><table class="t" id="progress"></table></div></div>
+        <div class="card" id="peopleCard"><h2 data-i18n="team.peopleH">People and access</h2>
+          <p class="lead" data-i18n="team.peopleLead">Add a person by email. They open the field forms, sign in with that email and their access is ready. Nobody can change their own access.</p>
+          <div id="inviteBox"></div>
+          <div class="scroll" style="margin-top:12px"><table class="t" id="people"></table></div></div>
+      </div>
+      <div class="card"><h2 data-i18n="team.recordsH">Records to check</h2>
+        <div class="chips" id="statusChips" role="group" aria-label="Status"></div>
+        <div id="records"></div></div>
+    </div>
+  </div>
+</div>
+<script src="assets/codes.js"></script>
+<script src="assets/fb-config.js"></script>
+<script src="review-current-v51/fb-config.js"></script>
+<script>window.STAFF_AUTH_RETURN=location.origin+location.pathname;</script>
+<script src="review-current-v51/current-auth.js"></script>
+<script src="assets/access-api.js"></script>
+<script src="assets/i18n-strings.js"></script>
+<script src="assets/i18n.js"></script>
+<script>
+(function(){
+"use strict";
+var A=window.AccessAPI,T=A.T,esc=A.esc,C=window.CODES||{};
+var $=function(s){return document.querySelector(s)};
+var me=null,form="grief",status="pending",data={grief:null,directory:null},prog=null,team=null;
+var ROLE={field:"Field staff",coordinator:"Coordinator",focal:"Focal point",admin:"Coordination"};
+var STAT={pending:"Waiting for review",accepted:"Accepted",returned:"Returned"};
+function org(c){var o=C.orgByCode&&C.orgByCode[c];return o?o.name:c}
+function pal(c){try{return C.palikaName?C.palikaName(c):c}catch(e){return c}}
+function msg(t,ok){var m=$("#msg");m.textContent=t||"";m.style.color=ok===true?"#1a7f37":ok===false?"#a3221c":"#52647a"}
+A.signInPanel($("#signin"),function(){start()});
+if(window.BaselineAuth)BaselineAuth.onChange(function(u){if(!u){me=null;$("#app").classList.add("hidden");$("#signedOut").classList.remove("hidden")}});
+var started=false;
+async function start(){
+  if(started)return;started=true;
+  try{me=await A.me()}catch(e){started=false;return}
+  $("#signedOut").classList.add("hidden");$("#app").classList.remove("hidden");
+  if(!me.role){$("#who").textContent=me.email;msg(T("team.noAccess","This email has no access yet. Ask the coordination team or your focal point."),false);return}
+  $("#who").innerHTML="<b>"+esc(me.email)+"</b> · "+esc(me.org?org(me.org):T("team.allOrgs","all organisations"))+" · "+esc(T("team.role."+me.role,ROLE[me.role]));
+  if(!me.canReview){msg(T("team.fieldOnly","Your records and their status are on the form page, under My records on the server."));$("#peopleCard").classList.add("hidden")}
+  me.forms=["grief","directory"].filter(function(f){return me.forms.indexOf(f)>=0});form=me.forms[0];
+  $("#formChips").innerHTML=me.forms.map(function(f){return '<button class="chip" data-form="'+f+'" aria-pressed="'+(f===form)+'">'+esc(T("team.form."+f,f==="grief"?"Grief conversations":"Referral directory"))+"</button>"}).join("");
+  $("#formChips").querySelectorAll("[data-form]").forEach(function(b){b.onclick=function(){form=b.dataset.form;$("#formChips").querySelectorAll(".chip").forEach(function(x){x.setAttribute("aria-pressed",String(x===b))});render()}});
+  $("#statusChips").innerHTML=["pending","returned","accepted","all"].map(function(s){return '<button class="chip" data-st="'+s+'" aria-pressed="'+(s===status)+'">'+esc(T("team.st."+s,s==="all"?"All":STAT[s]))+"</button>"}).join("");
+  $("#statusChips").querySelectorAll("[data-st]").forEach(function(b){b.onclick=function(){status=b.dataset.st;$("#statusChips").querySelectorAll(".chip").forEach(function(x){x.setAttribute("aria-pressed",String(x===b))});renderRecords()}});
+  await load();
+}
+async function load(){
+  msg(T("team.loading","Loading…"));
+  try{
+    var jobs=[A.progress().then(function(p){prog=p})];
+    if(me.canReview)jobs.push(A.team().then(function(t){team=t}));
+    if(me.forms.indexOf("grief")>=0)jobs.push(A.griefEntries(me.role==="admin"?"":me.org).then(function(g){data.grief=g.rows}));
+    if(me.forms.indexOf("directory")>=0)jobs.push(A.dirAll().then(function(r){data.directory=r}));
+    var res=await Promise.allSettled(jobs),bad=res.filter(function(x){return x.status==="rejected"});
+    msg(bad.length?T("team.loadFail","Could not load. Check the connection and refresh.")+" ("+bad.map(function(x){return x.reason&&x.reason.message}).join("; ")+")":"",bad.length?false:undefined);
+  }catch(e){msg(T("team.loadFail","Could not load. Check the connection and refresh.")+" ("+e.message+")",false)}
+  render();
+}
+function rows(){return (data[form]||[]).map(function(r){return {id:r.reportId,rev:r.revision,org:r.org,by:r.enteredBy||"",when:(r.updatedAt||"").slice(0,10),review:r.review||"pending",note:r.reviewNote||"",p:r.payload,can:form==="grief"?me.canReview:r.canReview}})}
+function render(){renderKpis();renderProgress();renderPeople();renderRecords()}
+document.addEventListener("i18n:changed",function(){if(me&&me.role)render()});
+function renderKpis(){
+  var r=rows(),c={pending:0,accepted:0,returned:0};r.forEach(function(x){c[x.review]++});
+  $("#kpis").innerHTML=[[r.length,T("team.k.entries","Records"),"#1f6fb2"],[c.pending,T("team.k.pending","Waiting for review"),"#8a6d1a"],[c.returned,T("team.k.returned","Returned"),"#a3221c"],[c.accepted,T("team.k.accepted","Accepted"),"#1a7f37"]].map(function(k){return '<div class="kpi" style="--c:'+k[2]+'"><b>'+k[0]+"</b><span>"+esc(k[1])+"</span></div>"}).join("");
+}
+function renderProgress(){
+  var g=(prog&&prog.forms&&prog.forms[form])||[];
+  var one=me.role!=="admin";
+  $("#progress").innerHTML="<thead><tr><th>"+esc(T("team.c.person","Person"))+"</th>"+(one?"":"<th>"+esc(T("team.c.org","Organisation"))+"</th>")+"<th>"+esc(T("team.c.entries","Records"))+"</th><th>"+esc(T("team.c.last","Last"))+"</th><th>"+esc(T("team.c.pending","Waiting"))+"</th><th>"+esc(T("team.c.returned","Returned"))+"</th></tr></thead><tbody>"+
+   (g.length?g.map(function(p){return '<tr class="'+(p.entries?"":"none")+'"><td>'+esc(p.email)+(p.role?" <small>("+esc(T("team.role."+p.role,ROLE[p.role]||p.role))+")</small>":"")+"</td>"+(one?"":"<td>"+esc(org(p.org))+"</td>")+"<td>"+(p.entries||esc(T("team.noEntry","none yet")))+"</td><td style=\"white-space:nowrap\">"+esc((p.last||"").slice(0,10))+"</td><td>"+p.pending+"</td><td>"+p.returned+"</td></tr>"}).join(""):'<tr><td colspan="'+(one?5:6)+'">'+esc(T("team.nobody","Nobody with access yet."))+"</td></tr>")+"</tbody>";
+}
+function renderPeople(){
+  if(!me.canReview||!team)return;
+  var orgs=(C.ORGS||[]).filter(function(o){return o.code!=="OTHER"});
+  $("#inviteBox").innerHTML='<div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));margin:0">'+
+   '<div><label class="f" for="iEmail">'+esc(T("team.i.email","Email"))+'</label><input type="email" id="iEmail"></div>'+
+   '<div><label class="f" for="iRole">'+esc(T("team.i.role","Role"))+'</label><select id="iRole">'+me.canInvite.map(function(r){return '<option value="'+r+'">'+esc(T("team.role."+r,ROLE[r]))+"</option>"}).join("")+"</select></div>"+
+   '<div><label class="f" for="iOrg">'+esc(T("team.i.org","Organisation"))+'</label><select id="iOrg"'+(me.role==="admin"?"":" disabled")+">"+(me.role==="admin"?orgs.map(function(o){return '<option value="'+o.code+'">'+esc(o.name)+"</option>"}).join(""):'<option value="'+esc(me.org)+'">'+esc(org(me.org))+"</option>")+"</select></div>"+
+   '<div><label class="f">'+esc(T("team.i.forms","Forms"))+"</label>"+me.forms.map(function(f){return '<label style="display:block;font-size:14px"><input type="checkbox" class="iForm" value="'+f+'" checked> '+esc(T("team.form."+f,f==="grief"?"Grief conversations":"Referral directory"))+"</label>"}).join("")+"</div></div>"+
+   '<div class="actions" style="margin-top:10px"><button class="btn" id="iGo">'+esc(T("team.i.go","Give access"))+"</button></div>";
+  $("#iGo").onclick=async function(){
+    var b={email:$("#iEmail").value.trim(),org:$("#iOrg").value,role:$("#iRole").value,forms:[].slice.call(document.querySelectorAll(".iForm:checked")).map(function(x){return x.value})};
+    if(!b.forms.length){msg(T("team.i.noForm","Choose at least one form."),false);return}
+    try{var r=await A.invite(b);msg((r.state==="updated"?T("team.i.updated","Access updated for"):T("team.i.done","Access ready for"))+" "+r.email+". "+T("team.i.tell","Tell them to open the field forms and sign in with this email."),true);$("#iEmail").value="";team=await A.team();renderPeople()}
+    catch(e){msg(e.message,false)}
+  };
+  var ppl=team.people.map(function(p){return Object.assign({state:p.enabled?"active":"disabled"},p)}).concat(team.invitations.map(function(i){return Object.assign({state:"invited"},i)}));
+  $("#people").innerHTML="<thead><tr><th>"+esc(T("team.c.person","Person"))+"</th><th>"+esc(T("team.c.org","Organisation"))+"</th><th>"+esc(T("team.i.role","Role"))+"</th><th>"+esc(T("team.c.state","Status"))+"</th><th></th></tr></thead><tbody>"+
+   ppl.map(function(p,i){var lower=me.role==="admin"||(me.canInvite.indexOf(p.role)>=0&&p.org===me.org);
+     return "<tr><td>"+esc(p.email)+"</td><td>"+esc(org(p.org))+"</td><td>"+esc(T("team.role."+p.role,ROLE[p.role]||p.role))+"</td><td>"+esc(T("team.s."+p.state,{active:"Active",disabled:"Turned off",invited:"Waiting for first sign-in"}[p.state]))+(p.source==="5Ws account"?" <small>(5Ws)</small>":"")+"</td><td>"+(lower&&p.state!=="disabled"&&p.email!==me.email&&p.source!=="5Ws account"?'<button class="btn ghost" data-off="'+i+'">'+esc(T("team.off","Turn off"))+"</button>":"")+"</td></tr>"}).join("")+"</tbody>";
+  $("#people").querySelectorAll("[data-off]").forEach(function(b){b.onclick=async function(){var p=ppl[+b.dataset.off];try{await A.disable(p.email);msg(T("team.offDone","Access turned off for")+" "+p.email,true);team=await A.team();renderPeople()}catch(e){msg(e.message,false)}}});
+}
+var GL={setting:{HOME:"Home visit",GROUP:"Group",IND:"Individual session",HF:"Health facility",HC:"Holding centre",OTH:"Other"},rites:{completed:"Completed",adapted:"Adapted",waiting:"Waiting",blocked:"Blocked",na:"Not applicable"},triage:{normal:"Normal grief",acute:"Acute stress",ptsd:"PTSD symptoms",redflag:"Red flag"},functioning:{usual:"As usual",difficulty:"Some difficulty",unable:"Unable"}};
+function detail(r){
+  var p=r.p,d=[];
+  if(form==="grief"){
+    d.push(["Code",p.code],["Date",p.date],["Palika",pal(p.palika)+(p.ward?" · ward "+p.ward:"")],["Setting",GL.setting[p.setting]||p.setting],["Agreed to talk",p.consent]);
+    if(p.consent==="yes"){
+      if(p.reg==="byname")d.push(["Name",p.name],["Phone",p.phone||"—"],["Reach by",p.reach||"—"]);else d.push(["Registered","Anonymous"+(p.initials?" · "+p.initials:"")]);
+      d.push(["Sex · age",p.sex+" · "+p.age],["Who died / missing",(p.who||[]).join(", ")+" · died "+p.nDied+" · missing "+p.nMissing],["Ceremonies",GL.rites[p.rites]||p.rites],["Daily life",GL.functioning[p.functioning]||p.functioning],["Worker's view",GL.triage[p.triage]||p.triage],["Action",(p.action||[]).join(", ")+((p.refTo||[]).length?" → "+p.refTo.join(", "):"")]);
+    }
+  }else{
+    d.push(["Organisation",org(p.org)],["Palika",pal(p.palika)],["Services",(p.services||[]).concat(p.crossServices||[]).join(", ")],["Phone",p.refPhone],["Hours",p.hours],["Cost",p.cost],["Status",p.status+" · "+p.continuity+(p.until?" until "+p.until:"")]);
+  }
+  return "<dl>"+d.map(function(x){return "<dt>"+esc(x[0])+"</dt><dd>"+esc(x[1]==null?"":x[1])+"</dd>"}).join("")+"</dl>";
+}
+function renderRecords(){
+  var list=rows().filter(function(r){return status==="all"||r.review===status}).sort(function(a,b){return b.when.localeCompare(a.when)});
+  if(!list.length){$("#records").innerHTML='<p class="lead">'+esc(T("team.noRecords","No records here."))+"</p>";return}
+  $("#records").innerHTML=list.slice(0,200).map(function(r,i){
+    var flag=form==="grief"&&r.p.triage==="redflag",title=form==="grief"?r.p.code:r.p.placeName;
+    return '<div class="rec'+(flag?" flag":"")+'"><div class="h"><b>'+esc(title)+(flag?' <span class="pill returned">'+esc(T("team.redflag","Red flag"))+"</span>":"")+'</b><span class="pill '+r.review+'">'+esc(T("team.st."+r.review,STAT[r.review]))+"</span></div>"+
+     '<div style="font-size:12.5px;color:#52647a;margin-top:4px">'+esc(r.when)+" · "+esc(org(r.org))+(r.by?" · "+esc(r.by):"")+" · v"+r.rev+"</div>"+detail(r)+
+     (r.note?'<p style="margin:0 0 8px;color:#a3221c">'+esc(r.note)+"</p>":"")+
+     (r.can?'<div class="actions"><button class="btn green" data-ok="'+i+'">'+esc(T("team.accept","Accept"))+'</button><button class="btn ghost" data-ret="'+i+'">'+esc(T("team.return","Return with a note"))+'</button></div><div class="hidden" id="rn'+i+'" style="margin-top:8px"><textarea rows="2" maxlength="500" placeholder="'+esc(T("team.notePh","What should be corrected?"))+'"></textarea><div class="actions" style="margin-top:6px"><button class="btn red" data-send="'+i+'">'+esc(T("team.sendBack","Send back"))+"</button></div></div>":"")+"</div>"}).join("");
+  function act(i,decision,note){var r=list[i];return A.review({form:form,reportId:r.id,revision:r.rev,decision:decision,note:note||""}).then(function(){return load()}).then(function(){msg(T("team.saved","Saved."),true)}).catch(function(e){msg(e.message,false)})}
+  $("#records").querySelectorAll("[data-ok]").forEach(function(b){b.onclick=function(){act(+b.dataset.ok,"accepted")}});
+  $("#records").querySelectorAll("[data-ret]").forEach(function(b){b.onclick=function(){$("#rn"+b.dataset.ret).classList.toggle("hidden")}});
+  $("#records").querySelectorAll("[data-send]").forEach(function(b){b.onclick=function(){var t=$("#rn"+b.dataset.send+" textarea").value.trim();if(!t){msg(T("team.needNote","Write what needs correcting."),false);return}act(+b.dataset.send,"returned",t)}});
+}
+$("#reload").onclick=load;
+$("#signout").onclick=async function(){try{await A.signOut()}catch(e){}started=false;location.reload()};
+})();
+</script>
+</body>
+</html>
