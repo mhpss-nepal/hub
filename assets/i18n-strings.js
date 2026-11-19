@@ -234,6 +234,7 @@ window.I18N_STRINGS = {
       "team.sendBack",
       "team.saved",
       "team.needNote",
+      "team.sentFrom",
       /* ==== END access-card ==== */
       /* ==== BEGIN send-card ==== */
       "send.title",
@@ -253,6 +254,12 @@ window.I18N_STRINGS = {
       "send.done",
       "send.signingIn",
       "send.signinFailed",
+      "send.recBy",
+      "send.recHelp",
+      "send.recBad",
+      "send.offline",
+      "send.back",
+      "send.reload",
       /* ==== END send-card ==== */
       /* ==== BEGIN dir-form ==== */
       "dirf.002",
@@ -497,6 +504,8 @@ window.I18N_STRINGS = {
       "dirf.msg.count",
       "dirf.msg.export",
       "dirf.msg.nothing",
+      "dirf.findingGps",
+      "dirf.noFix",
       /* ==== END dir-form ==== */
       /* ==== BEGIN grief-form ==== */
       "grief.002",
@@ -1752,6 +1761,7 @@ window.I18N_STRINGS = {
     "team.sendBack": "Send back",
     "team.saved": "Saved.",
     "team.needNote": "Write what needs correcting.",
+    "team.sentFrom": "sent from",
     /* ==== END access-card ==== */
     /* ==== BEGIN send-card ==== */
     "send.title": "Send to the server",
@@ -1771,6 +1781,12 @@ window.I18N_STRINGS = {
     "send.done": "Sent and confirmed by the server:",
     "send.signingIn": "Signing in…",
     "send.signinFailed": "Sign-in failed. Check the email and password.",
+    "send.recBy": "Filled in by (your email)",
+    "send.recHelp": "Your own email, also on a colleague’s phone. The record stays yours; the account on this phone only sends it.",
+    "send.recBad": "Type a valid email in “Filled in by”, or leave it empty.",
+    "send.offline": "No signal: you can still fill in and save. Saved records are sent when the phone has signal again.",
+    "send.back": "Signal is back.",
+    "send.reload": "Tap to connect and send",
     /* ==== END send-card ==== */
     /* ==== BEGIN dir-form ==== */
     "dirf.002": "Layer 1 · Field form · MHPSS Nepal",
@@ -2020,6 +2036,8 @@ window.I18N_STRINGS = {
     "dirf.msg.count": "Entries saved here:",
     "dirf.msg.export": "Signed in, the record is sent to the server; Export saved (CSV) keeps a copy for your organisation.",
     "dirf.msg.nothing": "Nothing saved yet.",
+    "dirf.findingGps": "Finding your location… Without internet the first fix can take a few minutes: stand in the open and keep this page open.",
+    "dirf.noFix": "Location not found yet. Move to an open place and try again.",
     /* ==== END dir-form ==== */
     /* ==== BEGIN grief-form ==== */
     "grief.002": "Layer 1 · Field form · MHPSS Nepal · for CMC-Nepal field staff",
@@ -2049,7 +2067,7 @@ window.I18N_STRINGS = {
     "grief.025": "Other",
     "grief.026": "Your role",
     "grief.028": "Basic information",
-    "grief.029": "Name and phone number are written only if the person chooses it. They stay with your organisation and are never sent to coordination or shown on the dashboard.",
+    "grief.029": "Name and phone number are written only if the person chooses it. They are kept by your organisation; the MHPSS coordination team can also see them to follow up. They are never published or shown on any dashboard.",
     "grief.030": "Ask",
     "grief.031": "“We may want to check on you again later. Would you like us to write down your name and phone number so that we can contact you? Or we can keep only a code, without your name.”",
     "grief.032": "By name — can be contacted again",
@@ -2131,7 +2149,7 @@ window.I18N_STRINGS = {
     "grief.140": "Past month",
     "grief.141": "Support",
     "grief.142": "Safety and next step",
-    "grief.143": "Coordination sees only totals per palika. Rows stay with the organisation that recorded them.",
+    "grief.143": "Dashboards show only totals per palika. Full records, including any name and phone number, are seen by your organisation and the MHPSS coordination team.",
     "grief.144": "MHPSS Nepal · Grief Early Assessment · version of 19 November 2026 · English is the reference text; the Nepali translation is being reviewed by a native-speaking clinician.",
     "grief.o.who.spouse": "Husband / wife / partner",
     "grief.o.who.child": "Son / daughter",
@@ -3426,6 +3444,7 @@ window.I18N_STRINGS = {
     "team.sendBack": "फिर्ता पठाउनुहोस्",
     "team.saved": "सुरक्षित गरियो।",
     "team.needNote": "के सच्याउनुपर्छ लेख्नुहोस्।",
+    "team.sentFrom": "पठाउने खाता",
     /* ==== END access-card ==== */
     /* ==== BEGIN send-card ==== */
     "send.title": "सर्भरमा पठाउनुहोस्",
@@ -3445,6 +3464,12 @@ window.I18N_STRINGS = {
     "send.done": "पठाइयो र सर्भरले पुष्टि गर्‍यो:",
     "send.signingIn": "साइन इन हुँदै…",
     "send.signinFailed": "साइन इन हुन सकेन। इमेल र पासवर्ड जाँच गर्नुहोस्।",
+    "send.recBy": "भर्ने व्यक्ति (तपाईंको इमेल)",
+    "send.recHelp": "सहकर्मीको फोनमा भए पनि आफ्नै इमेल लेख्नुहोस्। रेकर्ड तपाईंकै रहन्छ; यो फोनको खाताले यसलाई पठाउने मात्र गर्छ।",
+    "send.recBad": "“भर्ने व्यक्ति” मा सही इमेल लेख्नुहोस्, वा खाली छोड्नुहोस्।",
+    "send.offline": "सिग्नल छैन: तपाईं अझै भर्न र सुरक्षित गर्न सक्नुहुन्छ। फोनमा फेरि सिग्नल आएपछि सुरक्षित रेकर्डहरू पठाइन्छन्।",
+    "send.back": "सिग्नल फर्कियो।",
+    "send.reload": "जोडेर पठाउन थिच्नुहोस्",
     /* ==== END send-card ==== */
     /* ==== BEGIN dir-form ==== */
     "dirf.002": "तह १ · फिल्ड फारम · MHPSS नेपाल",
@@ -3689,6 +3714,8 @@ window.I18N_STRINGS = {
     "dirf.msg.count": "यहाँ सुरक्षित प्रविष्टिहरू:",
     "dirf.msg.export": "साइन इन भएमा रेकर्ड सर्भरमा पठाइन्छ; सुरक्षित गरिएका निर्यात गर्नुहोस् (CSV) ले तपाईंको संस्थाका लागि एउटा प्रति राख्छ।",
     "dirf.msg.nothing": "अहिलेसम्म केही सुरक्षित गरिएको छैन।",
+    "dirf.findingGps": "तपाईंको स्थान खोज्दै… इन्टरनेट नभएमा पहिलो पटक स्थान भेट्टाउन केही मिनेट लाग्न सक्छ: खुला ठाउँमा उभिनुहोस् र यो पृष्ठ खुलै राख्नुहोस्।",
+    "dirf.noFix": "अझै स्थान भेटिएन। खुला ठाउँमा गएर फेरि प्रयास गर्नुहोस्।",
     /* ==== END dir-form ==== */
     /* ==== BEGIN grief-form ==== */
     "grief.002": "तह १ · फिल्ड फारम · MHPSS नेपाल · CMC-Nepal का फिल्ड कर्मचारीहरूका लागि",
@@ -3716,7 +3743,7 @@ window.I18N_STRINGS = {
     "grief.025": "अन्य",
     "grief.026": "तपाईंको भूमिका",
     "grief.028": "आधारभूत जानकारी",
-    "grief.029": "व्यक्तिले चाहेमा मात्र नाम र फोन नम्बर लेखिन्छ। यी तपाईंको संस्थामै रहन्छन्, समन्वयमा कहिल्यै पठाइँदैनन् र ड्यासबोर्डमा देखाइँदैनन्।",
+    "grief.029": "व्यक्तिले चाहेमा मात्र नाम र फोन नम्बर लेखिन्छ। यी तपाईंको संस्थाले राख्छ; पछि सम्पर्क गर्नका लागि MHPSS समन्वय टोलीले पनि यी हेर्न सक्छ। यी कहिल्यै प्रकाशित गरिँदैनन् वा कुनै ड्यासबोर्डमा देखाइँदैनन्।",
     "grief.030": "सोध्नुहोस्",
     "grief.031": "“हामीले तपाईंलाई पछि फेरि सम्पर्क गर्नुपर्ने हुन सक्छ। के हामीले तपाईंलाई सम्पर्क गर्न सकौँ भनेर तपाईंको नाम र फोन नम्बर लेखौँ? वा तपाईंको नाम नलेखी एउटा कोड मात्र राखौँ?”",
     "grief.032": "नामसहित — पछि सम्पर्क गर्न सकिन्छ",
@@ -3790,7 +3817,7 @@ window.I18N_STRINGS = {
     "grief.140": "पछिल्लो महिना",
     "grief.141": "सहयोग",
     "grief.142": "सुरक्षा र अर्को कदम",
-    "grief.143": "समन्वयले पालिकाअनुसारको जम्मा संख्या मात्र देख्छ। विवरणहरू रेकर्ड गर्ने संस्थामै रहन्छन्।",
+    "grief.143": "ड्यासबोर्डले पालिकाअनुसार कुल सङ्ख्या मात्र देखाउँछ। नाम र फोन नम्बर सहितका पूरा रेकर्ड तपाईंको संस्था र MHPSS समन्वय टोलीले हेर्छन्।",
     "grief.144": "MHPSS नेपाल · शोकको प्रारम्भिक मूल्याङ्कन · १९ नोभेम्बर २०२६ को संस्करण · अङ्ग्रेजी पाठ आधिकारिक हो; नेपाली अनुवाद नेपाली भाषी चिकित्सकबाट समीक्षा भइरहेको छ।",
     "grief.o.who.spouse": "श्रीमान् / श्रीमती / जीवनसाथी",
     "grief.o.who.child": "छोरा / छोरी",

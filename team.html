@@ -139,7 +139,7 @@ async function load(){
   }catch(e){msg(T("team.loadFail","Could not load. Check the connection and refresh.")+" ("+e.message+")",false)}
   render();
 }
-function rows(){return (data[form]||[]).map(function(r){return {id:r.reportId,rev:r.revision,org:r.org,by:r.enteredBy||"",when:(r.updatedAt||"").slice(0,10),review:r.review||"pending",note:r.reviewNote||"",p:r.payload,can:form==="grief"?me.canReview:r.canReview}})}
+function rows(){return (data[form]||[]).map(function(r){return {id:r.reportId,rev:r.revision,org:r.org,by:r.enteredBy||(r.payload&&r.payload.recordedBy)||"",sent:r.sentBy&&r.sentBy!==r.enteredBy?r.sentBy:"",when:(r.updatedAt||"").slice(0,10),review:r.review||"pending",note:r.reviewNote||"",p:r.payload,can:form==="grief"?me.canReview:r.canReview}})}
 function render(){renderKpis();renderProgress();renderPeople();renderRecords()}
 document.addEventListener("i18n:changed",function(){if(me&&me.role)render()});
 function renderKpis(){
@@ -193,7 +193,7 @@ function renderRecords(){
   $("#records").innerHTML=list.slice(0,200).map(function(r,i){
     var flag=form==="grief"&&r.p.triage==="redflag",title=form==="grief"?r.p.code:r.p.placeName;
     return '<div class="rec'+(flag?" flag":"")+'"><div class="h"><b>'+esc(title)+(flag?' <span class="pill returned">'+esc(T("team.redflag","Red flag"))+"</span>":"")+'</b><span class="pill '+r.review+'">'+esc(T("team.st."+r.review,STAT[r.review]))+"</span></div>"+
-     '<div style="font-size:12.5px;color:#52647a;margin-top:4px">'+esc(r.when)+" · "+esc(org(r.org))+(r.by?" · "+esc(r.by):"")+" · v"+r.rev+"</div>"+detail(r)+
+     '<div style="font-size:12.5px;color:#52647a;margin-top:4px">'+esc(r.when)+" · "+esc(org(r.org))+(r.by?" · "+esc(r.by):"")+(r.sent?" · "+esc(T("team.sentFrom","sent from"))+" "+esc(r.sent):"")+" · v"+r.rev+"</div>"+detail(r)+
      (r.note?'<p style="margin:0 0 8px;color:#a3221c">'+esc(r.note)+"</p>":"")+
      (r.can?'<div class="actions"><button class="btn green" data-ok="'+i+'">'+esc(T("team.accept","Accept"))+'</button><button class="btn ghost" data-ret="'+i+'">'+esc(T("team.return","Return with a note"))+'</button></div><div class="hidden" id="rn'+i+'" style="margin-top:8px"><textarea rows="2" maxlength="500" placeholder="'+esc(T("team.notePh","What should be corrected?"))+'"></textarea><div class="actions" style="margin-top:6px"><button class="btn red" data-send="'+i+'">'+esc(T("team.sendBack","Send back"))+"</button></div></div>":"")+"</div>"}).join("");
   function act(i,decision,note){var r=list[i];return A.review({form:form,reportId:r.id,revision:r.rev,decision:decision,note:note||""}).then(function(){return load()}).then(function(){msg(T("team.saved","Saved."),true)}).catch(function(e){msg(e.message,false)})}
