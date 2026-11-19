@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Referral Directory — MHPSS Nepal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Manrope:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="assets/design.css">
+<link rel="stylesheet" href="assets/dashboard-shell-fd41a652ea98.css">
+<link rel="stylesheet" href="assets/home-nav.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+.l2x p,.l2x li,.l2x .note{text-align:justify;hyphens:none;-webkit-hyphens:none}
+body.dashboard-selected .skip{position:absolute;left:8px;top:-100px;z-index:999;background:white;padding:12px;color:#1d3d60}
+body.dashboard-selected .skip:focus{top:8px}
+.l2x table.t td,.l2x table.t th{text-align:left;hyphens:none}
+.l2x .sample{background:#fff4e0;border:1px solid #f0d199;color:#7a4b00;border-radius:10px;padding:10px 14px;font-size:13.5px;margin:0 0 14px}
+.l2x .kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0 0 16px}
+@media(min-width:900px){.l2x .kpis{grid-template-columns:repeat(5,minmax(0,1fr))}}
+.l2x .kpi{background:#fff;border:1px solid var(--line,#d6e0ea);border-top:4px solid var(--c,#1f6fb2);border-radius:12px;padding:14px 16px}
+.l2x .kpi b{display:block;font-size:30px;line-height:1.1;color:var(--c,#1f6fb2)}
+.l2x .kpi span{display:block;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--c,#1f6fb2);margin-top:4px}
+.l2x .kpi small{display:block;font-size:12.5px;color:#52647a;margin-top:6px;text-align:left}
+.l2x .panel2{background:#fff;border:1px solid var(--line,#d6e0ea);border-radius:12px;margin:0 0 16px;overflow:hidden}
+.l2x .panel2 h2{margin:0;padding:14px 18px;font-size:18px;color:#1b3a5f;border-bottom:1px solid var(--line,#d6e0ea);background:#f6f9fc}
+.l2x .panel2 .body{padding:14px 18px}
+.l2x .grid{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:1100px){.l2x .grid.two{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}}
+.l2x table.t{width:100%;border-collapse:collapse;font-size:13.5px}
+.l2x table.t th{background:#1b3a5f;color:#fff;text-align:left;padding:8px 10px;font-weight:700;font-size:12px;letter-spacing:.03em}
+.l2x table.t td{border-bottom:1px solid #e3eaf1;padding:8px 10px;vertical-align:top}
+.l2x .scroll{overflow-x:auto}
+.l2x .filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:14px}
+@media(min-width:900px){.l2x .filters{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.l2x .filters label{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#45546b;display:block;margin-bottom:4px}
+.l2x .filters select{width:100%;font:inherit;font-size:14px;padding:9px 10px;border:1px solid #b9c8d6;border-radius:10px;background:#fff}
+.l2x .ok{background:#e6f5ec;color:#1e7a4c;font-weight:700} .l2x .gap{background:#fdecea;color:#a3221c;font-weight:700}
+.l2x .chip{display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:1px 6px;margin:1px 3px 1px 0;background:#e8f1fa;color:#1f6fb2;white-space:nowrap}
+.l2x .bar{height:10px;border-radius:6px;background:var(--c,#5b4a8b)} .l2x .track{background:#eef1f6;border-radius:6px}
+.l2x .brow{display:grid;grid-template-columns:minmax(0,1fr) 70px;gap:10px;align-items:center;margin:7px 0;font-size:13.5px}
+.l2x .src{font-size:12.5px;color:#52647a}
+.l2x .btn2{font:inherit;font-size:13.5px;border-radius:10px;padding:8px 12px;border:1px solid #1f6fb2;background:#fff;color:#1f6fb2;cursor:pointer}
+</style>
+</head>
+<body class="hub dashboard-selected l2-shell"><nav aria-label="Home navigation"><a data-home-link href="./">← Back to Home</a></nav>
+<a class="skip" href="#dashboard-main">Skip to dashboard</a>
+<header class="top"><div><h1>Referral Directory — service mapping</h1><div class="sub">Nepal · where people can be referred for MHPSS, protection and GBV services · restricted coordination</div></div></header>
+<!--NAV:rail hubindex-->
+<button class="l2-menu" type="button" aria-controls="layer2-sidebar" aria-expanded="false">☰ <span>Menu</span></button>
+<div class="l2-backdrop" hidden></div>
+<aside class="rail" id="layer2-sidebar" aria-label="Layer 2 navigation">
+ <div class="l2-brand"><strong>MHPSS Nepal</strong><span>Coordination dashboard</span><button class="l2-close" type="button" aria-label="Close menu">×</button></div>
+ <nav aria-label="Dashboard sections"><p class="l2-navlabel">Reports and data</p><a data-destination="current" href="review-current-v51/"><span>5Ws Reports</span><small>Current reports · pilot not open</small></a><a data-destination="historical" href="review-analytics-v48/?source=historical"><span>Historical Baseline</span><small>Retained records · private</small></a><a data-destination="sample" href="legacy-dashboard.html?source=demo"><span>Sample Data</span><small>Fixed demonstration examples</small></a><p class="l2-navlabel">Referral and grief</p><a data-destination="directory" href="directory.html"><span>Referral Directory</span><small>Service points · map · gaps</small></a><a data-destination="grief" href="grief.html"><span>Grief Mapping</span><small>By palika · totals only</small></a><p class="l2-navlabel">Coming next</p><span class="l2-held" aria-disabled="true"><span>Individual Contacts</span><small>Not available yet</small></span><span class="l2-held" aria-disabled="true"><span>Referrals</span><small>Not available yet</small></span><span class="l2-held" aria-disabled="true"><span>PHQ-9 Follow-up</span><small>Not available yet</small></span><span class="l2-held" aria-disabled="true"><span>Admin Audit</span><small>Not available yet · Adib only</small></span><p class="l2-navlabel">Field entry</p><a class="l2-form-link" href="../form/">All field forms ↗</a></nav>
+ <p class="l2-foot">Private workspace · access follows your role.</p>
+</aside>
+<!--/NAV-->
+<main class="wrap wide l2x" id="dashboard-main">
+
+<p class="sample"><b>Sample data — synthetic, not real.</b> Eight invented service points at real palika locations show how the page works. Live entries come from the Referral Directory form once it is connected to the reporting backend; each entry is checked by coordination before it appears here.</p>
+<div class="kpis" id="kpis"></div>
+<div class="filters">
+ <div><label for="fDistrict">District</label><select id="fDistrict"></select></div>
+ <div><label for="fPalika">Palika</label><select id="fPalika"></select></div>
+ <div><label for="fService">MHPSS service</label><select id="fService"></select></div>
+ <div><label for="fCross">Protection / GBV service</label><select id="fCross"></select></div>
+</div>
+<div class="grid">
+ <section class="panel2"><h2>Where the services are</h2><div class="body"><div id="map" style="height:420px;border-radius:10px;border:1px solid #d6e0ea"></div>
+ <p class="src" style="margin-top:8px"><span style="color:#1f6fb2">●</span> Pin public &nbsp; <span style="color:#6b4fa0">●</span> Public shows palika only &nbsp; <span style="color:#a3221c">●</span> Coordination only (safe spaces, safe houses, child shelters). This page is restricted, so coordination sees every pin; the public directory shows only the blue ones.</p></div></section>
+ <section class="panel2"><h2>Gaps by palika</h2><div class="body scroll"><table class="t" id="gaps"></table>
+ <p class="src" style="margin-top:8px">"None" means no registered point offers the service in that palika yet. Key services follow the risks named by field staff in Nuwakot and Rasuwa and the MSP activities that carry them.</p></div></section>
+</div>
+<section class="panel2"><h2>Service points</h2><div class="body scroll"><table class="t" id="list"></table>
+<p style="margin-top:10px"><button type="button" class="btn2" id="csv">Export this view (CSV)</button></p></div></section>
+<section class="panel2"><h2>Staffing gaps reported by service points</h2><div class="body"><ul id="staff" style="margin:0;padding-left:18px"></ul>
+<p class="src">Internal. Shown to coordination only, never on the public directory.</p></div></section>
+<p class="src">Alignment: MSP service codes from Tool 3B and referral fields from Tool 4 of the multi-sectoral MHPSS assessment toolkit that accompanies the IASC MHPSS MSP (field-test draft, May 2024); protection and GBV categories from the Nepal Protection Cluster referral pathway.</p>
+</main>
+<script src="assets/codes.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="assets/layer2-nav.js"></script>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const C=window.CODES||{};const PAL=Object.fromEntries((C.PALIKAS||[]).map(p=>[p.pcode,p]));const DIS=Object.fromEntries((C.DISTRICTS||[]).map(d=>[d.code,d]));
+function rng(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+const pick=(r,a)=>a[Math.floor(r()*a.length)];
+const pal=c=>(PAL[c]||{}).name||c;
+const ACTIVE=/grief\.html$/.test(location.pathname)?"grief":"directory";$$("[data-destination]").forEach(a=>a.dataset.destination===ACTIVE?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current"));
+function opt(sel,items,all){$(sel).innerHTML=`<option value="">${all}</option>`+items.map(([v,t])=>`<option value="${v}">${t}</option>`).join("")}
+
+const SERVICES=[["1","Early childhood development","3.5"],["2","Group activities for children","3.6"],["3","Group activities for adults",""],["4","Safe spaces for women and girls","3.9"],["5","Psychosocial support in education","3.8"],["6","Mental health in general health care","3.10"],["7","Psychological interventions","3.12"],["8","Specialised mental health care",""],["9","Psychiatric hospitals and institutions","3.14"]];
+const CROSS=[["CM-GBV","GBV case management","3.13"],["CM-CP","Child protection case management","3.13"],["CMR","CMR (72 hours) / OCMC","3.11"],["SAFEHOUSE","Safe house / shelter",""],["LEGAL","Legal services",""],["TRACING","Family tracing",""]];
+const SENS=new Set(["4"]),SENSX=new Set(["SAFEHOUSE"]);
+const R=rng(20261119);
+const PLACES=[["NP0329403",28.205,85.375,"Ward office"],["NP0329402",28.117,85.295,"Health post"],["NP0329401",28.164,85.268,"Community centre"],["NP0329404",28.030,85.230,"Health post"],["NP0328301",27.925,85.155,"District hospital"],["NP0328301",27.918,85.165,"Holding centre"],["NP0328406",27.880,85.120,"School"],["NP0328402",27.990,85.230,"Health post"]];
+const ORGSAMPLE=["Organisation A","Organisation B","Organisation C","Organisation D"];
+const DATA=PLACES.map((p,i)=>{const sv=[...new Set([pick(R,["6","7","3","2"]),pick(R,["7","8","3","1",""])])].filter(Boolean);const cx=[...new Set([pick(R,["CM-GBV","CM-CP","","LEGAL"]),pick(R,["","CMR","TRACING",""])])].filter(Boolean);if(i===5){sv.push("4");cx.push("SAFEHOUSE")}
+ const miss=i===4?["Psychosocial counsellor","Case manager","Medico-legal team"]:(R()<.3?[pick(R,["Clinical psychologist","Female staff"])]:[]);
+ const sens=sv.some(s=>SENS.has(s))||cx.some(c=>SENSX.has(c));
+ return{id:"SP"+(101+i),place:`${p[3]} (sample ${i+1})`,org:ORGSAMPLE[i%4],palika:p[0],district:(PAL[p[0]]||{}).district||"",lat:p[1],lng:p[2],services:sv,cross:cx,missing:miss,capacity:pick(R,["open","open","waiting","full"]),vis:sens?"internal":pick(R,["public","public","palika"]),phone:"01-000"+(100+i)}});
+const svcName=c=>(SERVICES.find(s=>s[0]===c)||CROSS.find(s=>s[0]===c)||[c,c])[1];
+const mspOf=r=>[...new Set(r.services.map(c=>(SERVICES.find(s=>s[0]===c)||[])[2]).concat(r.cross.map(c=>(CROSS.find(s=>s[0]===c)||[])[2])).filter(Boolean))].sort();
+opt("#fDistrict",[...new Set(DATA.map(r=>r.district))].map(d=>[d,(DIS[d]||{}).name||d]),"All");
+opt("#fPalika",[...new Set(DATA.map(r=>r.palika))].map(p=>[p,pal(p)]),"All");
+opt("#fService",SERVICES.map(s=>[s[0],s[1]]),"All");opt("#fCross",CROSS.map(s=>[s[0],s[1]]),"All");
+let map,layer;
+function filtered(){const d=$("#fDistrict").value,p=$("#fPalika").value,s=$("#fService").value,x=$("#fCross").value;return DATA.filter(r=>(!d||r.district===d)&&(!p||r.palika===p)&&(!s||r.services.includes(s))&&(!x||r.cross.includes(x)))}
+const KEY=[["Psychological interventions",r=>r.services.includes("7")],["Mental health in general health care",r=>r.services.includes("6")],["Specialised mental health care",r=>r.services.includes("8")||r.services.includes("9")],["Group activities",r=>r.services.includes("2")||r.services.includes("3")],["GBV case management",r=>r.cross.includes("CM-GBV")],["Child protection case management",r=>r.cross.includes("CM-CP")],["CMR / OCMC",r=>r.cross.includes("CMR")],["Safe house or child shelter",r=>r.cross.includes("SAFEHOUSE")],["Legal services",r=>r.cross.includes("LEGAL")],["Family tracing",r=>r.cross.includes("TRACING")]];
+function render(){const l=filtered();
+ const msps=new Set(l.flatMap(mspOf));
+ $("#kpis").innerHTML=[[l.length,"Service points","registered and checked","#1f6fb2"],[new Set(l.map(r=>r.org)).size,"Organisations","with at least one point","#0f7a6b"],[new Set(l.map(r=>r.palika)).size,"Palikas covered","with at least one point","#6b4fa0"],[msps.size,"MSP activities","offered somewhere","#a3346b"],[l.filter(r=>r.missing.length).length,"Points short of staff","roles needed now","#a35a00"]].map(([n,t,s,c])=>`<div class="kpi" style="--c:${c}"><b>${n}</b><span>${t}</span><small>${s}</small></div>`).join("");
+ if(!map){map=L.map("map",{scrollWheelZoom:false}).setView([28.05,85.25],10);L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap contributors"}).addTo(map);layer=L.layerGroup().addTo(map)}
+ layer.clearLayers();const pts=[];
+ l.forEach(r=>{const col=r.vis==="public"?"#1f6fb2":r.vis==="palika"?"#6b4fa0":"#a3221c";L.circleMarker([r.lat,r.lng],{radius:9,color:"#fff",weight:2,fillColor:col,fillOpacity:.95}).addTo(layer).bindPopup(`<b>${r.place}</b><br>${r.org} · ${pal(r.palika)}<br>${mspOf(r).map(m=>"MSP "+m).join(", ")||"—"}<br>☎ ${r.phone}<br><i>${r.vis==="public"?"Pin public":r.vis==="palika"?"Public shows palika only":"Coordination only — not on the public map"}</i>`);pts.push([r.lat,r.lng])});
+ if(pts.length)map.fitBounds(pts,{padding:[30,30],maxZoom:12});
+ const ps=[...new Set(l.map(r=>r.palika))];
+ $("#gaps").innerHTML="<thead><tr><th>Key service</th>"+ps.map(p=>`<th>${pal(p)}</th>`).join("")+"</tr></thead><tbody>"+KEY.map(([n,f])=>"<tr><td>"+n+"</td>"+ps.map(p=>{const k=l.filter(r=>r.palika===p&&f(r)).length;return k?`<td class="ok">${k}</td>`:`<td class="gap">None</td>`}).join("")+"</tr>").join("")+"</tbody>";
+ $("#list").innerHTML="<thead><tr><th>Place</th><th>Organisation</th><th>Palika</th><th>MHPSS services</th><th>Protection / GBV</th><th>Taking people</th><th>Pin</th></tr></thead><tbody>"+l.map(r=>`<tr><td>${r.place}</td><td>${r.org}</td><td>${pal(r.palika)}</td><td>${r.services.map(c=>`<span class="chip">${svcName(c)}</span>`).join("")}</td><td>${r.cross.map(c=>`<span class="chip">${svcName(c)}</span>`).join("")||"—"}</td><td>${{open:"Yes",waiting:"Waiting list",full:"Not now"}[r.capacity]}</td><td>${{public:"Public",palika:"Palika only",internal:"Coordination only"}[r.vis]}</td></tr>`).join("")+"</tbody>";
+ const short=l.filter(r=>r.missing.length);$("#staff").innerHTML=short.length?short.map(r=>`<li><b>${r.place}</b> (${pal(r.palika)}): ${r.missing.join(", ")}</li>`).join(""):"<li>No staffing gaps reported.</li>"}
+$$(".filters select").forEach(s=>s.onchange=render);render();
+$("#csv").onclick=()=>{const l=filtered();const esc=v=>`"${String(v).replace(/"/g,'""')}"`;const rows=[["id","place","organisation","palika","msp","services","protection_gbv","taking_people","pin"]].concat(l.map(r=>[r.id,r.place,r.org,pal(r.palika),mspOf(r).join("; "),r.services.map(svcName).join("; "),r.cross.map(svcName).join("; "),r.capacity,r.vis]));const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["﻿"+rows.map(x=>x.map(esc).join(",")).join("\n")],{type:"text/csv"}));a.download="referral-directory-sample.csv";a.click()};
+</script>
+</body></html>
