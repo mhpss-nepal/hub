@@ -35,10 +35,10 @@ window.BRAND = {
 /* The ministry's name, verified 16 September 2026 from the government's own
    sites: mohp.gov.np prints "Ministry of Health and Food Safety Nepal" and
    edcd.gov.np gives its parent ministry as "Ministry of Health and Food
-   Safety". The abbreviation the ministry still uses for itself is MoHP, and
-   its domain is still mohp.gov.np -- so "MoHP" is right and "MoHFS" is not
-   what they call themselves. "Ministry of Health and Population" is the old
-   name; do not put it back. */
+   Safety". Its domain is still mohp.gov.np. The project naming rule (MHPSS
+   Nepal manual, section 8) writes the abbreviation as MoHFS in new material;
+   "MoHP" only when quoting an older publication. Changed on 20 Nov 2026.
+   "Ministry of Health and Population" is the old name; do not put it back. */
 (function () {
   "use strict";
   var B = window.BRAND, P = B.prefix;
@@ -61,7 +61,7 @@ window.BRAND = {
         (B.who  ? mark(B.who,  "WHO Nepal")
                 : credit("WHO Nepal", "with the support of")) +
         (B.mohp ? mark(B.mohp, "Ministry of Health and Food Safety — EDCD")
-                : credit("MoHP &middot; EDCD", "in coordination with")) +
+                : credit("MoHFS &middot; EDCD", "in coordination with")) +
       '</div>';
   }
 

@@ -2521,7 +2521,7 @@ window.I18N_STRINGS = {
     "attrib.body":        "Developed for the MHPSS Technical Working Group, Rasuwa / Bhote Koshi flood response, with support from WHO Nepal and in coordination with the Ministry of Health and Food Safety — Epidemiology and Disease Control Division.",
     "attrib.who":         "WHO Nepal",
     "attrib.whoRole":     "with the support of",
-    "attrib.mohp":        "MoHP · EDCD",
+    "attrib.mohp":        "MoHFS · EDCD",
     "attrib.mohpRole":    "in coordination with",
 
     /* ---- hub landing page ---- */
