@@ -41,3 +41,36 @@ class DashboardDoorTest(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class DirectorySeedPrivacyTest(unittest.TestCase):
+    """The directory page is a static file in a public repository: it may carry
+    organisation-level rows only. Staff names, phones and e-mails stay in the
+    restricted workbook on the coordination Mac (decision 19 Nov 2026)."""
+    CADRES = {'Psychiatrist', 'Clinical psychologist', 'Psychologist', 'Senior psychosocial counsellor',
+              'Community psychosocial worker', 'Psychosocial counsellor', 'PFA volunteer', 'Nurse',
+              'Child mental health officer', 'MHPSS coordinator', 'Health coordinator', 'Psychology student'}
+
+    def setUp(self):
+        import json
+        s = (ROOT / 'directory.html').read_text(encoding='utf-8')
+        self.html = s
+        self.seed = json.loads(re.search(r'const SEED=(\{.*?\});\n', s, re.S).group(1))
+
+    def test_no_contact_details(self):
+        self.assertNotIn('@', json_dump(self.seed))
+        self.assertIsNone(re.search(r'\b9[78]\d{8}\b', json_dump([p for p in self.seed['points']])))
+
+    def test_cadres_come_from_the_whitelist_only(self):
+        for p in self.seed['points']:
+            for part in filter(None, p['cadres'].split('; ')):
+                self.assertIn(re.sub(r' \d+$', '', part), self.CADRES, p['id'])
+
+    def test_rows_are_marked_unconfirmed_and_safe_homes_are_not_shown(self):
+        self.assertIn('Unconfirmed', self.html)
+        self.assertNotIn('Safe home', json_dump(self.seed['points']))
+
+
+def json_dump(x):
+    import json
+    return json.dumps(x, ensure_ascii=False)
