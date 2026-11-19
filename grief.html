@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grief Mapping — MHPSS Nepal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Manrope:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="assets/design.css">
+<link rel="stylesheet" href="assets/dashboard-shell-fd41a652ea98.css">
+<link rel="stylesheet" href="assets/home-nav.css">
+
+<style>
+.l2x p,.l2x li,.l2x .note{text-align:justify;hyphens:none;-webkit-hyphens:none}
+body.dashboard-selected .skip{position:absolute;left:8px;top:-100px;z-index:999;background:white;padding:12px;color:#1d3d60}
+body.dashboard-selected .skip:focus{top:8px}
+.l2x table.t td,.l2x table.t th{text-align:left;hyphens:none}
+.l2x .sample{background:#fff4e0;border:1px solid #f0d199;color:#7a4b00;border-radius:10px;padding:10px 14px;font-size:13.5px;margin:0 0 14px}
+.l2x .kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0 0 16px}
+@media(min-width:900px){.l2x .kpis{grid-template-columns:repeat(5,minmax(0,1fr))}}
+.l2x .kpi{background:#fff;border:1px solid var(--line,#d6e0ea);border-top:4px solid var(--c,#1f6fb2);border-radius:12px;padding:14px 16px}
+.l2x .kpi b{display:block;font-size:30px;line-height:1.1;color:var(--c,#1f6fb2)}
+.l2x .kpi span{display:block;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--c,#1f6fb2);margin-top:4px}
+.l2x .kpi small{display:block;font-size:12.5px;color:#52647a;margin-top:6px;text-align:left}
+.l2x .panel2{background:#fff;border:1px solid var(--line,#d6e0ea);border-radius:12px;margin:0 0 16px;overflow:hidden}
+.l2x .panel2 h2{margin:0;padding:14px 18px;font-size:18px;color:#1b3a5f;border-bottom:1px solid var(--line,#d6e0ea);background:#f6f9fc}
+.l2x .panel2 .body{padding:14px 18px}
+.l2x .grid{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:1100px){.l2x .grid.two{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}}
+.l2x table.t{width:100%;border-collapse:collapse;font-size:13.5px}
+.l2x table.t th{background:#1b3a5f;color:#fff;text-align:left;padding:8px 10px;font-weight:700;font-size:12px;letter-spacing:.03em}
+.l2x table.t td{border-bottom:1px solid #e3eaf1;padding:8px 10px;vertical-align:top}
+.l2x .scroll{overflow-x:auto}
+.l2x .filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:14px}
+@media(min-width:900px){.l2x .filters{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.l2x .filters label{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#45546b;display:block;margin-bottom:4px}
+.l2x .filters select{width:100%;font:inherit;font-size:14px;padding:9px 10px;border:1px solid #b9c8d6;border-radius:10px;background:#fff}
+.l2x .ok{background:#e6f5ec;color:#1e7a4c;font-weight:700} .l2x .gap{background:#fdecea;color:#a3221c;font-weight:700}
+.l2x .chip{display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:1px 6px;margin:1px 3px 1px 0;background:#e8f1fa;color:#1f6fb2;white-space:nowrap}
+.l2x .bar{height:10px;border-radius:6px;background:var(--c,#5b4a8b)} .l2x .track{background:#eef1f6;border-radius:6px}
+.l2x .brow{display:grid;grid-template-columns:minmax(0,1fr) 70px;gap:10px;align-items:center;margin:7px 0;font-size:13.5px}
+.l2x .src{font-size:12.5px;color:#52647a}
+.l2x .btn2{font:inherit;font-size:13.5px;border-radius:10px;padding:8px 12px;border:1px solid #1f6fb2;background:#fff;color:#1f6fb2;cursor:pointer}
+</style>
+</head>
+<body class="hub dashboard-selected l2-shell"><nav aria-label="Home navigation"><a data-home-link href="./">← Back to Home</a></nav>
+<a class="skip" href="#dashboard-main">Skip to dashboard</a>
+<header class="top"><div><h1>Grief Mapping — by palika</h1><div class="sub">Nepal · losses, mourning and needs after the flood · totals only · restricted coordination</div></div></header>
+<!--NAV:rail hubindex-->
+<button class="l2-menu" type="button" aria-controls="layer2-sidebar" aria-expanded="false">☰ <span>Menu</span></button>
+<div class="l2-backdrop" hidden></div>
+<aside class="rail" id="layer2-sidebar" aria-label="Layer 2 navigation">
+ <div class="l2-brand"><strong>MHPSS Nepal</strong><span>Coordination dashboard</span><button class="l2-close" type="button" aria-label="Close menu">×</button></div>
+ <nav aria-label="Dashboard sections"><p class="l2-navlabel">Dashboard</p><a data-destination="current" href="index.html?view=dashboard&house=5ws"><span>5Ws Reports</span><small>Activities by place and type</small></a><a data-destination="directory" href="directory.html"><span>Referral Directory</span><small>Services on a map · gaps</small></a><a data-destination="grief" href="grief.html"><span>Grief Mapping</span><small>By palika · totals only</small></a><a data-destination="training" href="index.html?view=dashboard&house=training"><span>Training &amp; orientation</span><small>Sessions and participants</small></a><a data-destination="providers" href="index.html?view=dashboard&house=providers"><span>Provider register</span><small>Registrations for review</small></a><a data-destination="servicepoints" href="index.html?view=dashboard&house=servicepoints"><span>Service points</span><small>Registrations for review</small></a><div class="l2-owner" hidden><p class="l2-navlabel">Coordination team</p><a data-destination="historical" href="review-analytics-v48/?source=historical"><span>Historical Baseline</span><small>Earlier records</small></a><a data-destination="sample" href="legacy-dashboard.html?source=demo"><span>Sample Data</span><small>Demonstration examples</small></a></div><p class="l2-navlabel">Field forms</p><a class="l2-form-link" href="../form/">Open field forms ↗</a></nav>
+ <p class="l2-foot">MHPSS Nepal · coordination dashboard</p>
+</aside>
+<!--/NAV-->
+<main class="wrap wide l2x" id="dashboard-main">
+
+<p class="sample"><b>Sample data — synthetic, not real.</b> Invented conversations at real palikas show how the page works. Live totals come from the Grief Early Assessment form used by CMC-Nepal field staff once it is connected. Coordination sees totals only, never a single person.</p>
+<div class="filters" style="grid-template-columns:minmax(0,320px)"><div><label for="fPalika">Palika</label><select id="fPalika"></select></div></div>
+<div class="kpis" id="kpis"></div>
+<section class="panel2"><h2>By palika</h2><div class="body scroll"><table class="t" id="table"></table>
+<p class="src" style="margin-top:8px">Palikas with fewer than five conversations are hidden. The figures describe losses and needs; they are not diagnoses and no score is calculated.</p></div></section>
+<div class="grid two">
+ <section class="panel2"><h2>Reactions reported on most days</h2><div class="body" id="rx"></div></section>
+ <div>
+  <section class="panel2"><h2>What is in the way of rites</h2><div class="body" id="obs"></div></section>
+  <section class="panel2"><h2>What would help most</h2><div class="body" id="needs"></div></section>
+ </div>
+</div>
+<p class="src">Questions follow WHO mhGAP Humanitarian Intervention Guide (2015), grief module pp. 17–20, and the programme design of 6 October 2026 (Box 1). No screening scale is used before 26 February 2027.</p>
+</main>
+<script src="assets/codes.js"></script>
+
+<script src="assets/layer2-nav.js"></script>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const C=window.CODES||{};const PAL=Object.fromEntries((C.PALIKAS||[]).map(p=>[p.pcode,p]));const DIS=Object.fromEntries((C.DISTRICTS||[]).map(d=>[d.code,d]));
+function rng(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+const pick=(r,a)=>a[Math.floor(r()*a.length)];
+const pal=c=>(PAL[c]||{}).name||c;
+const ACTIVE=/grief\.html$/.test(location.pathname)?"grief":"directory";$$("[data-destination]").forEach(a=>a.dataset.destination===ACTIVE?a.setAttribute("aria-current","page"):a.removeAttribute("aria-current"));
+function opt(sel,items,all){$(sel).innerHTML=`<option value="">${all}</option>`+items.map(([v,t])=>`<option value="${v}">${t}</option>`).join("")}
+
+const RX=[["sad","Sadness"],["yearn","Yearning for the person who died"],["intrusive","Unwanted memories of what happened"],["sleep","Sleep problems"],["appetite","Little appetite or energy"],["concentr","Difficulty concentrating"],["withdraw","Keeping away from others"],["body","Body pains without clear cause"],["voice","Hearing or seeing the person who died"],["anger","Anger"],["compare","Comparing life before and after the flood"]];
+const OBS={nobody:"No body found",cost:"Cost",priest:"Priest, lama or elder not available",place:"Place destroyed or unsafe",displaced:"Family displaced",timing:"Customary time has passed"};
+const NEEDS={rites:"Help with rites or a memorial",news:"News about a missing relative",talk:"Someone to talk to",group:"Meeting others who lost family",livelihood:"Help with income or housing",health:"Health care for body complaints",documents:"Help with documents",safety:"Protection or safety"};
+const R=rng(1119);const PALS=[["NP0329403",34],["NP0329402",22],["NP0329401",14],["NP0328301",9],["NP0329404",3]];
+const DATA=[];PALS.forEach(([p,n])=>{for(let i=0;i<n;i++){const declined=R()<.12;if(declined){DATA.push({palika:p,consent:"no"});continue}
+ const miss=R()<(p==="NP0329403"?.55:.25);const rites=miss?pick(R,["waiting","blocked","adapted","waiting"]):pick(R,["completed","completed","adapted","waiting"]);
+ const rx={};RX.forEach(([k])=>rx[k]=R()<(k==="sleep"||k==="sad"||k==="yearn"?.45:k==="compare"||k==="anger"?.3:.15)?2:(R()<.5?1:0));
+ const red=R()<.05;DATA.push({palika:p,consent:"yes",nMissing:miss?1:0,nDied:R()<.6?1:0,rites,obstacles:rites==="blocked"||rites==="waiting"?[miss?"nobody":pick(R,["cost","priest","place","displaced"])]:[],rx,functioning:pick(R,["usual","difficulty","difficulty","unable","usual"]),needs:[pick(R,Object.keys(NEEDS)),pick(R,["rites","livelihood","talk","news"])],red,referred:red||R()<.2})}});
+const MIN=5;
+function render(){const p=$("#fPalika").value;const l=DATA.filter(r=>!p||r.palika===p),A=l.filter(r=>r.consent==="yes");
+ $("#kpis").innerHTML=[[A.length,"Conversations","adults who agreed","#5b4a8b"],[l.length-A.length,"Declined","or asked to talk later","#52647a"],[A.filter(r=>r.nMissing>0).length,"Relative still missing","ambiguous loss","#a3346b"],[A.filter(r=>r.rites==="waiting"||r.rites==="blocked").length,"Rites waiting or blocked","where support can help","#a35a00"],[A.filter(r=>r.red).length,"Red flags","cared for the same day","#a3221c"]].map(([n,t,s,c])=>`<div class="kpi" style="--c:${c}"><b>${n}</b><span>${t}</span><small>${s}</small></div>`).join("");
+ const by={};DATA.forEach(r=>{const g=by[r.palika]=by[r.palika]||{n:0,dec:0,miss:0,rites:0,obs:{},func:0,ref:0,needs:{}};if(r.consent!=="yes"){g.dec++;return}g.n++;if(r.nMissing)g.miss++;if(r.rites==="waiting"||r.rites==="blocked")g.rites++;r.obstacles.forEach(o=>g.obs[o]=(g.obs[o]||0)+1);if(r.functioning!=="usual")g.func++;if(r.referred)g.ref++;r.needs.forEach(o=>g.needs[o]=(g.needs[o]||0)+1)});
+ const top=(o,M)=>{const k=Object.entries(o).sort((a,b)=>b[1]-a[1])[0];return k?M[k[0]]:"—"};const pct=(a,b)=>b?Math.round(100*a/b)+"%":"—";
+ $("#table").innerHTML="<thead><tr><th>Palika</th><th>Conversations</th><th>Declined</th><th>Relative missing</th><th>Rites waiting / blocked</th><th>Main obstacle</th><th>Daily life affected</th><th>Referred</th><th>Most asked-for help</th></tr></thead><tbody>"+Object.entries(by).filter(([k])=>!p||k===p).sort((a,b)=>b[1].n-a[1].n).map(([k,g])=>g.n<MIN?`<tr><td>${pal(k)}</td><td colspan="8" class="src">Fewer than ${MIN} conversations — totals hidden to protect the people who took part.</td></tr>`:`<tr><td>${pal(k)}</td><td>${g.n}</td><td>${g.dec}</td><td>${g.miss} · ${pct(g.miss,g.n)}</td><td>${g.rites} · ${pct(g.rites,g.n)}</td><td>${top(g.obs,OBS)}</td><td>${g.func} · ${pct(g.func,g.n)}</td><td>${g.ref}</td><td>${top(g.needs,NEEDS)}</td></tr>`).join("")+"</tbody>";
+ $("#rx").innerHTML=RX.map(([k,t])=>{const n=A.filter(r=>r.rx[k]===2).length,v=A.length?Math.round(100*n/A.length):0;return`<div class="brow"><div>${t}<div class="track"><div class="bar" style="width:${v}%"></div></div></div><div style="text-align:right">${n} · ${v}%</div></div>`}).join("");
+ const obs={};A.forEach(r=>r.obstacles.forEach(o=>obs[o]=(obs[o]||0)+1));const mo=Math.max(1,...Object.values(obs));
+ $("#obs").innerHTML=Object.entries(obs).sort((a,b)=>b[1]-a[1]).map(([k,n])=>`<div class="brow"><div>${OBS[k]}<div class="track"><div class="bar" style="--c:#a35a00;width:${Math.round(100*n/mo)}%"></div></div></div><div style="text-align:right">${n}</div></div>`).join("")||"<p class='src'>None reported.</p>";
+ const nd={};A.forEach(r=>r.needs.forEach(o=>nd[o]=(nd[o]||0)+1));const mn=Math.max(1,...Object.values(nd));
+ $("#needs").innerHTML=Object.entries(nd).sort((a,b)=>b[1]-a[1]).map(([k,n])=>`<div class="brow"><div>${NEEDS[k]}<div class="track"><div class="bar" style="--c:#0f7a6b;width:${Math.round(100*n/mn)}%"></div></div></div><div style="text-align:right">${n}</div></div>`).join("")}
+opt("#fPalika",PALS.map(([p])=>[p,pal(p)]),"All palikas");$("#fPalika").onchange=render;render();
+</script>
+</body></html>
