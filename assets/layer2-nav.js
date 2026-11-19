@@ -52,7 +52,9 @@
   phone.addEventListener('change', function () { setOpen(false); });
   function mark() {
     var path = location.pathname;
-    var key = /\/review-current-v51\/(?:index.html)?$/.test(path) ? 'current' : /\/review-analytics-v48\/(?:index.html)?$/.test(path) ? 'historical' : new URLSearchParams(location.search).get('source') === 'demo' ? 'sample' : '';
+    var key = /\/review-current-v51\/(?:index.html)?$/.test(path) ? 'current' : /\/review-analytics-v48\/(?:index.html)?$/.test(path) ? 'historical' : /\/directory\.html$/.test(path) ? 'directory' : /\/grief\.html$/.test(path) ? 'grief' : new URLSearchParams(location.search).get('source') === 'demo' ? 'sample' : '';
+    var owner = rail.querySelector('.l2-owner');
+    if (owner) owner.hidden = !(key === 'historical' || key === 'sample');
     rail.querySelectorAll('[data-destination]').forEach(function (a) {
       if (a.dataset.destination === key) a.setAttribute('aria-current', 'page');
       else a.removeAttribute('aria-current');
