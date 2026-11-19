@@ -140,7 +140,6 @@ window.I18N_STRINGS = {
        A key absent from both is simply not translated yet. */
     source: { machine: [
       /* ==== BEGIN dir-form ==== */
-      "dirf.001",
       "dirf.002",
       "dirf.003",
       "dirf.004",
@@ -385,7 +384,6 @@ window.I18N_STRINGS = {
       "dirf.msg.nothing",
       /* ==== END dir-form ==== */
       /* ==== BEGIN grief-form ==== */
-      "grief.001",
       "grief.002",
       "grief.003",
       "grief.004",
@@ -1545,7 +1543,6 @@ window.I18N_STRINGS = {
 
   en: {
     /* ==== BEGIN dir-form ==== */
-    "dirf.001": "PREVIEW FOR REVIEW · 19 Nov 2026 · Entries stay on this device only — nothing is sent anywhere",
     "dirf.002": "Layer 1 · Field form · MHPSS Nepal",
     "dirf.003": "Referral Directory — Service Mapping",
     "dirf.004": "One entry is one place where clients can be referred for MHPSS services.",
@@ -1704,8 +1701,8 @@ window.I18N_STRINGS = {
     "dirf.173": "How long it runs",
     "dirf.174": "MSP mapping",
     "dirf.175": "(optional)",
-    "dirf.177": "Preview build. In the live version, a saved entry goes to coordination for a check before it appears on the public directory.",
-    "dirf.178": "MHPSS Nepal · Referral Directory — Service Mapping · preview v2.2, 19 Nov 2026 · Draft instrument, to be agreed with partners. English is the reference text; the Nepali is a draft translation under review by a native speaker before field use.",
+    "dirf.177": "Coordination checks each entry before it appears on the public directory.",
+    "dirf.178": "MHPSS Nepal · Referral Directory — Service Mapping · version 2.2, 19 November 2026 · English is the reference text; the Nepali translation is being reviewed by a native speaker.",
     "dirf.o.services.1": "1. Early childhood development",
     "dirf.o.services.1.d": "ECD activities for young children and their caregivers, e.g. mother–baby spaces",
     "dirf.o.services.2": "2. Group activities for children",
@@ -1795,7 +1792,6 @@ window.I18N_STRINGS = {
     "dirf.msg.nothing": "Nothing saved yet.",
     /* ==== END dir-form ==== */
     /* ==== BEGIN grief-form ==== */
-    "grief.001": "PREVIEW FOR REVIEW · 19 Nov 2026 · Entries stay on this device only — nothing is sent anywhere",
     "grief.002": "Layer 1 · Field form · MHPSS Nepal · for CMC-Nepal field staff",
     "grief.003": "Grief Early Assessment",
     "grief.004": "A short conversation added to a contact you already have. It maps losses, mourning and needs. It does not diagnose anyone.",
@@ -1906,7 +1902,7 @@ window.I18N_STRINGS = {
     "grief.141": "Support",
     "grief.142": "Safety and next step",
     "grief.143": "Coordination sees only totals per palika. Rows stay with the organisation that recorded them.",
-    "grief.144": "MHPSS Nepal · Grief Early Assessment · preview 19 Nov 2026 · Draft instrument for CMC-Nepal. English is the reference text; the Nepali is a draft translation under review by a native-speaking clinician before field use.",
+    "grief.144": "MHPSS Nepal · Grief Early Assessment · version of 19 November 2026 · English is the reference text; the Nepali translation is being reviewed by a native-speaking clinician.",
     "grief.o.who.spouse": "Husband / wife / partner",
     "grief.o.who.child": "Son / daughter",
     "grief.o.who.parent": "Mother / father",
@@ -3106,7 +3102,6 @@ window.I18N_STRINGS = {
      vocabulary that then fails to match the national one. */
   ne: {
     /* ==== BEGIN dir-form ==== */
-    "dirf.001": "समीक्षाका लागि पूर्वावलोकन · १९ नोभेम्बर २०२६ · प्रविष्टिहरू यही उपकरणमा मात्र रहन्छन् — कतै पठाइँदैन",
     "dirf.002": "तह १ · फिल्ड फारम · MHPSS नेपाल",
     "dirf.003": "प्रेषण निर्देशिका — सेवा नक्साङ्कन",
     "dirf.004": "एउटा प्रविष्टि भनेको सेवाग्राहीलाई MHPSS सेवाका लागि प्रेषण गर्न सकिने एउटा स्थान हो।",
@@ -3260,8 +3255,8 @@ window.I18N_STRINGS = {
     "dirf.173": "कति समय चल्छ",
     "dirf.174": "MSP नक्साङ्कन",
     "dirf.175": "(ऐच्छिक)",
-    "dirf.177": "पूर्वावलोकन संस्करण। प्रत्यक्ष संस्करणमा, सुरक्षित गरिएको प्रविष्टि सार्वजनिक निर्देशिकामा देखिनुअघि जाँचका लागि समन्वयमा जान्छ।",
-    "dirf.178": "MHPSS नेपाल · प्रेषण निर्देशिका — सेवा नक्साङ्कन · पूर्वावलोकन v2.2, १९ नोभेम्बर २०२६ · साझेदारहरूसँग सहमति गर्न बाँकी मस्यौदा उपकरण। अङ्ग्रेजी पाठ आधिकारिक हो; नेपाली मस्यौदा अनुवाद हो र फिल्डमा प्रयोग गर्नुअघि नेपाली भाषीबाट समीक्षा हुँदैछ।",
+    "dirf.177": "सार्वजनिक निर्देशिकामा देखिनुअघि समन्वयले हरेक प्रविष्टि जाँच गर्छ।",
+    "dirf.178": "MHPSS नेपाल · प्रेषण निर्देशिका — सेवा नक्साङ्कन · संस्करण २.२, १९ नोभेम्बर २०२६ · अङ्ग्रेजी पाठ आधिकारिक हो; नेपाली अनुवाद नेपाली भाषीबाट समीक्षा भइरहेको छ।",
     "dirf.o.services.1": "1. प्रारम्भिक बाल विकास",
     "dirf.o.services.1.d": "साना बालबालिका र तिनका हेरचाहकर्ताका लागि प्रारम्भिक बाल विकास गतिविधि, जस्तै आमा–शिशु स्थल",
     "dirf.o.services.2": "2. बालबालिकाका लागि समूह गतिविधि",
@@ -3351,7 +3346,6 @@ window.I18N_STRINGS = {
     "dirf.msg.nothing": "अहिलेसम्म केही सुरक्षित गरिएको छैन।",
     /* ==== END dir-form ==== */
     /* ==== BEGIN grief-form ==== */
-    "grief.001": "समीक्षाका लागि पूर्वावलोकन · १९ नोभेम्बर २०२६ · प्रविष्टिहरू यही उपकरणमा मात्र रहन्छन् — कतै पठाइँदैन",
     "grief.002": "तह १ · फिल्ड फारम · MHPSS नेपाल · CMC-Nepal का फिल्ड कर्मचारीहरूका लागि",
     "grief.003": "शोकको प्रारम्भिक मूल्याङ्कन",
     "grief.004": "तपाईंले पहिले नै गरिरहेको भेटमा थपिने छोटो कुराकानी। यसले क्षति, शोक र आवश्यकताहरूको नक्सा बनाउँछ। यसले कसैको रोग निदान गर्दैन।",
@@ -3452,7 +3446,7 @@ window.I18N_STRINGS = {
     "grief.141": "सहयोग",
     "grief.142": "सुरक्षा र अर्को कदम",
     "grief.143": "समन्वयले पालिकाअनुसारको जम्मा संख्या मात्र देख्छ। विवरणहरू रेकर्ड गर्ने संस्थामै रहन्छन्।",
-    "grief.144": "MHPSS नेपाल · शोकको प्रारम्भिक मूल्याङ्कन · पूर्वावलोकन १९ नोभेम्बर २०२६ · CMC-Nepal का लागि मस्यौदा उपकरण। अङ्ग्रेजी पाठ आधिकारिक हो; नेपाली मस्यौदा अनुवाद हो र फिल्डमा प्रयोग गर्नुअघि नेपाली भाषी चिकित्सकबाट समीक्षा हुँदैछ।",
+    "grief.144": "MHPSS नेपाल · शोकको प्रारम्भिक मूल्याङ्कन · १९ नोभेम्बर २०२६ को संस्करण · अङ्ग्रेजी पाठ आधिकारिक हो; नेपाली अनुवाद नेपाली भाषी चिकित्सकबाट समीक्षा भइरहेको छ।",
     "grief.o.who.spouse": "श्रीमान् / श्रीमती / जीवनसाथी",
     "grief.o.who.child": "छोरा / छोरी",
     "grief.o.who.parent": "आमा / बुबा",
