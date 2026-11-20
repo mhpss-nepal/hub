@@ -28,6 +28,11 @@ input[type=email],input[type=password],select,textarea{width:100%;box-sizing:bor
 .btn[disabled]{opacity:.5;cursor:default}
 .actions{display:flex;flex-wrap:wrap;gap:8px}
 .chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin:0 0 12px}
+/* QC 20 Nov 2026: links to send after giving access, with copy buttons */
+.share{margin-top:16px;border-top:1px solid #d6e0ea;padding-top:12px}.share h3{font-size:15px;margin:0 0 4px;color:#1b3a5f}
+.share .ln{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:7px 0;border-bottom:1px dashed #e1e8ef}.share .ln span{flex:1 1 180px;min-width:0;font-size:13.5px}
+.share .ln code{display:block;font-size:12.5px;color:#1f6fb2;overflow-wrap:anywhere;text-align:left}
+.share .btn{padding:7px 12px;font-size:13px}
 .chip{flex:0 0 auto;font:inherit;font-weight:700;font-size:13px;border:1px solid #b9c8d6;background:#fff;color:#1b3a5f;border-radius:999px;padding:7px 14px;cursor:pointer}
 .chip[aria-pressed=true]{background:#1b3a5f;color:#fff;border-color:#1b3a5f}
 .kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0 0 16px}
@@ -84,7 +89,8 @@ tr.none td{background:#fff8e6}
         <div class="card" id="peopleCard"><h2 data-i18n="team.peopleH">People and access</h2>
           <p class="lead" data-i18n="team.peopleLead">Add a person by email. They open the field forms, sign in with that email and their access is ready. Nobody can change their own access.</p>
           <div id="inviteBox"></div>
-          <div class="scroll" style="margin-top:12px"><table class="t" id="people"></table></div></div>
+          <div class="scroll" style="margin-top:12px"><table class="t" id="people"></table></div>
+          <div id="shareBox" class="share"></div></div>
       </div>
       <div class="card"><h2 data-i18n="team.recordsH">Records to check</h2>
         <div class="chips" id="statusChips" role="group" aria-label="Status"></div>
@@ -156,8 +162,26 @@ function renderProgress(){
   $("#progress").innerHTML="<thead><tr><th>"+esc(T("team.c.person","Person"))+"</th>"+(one?"":"<th>"+esc(T("team.c.org","Organisation"))+"</th>")+"<th>"+esc(T("team.c.entries","Records"))+"</th><th>"+esc(T("team.c.last","Last"))+"</th><th>"+esc(T("team.c.pending","Waiting"))+"</th><th>"+esc(T("team.c.returned","Returned"))+"</th></tr></thead><tbody>"+
    (g.length?g.map(function(p){return '<tr class="'+(p.entries?"":"none")+'"><td>'+esc(p.email)+(p.role?" <small>("+esc(T("team.role."+p.role,ROLE[p.role]||p.role))+")</small>":"")+"</td>"+(one?"":"<td>"+esc(org(p.org))+"</td>")+"<td>"+(p.entries||esc(T("team.noEntry","none yet")))+"</td><td style=\"white-space:nowrap\">"+esc((p.last||"").slice(0,10))+"</td><td>"+p.pending+"</td><td>"+p.returned+"</td></tr>"}).join(""):'<tr><td colspan="'+(one?5:6)+'">'+esc(T("team.nobody","Nobody with access yet."))+"</td></tr>")+"</tbody>";
 }
+var SITE="https://mhpss-nepal.github.io/";
+var LINKS=[["form/",T("team.l.forms","Field forms — for everyone you add (phone)")],
+ ["hub/team.html",T("team.l.team","Team and checking — for coordinators and focal points")],
+ ["hub/grief.html",T("team.l.grief","Grief Mapping dashboard — totals per palika")],
+ ["form/preview/grief-early-assessment.html",T("team.l.griefForm","Grief conversation form — direct link")],
+ ["form/preview/referral-directory.html",T("team.l.dirForm","Referral Directory form — direct link")]];
+function shareMsg(){return T("team.l.msgText","You now have access to the MHPSS field forms.\n1. Open "+SITE+"form/ on your phone.\n2. Type your work email (the one this message was sent to) and tap \u201cEmail me a sign-in link\u201d.\n3. Open the email on the same phone and tap the link (check Spam or Updates if it is not in the inbox).\nYou stay signed in. Records you save are kept on the phone and sent when it has signal; \u201cSent and confirmed by the server\u201d means they arrived.\nCoordinators: check your team\u2019s records at "+SITE+"hub/team.html")}
+function copy(t,b){var done=function(){var o=b.textContent;b.textContent=T("team.l.copied","Copied");setTimeout(function(){b.textContent=o},1500)};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,function(){prompt(T("team.l.copyHint","Copy this:"),t)});else prompt(T("team.l.copyHint","Copy this:"),t)}
+function renderShare(){
+  var box=$("#shareBox");if(!box)return;
+  box.innerHTML="<h3>"+esc(T("team.l.h","Links to send after giving access"))+'</h3><p class="lead" style="margin:0 0 6px">'+esc(T("team.l.lead","Giving access does not send an email. Send the person the field forms link, or copy the ready message."))+"</p>"+
+   LINKS.map(function(l,i){return '<div class="ln"><span>'+esc(l[1])+"<code>"+esc(SITE+l[0])+'</code></span><button class="btn ghost" data-cp="'+i+'">'+esc(T("team.l.copy","Copy link"))+"</button></div>"}).join("")+
+   '<div class="ln"><span><b>'+esc(T("team.l.msg","Ready message (email or WhatsApp)"))+'</b></span><button class="btn" id="cpMsg">'+esc(T("team.l.copyMsg","Copy message"))+"</button></div>";
+  box.querySelectorAll("[data-cp]").forEach(function(b){b.onclick=function(){copy(SITE+LINKS[+b.dataset.cp][0],b)}});
+  $("#cpMsg").onclick=function(){copy(shareMsg(),this)};
+}
 function renderPeople(){
   if(!me.canReview||!team)return;
+  renderShare();
   var orgs=(C.ORGS||[]).filter(function(o){return o.code!=="OTHER"});
   $("#inviteBox").innerHTML='<div class="kpis" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));margin:0">'+
    '<div><label class="f" for="iEmail">'+esc(T("team.i.email","Email"))+'</label><input type="email" id="iEmail"></div>'+
