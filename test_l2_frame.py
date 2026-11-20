@@ -58,6 +58,9 @@ class LayerTwoFrame(unittest.TestCase):
         self.assertIn("it[0] !== page", f)
         self.assertIn("'all organisations'", read("assets/landing.js"))
         self.assertIn("BaselineAuth.onChange", f.split("var waits")[1])
+        land = read("assets/landing.js")
+        self.assertNotIn("$('dashNav').replaceChildren()", land)
+        self.assertIn("sessionStorage.removeItem(SCOPE_KEY)", land)
         self.assertIn("#fbbar#fbbar{position:fixed", read("assets/l2-frame.css"))
 
     def test_routine_success_notice_is_not_shown(self):
