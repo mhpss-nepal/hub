@@ -1,0 +1,53 @@
+/* =====================================================================
+   MHPSS Nepal — one frame for every Layer 2 page (QC 20 Nov 2026)
+   The main dashboard (index.html, view=dashboard) is the reference. Pages
+   that live in their own file (Referral Directory, Grief Mapping, Team and
+   checking) wear the same frame: same top bar, same back bar, same 248 px
+   dark sidebar with the same menu, so moving between sections no longer
+   jumps. Values copied from landing.css + instrument-homes.css; keep the two
+   in step (test_l2_frame.py checks the key numbers).
+   ===================================================================== */
+body.l2-frame{margin:0;background:#f5f7fa;padding:0!important;display:block!important}
+body.l2-frame .l2f-lang{display:flex;justify-content:flex-end;align-items:center;background:#20313b;padding:4px 20px;min-height:52px;box-sizing:border-box}
+body.l2-frame .l2f-lang #i18nbar{position:static!important;margin:0!important;box-shadow:none!important}
+body.l2-frame .l2f-lang #i18nbar button{min-width:48px;min-height:44px}
+body.l2-frame .l2f-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 20px;min-height:60px;box-sizing:border-box;background:#fff;border-bottom:1px solid #d7e1eb;flex-wrap:wrap;font:16px/1.6 system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+body.l2-frame .l2f-bar p{margin:0;font-size:12px;color:#53697d}
+body.l2-frame .l2f-back{display:inline-flex;align-items:center;border:1px solid #c9d6e2;border-radius:9px;background:#fff;color:#193e61;padding:10px 16px;min-height:44px;box-sizing:border-box;text-decoration:none;font-size:16px}
+body.l2-frame .l2f-layout{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:calc(100vh - 112px)}
+body.l2-frame .l2f-side{background:#193d5b;color:#fff;padding:24px 16px;font:16px/1.6 system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;align-self:stretch}
+body.l2-frame .l2f-side h2{font:700 22px Georgia,serif;margin:0 0 5px;color:#fff;padding:0;border:0;background:none}
+body.l2-frame .l2f-side .l2f-scope{font-size:12px;color:#c5d8e7;margin:0 0 16px;min-height:19px}
+body.l2-frame .l2f-side .l2f-group{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#bad1e1;margin:22px 10px 8px}
+body.l2-frame .l2f-side nav a{display:block;width:100%;min-height:58px;padding:11px 12px;border-radius:9px;color:#e4edf5;margin:3px 0;font-size:14px;line-height:1.6;text-decoration:none;box-sizing:border-box;background:transparent}
+body.l2-frame .l2f-side nav a:hover{background:#ffffff14}
+body.l2-frame .l2f-side nav a span{display:block;font-weight:650}
+body.l2-frame .l2f-side nav a small{display:block;font-size:11px;line-height:1.45;margin-top:3px;color:inherit}
+body.l2-frame .l2f-side nav a.active{background:#fff;color:#173e61;font-weight:750}
+body.l2-frame .l2f-side .l2f-admin{border-top:1px solid #698197;margin-top:16px;padding-top:18px}
+body.l2-frame .l2f-main{min-width:0;background:#eef3f6}
+body.l2-frame .l2f-context{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:8px 20px;min-height:58px;box-sizing:border-box;background:#fff;border-bottom:1px solid #dae4ed;font:13px/1.6 system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;flex-wrap:wrap}
+body.l2-frame .l2f-context span{color:#49667e}
+body.l2-frame .l2f-context button{border:1px solid #c9d6e2;border-radius:9px;background:#fff;color:#193e61;padding:8px 14px;min-height:40px;font:inherit;font-size:13px;cursor:pointer}
+body.l2-frame .l2f-menu{display:none}
+body.l2-frame .l2f-content{padding:24px;box-sizing:border-box}
+/* the page's own heading becomes the same serif heading the main dashboard uses */
+body.l2-frame .l2f-content header.top{background:none!important;color:#19334b!important;padding:0 0 6px!important;margin:0 0 14px!important;border:0!important;box-shadow:none!important;display:block!important;min-height:0!important}
+body.l2-frame .l2f-content header.top h1{font:700 32px/1.2 Georgia,serif!important;color:#19334b!important;margin:0 0 8px!important;letter-spacing:0!important;text-transform:none!important}
+body.l2-frame .l2f-content header.top .sub{font:14px/1.6 system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif!important;color:#45546b!important;text-transform:none!important;letter-spacing:0!important;opacity:1!important}
+body.l2-frame .l2f-content header.top>a{display:none!important}
+body.l2-frame .l2f-content main,body.l2-frame .l2f-content .wrap,body.l2-frame .l2f-content .tw{max-width:none!important;margin:0!important;padding:0!important;width:auto!important}
+body.l2-frame .l2f-content .tw>.tbar:first-child h1{font:700 32px/1.2 Georgia,serif;color:#19334b;margin:0 0 8px}
+body.l2-frame .l2f-content .tw>.tbar:first-child .actions{display:none}
+@media(max-width:760px){
+  body.l2-frame .l2f-layout{grid-template-columns:1fr}
+  body.l2-frame .l2f-side{display:none}
+  body.l2-frame .l2f-side.open{display:block;max-height:65dvh;overflow-y:auto}
+  body.l2-frame .l2f-menu{display:inline-block}
+  body.l2-frame .l2f-bar{padding:8px 16px}
+  body.l2-frame .l2f-bar p{display:none}
+  body.l2-frame .l2f-context{gap:8px;padding:8px 16px}
+  body.l2-frame .l2f-context span{display:none}
+  body.l2-frame .l2f-content{padding:20px 16px}
+  body.l2-frame .l2f-content header.top h1,body.l2-frame .l2f-content .tw>.tbar:first-child h1{font-size:26px!important}
+}
