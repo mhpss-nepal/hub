@@ -218,7 +218,7 @@ function detail(r){
     d.push(["Code",p.code],["Date",p.date],["Palika",pal(p.palika)+(p.ward?" · ward "+p.ward:"")],["Setting",GL.setting[p.setting]||p.setting],["Agreed to talk",p.consent]);
     if(p.consent==="yes"){
       if(p.reg==="byname")d.push(["Name",p.name],["Phone",p.phone||"—"],["Reach by",p.reach||"—"]);else d.push(["Registered","Anonymous"+(p.initials?" · "+p.initials:"")]);
-      d.push(["Sex · age",p.sex+" · "+p.age],["Who died / missing",(p.who||[]).join(", ")+" · died "+p.nDied+" · missing "+p.nMissing],["Ceremonies",GL.rites[p.rites]||p.rites],["Daily life",GL.functioning[p.functioning]||p.functioning],["Worker's view",GL.triage[p.triage]||p.triage],["Action",(p.action||[]).join(", ")+((p.refTo||[]).length?" → "+p.refTo.join(", "):"")]);
+      d.push(["Sex · age",p.sex+" · "+p.age],["Who died / missing",(p.who||[]).join(", ")+" · died "+p.nDied+" · missing "+p.nMissing],["Ceremonies",GL.rites[p.rites]||p.rites],["Daily life",GL.functioning[p.functioning]||p.functioning],["Worker's view",GL.triage[p.triage]||p.triage],["Right now",p.stateNow||"—"],["PHQ-9",p.phq9?p.phq9.score+" / 27"+(p.phq9.score>=10?" (10+)":"")+(p.phq9.items[8]>0?" · item 9 positive":""):"not done"],["Action",(p.action||[]).join(", ")+((p.refTo||[]).length?" → "+p.refTo.join(", "):"")]);
     }
   }else{
     d.push(["Organisation",org(p.org)],["Palika",pal(p.palika)],["Services",(p.services||[]).concat(p.crossServices||[]).join(", ")],["Phone",p.refPhone],["Hours",p.hours],["Cost",p.cost],["Status",p.status+" · "+p.continuity+(p.until?" until "+p.until:"")]);
