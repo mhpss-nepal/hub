@@ -70,6 +70,15 @@ class LayerTwoFrame(unittest.TestCase):
             self.assertIn('"%s"' % path, t)
         self.assertIn("Giving access does not send an email", t)
 
+    def test_team_page_counts_records_per_day_and_opens_on_red_flags(self):
+        t = read("team.html")
+        self.assertIn('id="day"', t)
+        self.assertIn("r.day===day", t)
+        self.assertIn('status="redflag"', t)
+        self.assertIn('pending:"Received"', t)
+        self.assertIn("function localDay", t)
+        self.assertNotIn('when:(r.updatedAt||"").slice(0,10)', t)
+
     def test_routine_success_notice_is_not_shown(self):
         self.assertNotIn("Account access verified. Registration choices never change permissions.", read("assets/landing.js"))
 

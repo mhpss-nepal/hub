@@ -33,6 +33,8 @@ input[type=email],input[type=password],select,textarea{width:100%;box-sizing:bor
 .share .ln{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:7px 0;border-bottom:1px dashed #e1e8ef}.share .ln span{flex:1 1 180px;min-width:0;font-size:13.5px}
 .share .ln code{display:block;font-size:12.5px;color:#1f6fb2;overflow-wrap:anywhere;text-align:left}
 .share .btn{padding:7px 12px;font-size:13px}
+/* QC 20 Nov 2026: daily count for monitoring */
+.dayrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 10px}.dayrow label{margin:0}.dayrow input{width:auto;padding:7px 10px}#daySum{font-weight:700;color:#1b3a5f}
 .chip{flex:0 0 auto;font:inherit;font-weight:700;font-size:13px;border:1px solid #b9c8d6;background:#fff;color:#1b3a5f;border-radius:999px;padding:7px 14px;cursor:pointer}
 .chip[aria-pressed=true]{background:#1b3a5f;color:#fff;border-color:#1b3a5f}
 .kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0 0 16px}
@@ -84,7 +86,8 @@ tr.none td{background:#fff8e6}
     <div class="grid">
       <div>
         <div class="card"><h2 data-i18n="team.progressH">Who has entered</h2>
-          <p class="lead" data-i18n="team.progressLead">Everyone with access to this form, including those who have not entered anything yet (highlighted).</p>
+          <p class="lead" data-i18n="team.progressLead2">Pick a day to see how many records each person has sent. People with none that day are highlighted. If someone entered more than shows here, the rest are still on their phone: ask them to open the form with signal.</p>
+          <div class="dayrow"><label class="f" for="day" data-i18n="team.day">Day</label><input type="date" id="day"><span id="daySum"></span></div>
           <div class="scroll"><table class="t" id="progress"></table></div></div>
         <div class="card" id="peopleCard"><h2 data-i18n="team.peopleH">People and access</h2>
           <p class="lead" data-i18n="team.peopleLead">Add a person by email. They open the field forms, sign in with that email and their access is ready. Nobody can change their own access.</p>
@@ -112,9 +115,12 @@ tr.none td{background:#fff8e6}
 "use strict";
 var A=window.AccessAPI,T=A.T,esc=A.esc,C=window.CODES||{};
 var $=function(s){return document.querySelector(s)};
-var me=null,form="grief",status="pending",data={grief:null,directory:null},prog=null,team=null;
+var me=null,form="grief",status="redflag",data={grief:null,directory:null},prog=null,team=null;
 var ROLE={field:"Field staff",coordinator:"Coordinator",focal:"Focal point",admin:"Coordination"};
-var STAT={pending:"Waiting for review",accepted:"Accepted",returned:"Returned"};
+var STAT={pending:"Received",accepted:"Accepted",returned:"Returned"};
+/* QC 20 Nov 2026: coordinators monitor what has arrived; only red flags need a look by default */
+function localDay(v){if(!v)return"";var d=new Date(v);if(isNaN(d))return String(v).slice(0,10);var z=function(n){return String(n).padStart(2,"0")};return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate())}
+var day=localDay(new Date().toISOString());
 function org(c){var o=C.orgByCode&&C.orgByCode[c];return o?o.name:c}
 function pal(c){try{return C.palikaName?C.palikaName(c):c}catch(e){return c}}
 function msg(t,ok){var m=$("#msg");m.textContent=t||"";m.style.color=ok===true?"#1a7f37":ok===false?"#a3221c":"#52647a"}
@@ -130,11 +136,10 @@ async function start(){
   if(!me.role){$("#who").textContent=me.email;msg(T("team.noAccess","This email has no access yet. Ask the coordination team or your focal point."),false);return}
   $("#who").innerHTML="<b>"+esc(me.email)+"</b> · "+esc(me.org?org(me.org):T("team.allOrgs","all organisations"))+" · "+esc(T("team.role."+me.role,ROLE[me.role]));
   if(!me.canReview){msg(T("team.fieldOnly","Your records and their status are on the form page, under My records on the server."));$("#peopleCard").classList.add("hidden")}
-  me.forms=["grief","directory"].filter(function(f){return me.forms.indexOf(f)>=0});form=me.forms[0];
+  me.forms=["grief","directory"].filter(function(f){return me.forms.indexOf(f)>=0});form=me.forms[0];status=form==="grief"?"redflag":"all";
   $("#formChips").innerHTML=me.forms.map(function(f){return '<button class="chip" data-form="'+f+'" aria-pressed="'+(f===form)+'">'+esc(T("team.form."+f,f==="grief"?"Grief conversations":"Referral directory"))+"</button>"}).join("");
-  $("#formChips").querySelectorAll("[data-form]").forEach(function(b){b.onclick=function(){form=b.dataset.form;$("#formChips").querySelectorAll(".chip").forEach(function(x){x.setAttribute("aria-pressed",String(x===b))});render()}});
-  $("#statusChips").innerHTML=["pending","returned","accepted","all"].map(function(s){return '<button class="chip" data-st="'+s+'" aria-pressed="'+(s===status)+'">'+esc(T("team.st."+s,s==="all"?"All":STAT[s]))+"</button>"}).join("");
-  $("#statusChips").querySelectorAll("[data-st]").forEach(function(b){b.onclick=function(){status=b.dataset.st;$("#statusChips").querySelectorAll(".chip").forEach(function(x){x.setAttribute("aria-pressed",String(x===b))});renderRecords()}});
+  $("#formChips").querySelectorAll("[data-form]").forEach(function(b){b.onclick=function(){form=b.dataset.form;status=form==="grief"?"redflag":"all";renderChips();$("#formChips").querySelectorAll(".chip").forEach(function(x){x.setAttribute("aria-pressed",String(x===b))});render()}});
+  renderChips();
   await load();
 }
 async function load(){
@@ -149,18 +154,23 @@ async function load(){
   }catch(e){msg(T("team.loadFail","Could not load. Check the connection and refresh.")+" ("+e.message+")",false)}
   render();
 }
-function rows(){return (data[form]||[]).map(function(r){return {id:r.reportId,rev:r.revision,org:r.org,by:r.enteredBy||(r.payload&&r.payload.recordedBy)||"",sent:r.sentBy&&r.sentBy!==r.enteredBy?r.sentBy:"",when:(r.updatedAt||"").slice(0,10),review:r.review||"pending",note:r.reviewNote||"",p:r.payload,can:form==="grief"?me.canReview:r.canReview}})}
+function rows(){return (data[form]||[]).map(function(r){return {id:r.reportId,rev:r.revision,org:r.org,by:r.enteredBy||(r.payload&&r.payload.recordedBy)||"",sent:r.sentBy&&r.sentBy!==r.enteredBy?r.sentBy:"",when:localDay(r.updatedAt),day:form==="grief"&&r.payload&&r.payload.date?r.payload.date:localDay(r.updatedAt),review:r.review||"pending",note:r.reviewNote||"",p:r.payload,can:form==="grief"?me.canReview:r.canReview}})}
 function render(){renderKpis();renderProgress();renderPeople();renderRecords()}
+(function(){var d=document.getElementById("day");if(d){d.value=day;d.onchange=function(){day=d.value||day;renderProgress()}}})();
 document.addEventListener("i18n:changed",function(){if(me&&me.role)render()});
 function renderKpis(){
   var r=rows(),c={pending:0,accepted:0,returned:0};r.forEach(function(x){c[x.review]++});
-  $("#kpis").innerHTML=[[r.length,T("team.k.entries","Records"),"#1f6fb2"],[c.pending,T("team.k.pending","Waiting for review"),"#8a6d1a"],[c.returned,T("team.k.returned","Returned"),"#a3221c"],[c.accepted,T("team.k.accepted","Accepted"),"#1a7f37"]].map(function(k){return '<div class="kpi" style="--c:'+k[2]+'"><b>'+k[0]+"</b><span>"+esc(k[1])+"</span></div>"}).join("");
+  $("#kpis").innerHTML=[[r.length,T("team.k.entries","Records"),"#1f6fb2"],[c.pending,T("team.k.pending","Received"),"#1f6fb2"],[c.returned,T("team.k.returned","Returned"),"#a3221c"],[c.accepted,T("team.k.accepted","Accepted"),"#1a7f37"]].map(function(k){return '<div class="kpi" style="--c:'+k[2]+'"><b>'+k[0]+"</b><span>"+esc(k[1])+"</span></div>"}).join("");
 }
 function renderProgress(){
   var g=(prog&&prog.forms&&prog.forms[form])||[];
-  var one=me.role!=="admin";
-  $("#progress").innerHTML="<thead><tr><th>"+esc(T("team.c.person","Person"))+"</th>"+(one?"":"<th>"+esc(T("team.c.org","Organisation"))+"</th>")+"<th>"+esc(T("team.c.entries","Records"))+"</th><th>"+esc(T("team.c.last","Last"))+"</th><th>"+esc(T("team.c.pending","Waiting"))+"</th><th>"+esc(T("team.c.returned","Returned"))+"</th></tr></thead><tbody>"+
-   (g.length?g.map(function(p){return '<tr class="'+(p.entries?"":"none")+'"><td>'+esc(p.email)+(p.role?" <small>("+esc(T("team.role."+p.role,ROLE[p.role]||p.role))+")</small>":"")+"</td>"+(one?"":"<td>"+esc(org(p.org))+"</td>")+"<td>"+(p.entries||esc(T("team.noEntry","none yet")))+"</td><td style=\"white-space:nowrap\">"+esc((p.last||"").slice(0,10))+"</td><td>"+p.pending+"</td><td>"+p.returned+"</td></tr>"}).join(""):'<tr><td colspan="'+(one?5:6)+'">'+esc(T("team.nobody","Nobody with access yet."))+"</td></tr>")+"</tbody>";
+  var one=me.role!=="admin",R=rows(),cnt={},tot=0,who=0;
+  R.forEach(function(r){if(r.day===day){var k=(r.by||"").toLowerCase();cnt[k]=(cnt[k]||0)+1;tot++}});
+  Object.keys(cnt).forEach(function(){who++});
+  var dl=day?new Date(day+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"}):"";
+  $("#daySum").textContent=dl+": "+tot+" "+(tot===1?T("team.rec1","record"):T("team.recN","records"))+" · "+who+" "+(who===1?T("team.ppl1","person"):T("team.pplN","people"));
+  $("#progress").innerHTML="<thead><tr><th>"+esc(T("team.c.person","Person"))+"</th>"+(one?"":"<th>"+esc(T("team.c.org","Organisation"))+"</th>")+"<th>"+esc(dl)+"</th><th>"+esc(T("team.c.total","All days"))+"</th><th>"+esc(T("team.c.last","Last"))+"</th><th>"+esc(T("team.c.returned","Returned"))+"</th></tr></thead><tbody>"+
+   (g.length?g.map(function(p){var n=cnt[(p.email||"").toLowerCase()]||0;return '<tr class="'+(n?"":"none")+'"><td>'+esc(p.email)+(p.role?" <small>("+esc(T("team.role."+p.role,ROLE[p.role]||p.role))+")</small>":"")+"</td>"+(one?"":"<td>"+esc(org(p.org))+"</td>")+"<td><b>"+n+"</b></td><td>"+(p.entries||esc(T("team.noEntry","none yet")))+"</td><td style=\"white-space:nowrap\">"+esc(localDay(p.last))+"</td><td>"+p.returned+"</td></tr>"}).join(""):'<tr><td colspan="'+(one?5:6)+'">'+esc(T("team.nobody","Nobody with access yet."))+"</td></tr>")+"</tbody>";
 }
 var SITE="https://mhpss-nepal.github.io/";
 var LINKS=[["form/",T("team.l.forms","Field forms — for everyone you add (phone)")],
@@ -215,8 +225,14 @@ function detail(r){
   }
   return "<dl>"+d.map(function(x){return "<dt>"+esc(x[0])+"</dt><dd>"+esc(x[1]==null?"":x[1])+"</dd>"}).join("")+"</dl>";
 }
+function renderChips(){
+  var list=(form==="grief"?["redflag"]:[]).concat(["pending","returned","accepted","all"]);
+  if(list.indexOf(status)<0)status=list[0];
+  $("#statusChips").innerHTML=list.map(function(s){return '<button class="chip" data-st="'+s+'" aria-pressed="'+(s===status)+'">'+esc(T("team.st."+s,s==="all"?"All":s==="redflag"?"Red flag":STAT[s]))+"</button>"}).join("");
+  $("#statusChips").querySelectorAll("[data-st]").forEach(function(b){b.onclick=function(){status=b.dataset.st;$("#statusChips").querySelectorAll(".chip").forEach(function(x){x.setAttribute("aria-pressed",String(x===b))});renderRecords()}});
+}
 function renderRecords(){
-  var list=rows().filter(function(r){return status==="all"||r.review===status}).sort(function(a,b){return b.when.localeCompare(a.when)});
+  var list=rows().filter(function(r){return status==="all"||(status==="redflag"?(r.p&&r.p.triage==="redflag"):r.review===status)}).sort(function(a,b){return b.when.localeCompare(a.when)});
   if(!list.length){$("#records").innerHTML='<p class="lead">'+esc(T("team.noRecords","No records here."))+"</p>";return}
   $("#records").innerHTML=list.slice(0,200).map(function(r,i){
     var flag=form==="grief"&&r.p.triage==="redflag",title=form==="grief"?r.p.code:r.p.placeName;
