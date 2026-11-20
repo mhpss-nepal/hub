@@ -98,7 +98,7 @@
   var done = false;
   function who(u, st) {
     if (!window.BaselineAuth) return false;
-    if (!u && st && st.restoration && st.restoration !== "restoring") {
+    if (!u && st && (st.restoration === "signed-out" || st.restoration === "failed")) {
       try { sessionStorage.removeItem(KEY); } catch (e) { /* storage blocked */ }
       scope.textContent = ""; ctxScope.textContent = "";
       admins.forEach(function (a) { a.hidden = true; }); adm.hidden = true;
