@@ -63,6 +63,13 @@ class LayerTwoFrame(unittest.TestCase):
         self.assertIn("sessionStorage.removeItem(SCOPE_KEY)", land)
         self.assertIn("#fbbar#fbbar{position:fixed", read("assets/l2-frame.css"))
 
+    def test_team_page_offers_links_to_send(self):
+        t = read("team.html")
+        self.assertIn('id="shareBox"', t)
+        for path in ("form/", "hub/team.html", "hub/grief.html"):
+            self.assertIn('"%s"' % path, t)
+        self.assertIn("Giving access does not send an email", t)
+
     def test_routine_success_notice_is_not_shown(self):
         self.assertNotIn("Account access verified. Registration choices never change permissions.", read("assets/landing.js"))
 
