@@ -48,7 +48,7 @@
     var a = el("a"); a.href = BASE + it[3]; a.dataset.house = it[0];
     a.append(el("span", null, it[1]), el("small", null, it[2]));
     if (it[0] === page) { a.className = "active"; a.setAttribute("aria-current", "page"); }
-    if (it[4]) { a.hidden = true; admins.push(a); }
+    if (it[4] && it[0] !== page) { a.hidden = true; admins.push(a); }
     nav.append(a);
   });
   var adm = el("div", "l2f-admin"); adm.hidden = true;
@@ -76,19 +76,42 @@
   if (head) holder.insertBefore(head, content);
 
   /* who is signed in: the same line the main dashboard shows under the name */
-  function who() {
-    var A = window.AccessAPI;
-    if (!A || !A.me || !(A.user && A.user())) return false;
-    A.me().then(function (me) {
+  /* QC 20 Nov 2026: the last confirmed role and organisation (no personal data) are kept for this
+     browser tab, so moving between pages does not make the scope line and admin items appear late. */
+  var KEY = "mhpss-l2f-scope";
+  function apply(me) {
+    var t = me.role + " · " + (me.org || "all organisations");
+    scope.textContent = t; ctxScope.textContent = t;
+    var isAdmin = me.role === "admin";
+    admins.forEach(function (a) { a.hidden = !isAdmin; });
+    adm.hidden = !isAdmin;
+  }
+  try { var c = JSON.parse(sessionStorage.getItem(KEY) || "null"); if (c && c.role) apply(c); } catch (e) { /* storage blocked */ }
+  function fetchMe() {
+    if (window.AccessAPI && AccessAPI.me) return AccessAPI.me();
+    /* pages that do not load the access client ask the same server directly */
+    return BaselineAuth.token().then(function (tok) {
+      return fetch("https://mhpss5ws-tdp3xtfnsq-as.a.run.app/access/me", { headers: { Authorization: "Bearer " + tok } })
+        .then(function (r) { return r.ok ? r.json() : null; });
+    });
+  }
+  var done = false;
+  function who(u, st) {
+    if (!window.BaselineAuth) return false;
+    if (!u && st && st.restoration && st.restoration !== "restoring") {
+      try { sessionStorage.removeItem(KEY); } catch (e) { /* storage blocked */ }
+      scope.textContent = ""; ctxScope.textContent = "";
+      admins.forEach(function (a) { a.hidden = true; }); adm.hidden = true;
+      return true;
+    }
+    if (!u || done) return false;
+    done = true;
+    fetchMe().then(function (me) {
       if (!me || !me.role) return;
-      var t = me.role + " · " + (me.org || "all organisations");
-      scope.textContent = t; ctxScope.textContent = t;
-      var isAdmin = me.role === "admin";
-      admins.forEach(function (a) { a.hidden = !isAdmin; });
-      adm.hidden = !isAdmin;
-    }).catch(function () { /* offline: the menu still works */ });
+      apply(me);
+      try { sessionStorage.setItem(KEY, JSON.stringify({ role: me.role, org: me.org || "" })); } catch (e) { /* storage blocked */ }
+    }).catch(function () { done = false; /* offline: the menu still works */ });
     return true;
   }
-  var tries = 0, timer = setInterval(function () { if (who() || ++tries > 40) clearInterval(timer); }, 250);
-  if (window.BaselineAuth && BaselineAuth.onChange) try { BaselineAuth.onChange(function () { who(); }); } catch (e) { /* optional */ }
+  if (window.BaselineAuth && BaselineAuth.onChange) try { BaselineAuth.onChange(function (u, st) { if (!u) done = false; who(u, st); }); } catch (e) { /* optional */ }
 })();

@@ -51,6 +51,13 @@ class LayerTwoFrame(unittest.TestCase):
         self.assertIn('<div class="card hidden" id="signedOut">', t)
         self.assertNotIn("notice('Checking your approved account profile…')", read("assets/landing.js"))
 
+    def test_scope_and_admin_items_do_not_arrive_late(self):
+        f = read("assets/l2-frame.js")
+        self.assertIn("sessionStorage", f)
+        self.assertIn("/access/me", f)
+        self.assertIn("it[0] !== page", f)
+        self.assertIn("'all organisations'", read("assets/landing.js"))
+
     def test_routine_success_notice_is_not_shown(self):
         self.assertNotIn("Account access verified. Registration choices never change permissions.", read("assets/landing.js"))
 
