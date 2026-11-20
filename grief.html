@@ -176,13 +176,13 @@ render();
 (function(){var show=function(){document.body.classList.remove("gm-wait")};setTimeout(show,8000);if(!window.BaselineAuth||!window.AccessAPI){show();return}var busy=false;
 BaselineAuth.onChange(async function(u,st){if(!u){if(!st||st.restoration!=="restoring")show();return}if(busy)return;busy=true;
  try{var me=await AccessAPI.me();if(!me.role||me.forms.indexOf("grief")<0){busy=false;show();return}
-  var g=await AccessAPI.griefEntries(me.role==="admin"?"":me.org);DATA.length=0;var waiting=0;
-  g.rows.forEach(function(r){var p=r.payload;if(r.review!=="accepted")waiting++;
+  var g=await AccessAPI.griefEntries(me.role==="admin"?"":me.org);DATA.length=0;var redn=0;
+  g.rows.forEach(function(r){var p=r.payload;if(p.triage==="redflag"||p.selfharm==="yes")redn++;
    if(p.consent!=="yes"){DATA.push({palika:p.palika,consent:p.consent});return}
    DATA.push({palika:p.palika,consent:"yes",nMissing:p.nMissing,nDied:p.nDied,rites:p.rites,obstacles:p.obstacles||[],rx:p.rx,functioning:p.functioning,needs:p.needs||[],red:p.triage==="redflag"||p.selfharm==="yes",referred:(p.action||[]).some(function(a){return a==="referred"||a==="urgent"})})});
   var scope=g.scope==="all"?"all organisations":g.scope==="org"?(me.org||""):"your own records";
   var b=document.querySelector(".sample");if(b){b.style.background="#e6f5ec";b.style.borderColor="#b8e0c9";b.style.color="#1e7a4c";
-   b.innerHTML="<b>Live data</b> &mdash; "+g.rows.length+" record"+(g.rows.length===1?"":"s")+" from the Grief Early Assessment form ("+scope+"), "+waiting+" not yet checked by a coordinator. Totals only; a palika with fewer than five conversations is not shown by name."}
+   b.innerHTML="<b>Live data</b> &mdash; "+g.rows.length+" record"+(g.rows.length===1?"":"s")+" from the Grief Conversation form ("+scope+"), "+redn+" marked Red flag. Totals only; a palika with fewer than five conversations is not shown by name."}
   SELP="";render();show();
  }catch(e){busy=false;show()}});})();
 </script>
