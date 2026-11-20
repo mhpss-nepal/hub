@@ -33,6 +33,24 @@ class LayerTwoFrame(unittest.TestCase):
         frame = re.findall(r'\["([a-z0-9]+)", "', read("assets/l2-frame.js"))
         self.assertEqual(listed, frame)
 
+    def test_older_pages_wear_the_frame_too(self):
+        for page, key, css, js in (("review-analytics-v48/index.html", "baseline", "../assets/l2-frame.css", "../assets/l2-frame.js"),
+                                   ("legacy-dashboard.html", "sample", "assets/l2-frame.css", "assets/l2-frame.js")):
+            s = read(page)
+            self.assertIn('data-l2-page="%s"' % key, s, page)
+            self.assertIn('href="%s"' % css, s, page)
+            self.assertIn('src="%s"' % js, s, page)
+        self.assertIn("<h1>Historical Baseline</h1>", read("review-analytics-v48/index.html"))
+        self.assertIn("<h1>Sample Data</h1>", read("legacy-dashboard.html"))
+
+    def test_no_flash_of_the_wrong_state_while_signing_in(self):
+        g = read("grief.html")
+        self.assertIn("gm-wait", g)
+        self.assertIn('st.restoration!=="restoring"', g)
+        t = read("team.html")
+        self.assertIn('<div class="card hidden" id="signedOut">', t)
+        self.assertNotIn("notice('Checking your approved account profile…')", read("assets/landing.js"))
+
     def test_routine_success_notice_is_not_shown(self):
         self.assertNotIn("Account access verified. Registration choices never change permissions.", read("assets/landing.js"))
 
