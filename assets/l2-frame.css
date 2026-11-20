@@ -28,16 +28,16 @@ body.l2-frame .l2f-side .l2f-admin{border-top:1px solid #698197;margin-top:16px;
 body.l2-frame .l2f-main{min-width:0;background:#eef3f6}
 body.l2-frame .l2f-context{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:8px 20px;min-height:58px;box-sizing:border-box;background:#fff;border-bottom:1px solid #dae4ed;font:13px/1.6 system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;flex-wrap:wrap}
 body.l2-frame .l2f-context span{color:#49667e}
-body.l2-frame .l2f-context button{border:1px solid #c9d6e2;border-radius:9px;background:#fff;color:#193e61;padding:8px 14px;min-height:40px;font:inherit;font-size:13px;cursor:pointer}
+body.l2-frame .l2f-context button{border:1px solid #c9d6e2;border-radius:9px;background:#fff;color:#193e61;padding:8px 14px;min-height:44px;font:inherit;font-size:13px;cursor:pointer}
 body.l2-frame .l2f-menu{display:none}
 body.l2-frame .l2f-content{padding:24px;box-sizing:border-box}
 /* the page's own heading becomes the same serif heading the main dashboard uses */
 body.l2-frame .l2f-content header.top{background:none!important;color:#19334b!important;padding:0 0 6px!important;margin:0 0 14px!important;border:0!important;box-shadow:none!important;display:block!important;min-height:0!important}
-body.l2-frame .l2f-content header.top h1{font:700 32px/1.2 Georgia,serif!important;color:#19334b!important;margin:0 0 8px!important;letter-spacing:0!important;text-transform:none!important}
+body.l2-frame .l2f-content header.top h1{font:700 32px/1.2 Georgia,serif!important;color:#19334b!important;margin:7px 0 10px!important;letter-spacing:0!important;text-transform:none!important}
 body.l2-frame .l2f-content header.top .sub{font:14px/1.6 system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif!important;color:#45546b!important;text-transform:none!important;letter-spacing:0!important;opacity:1!important}
 body.l2-frame .l2f-content header.top>a{display:none!important}
 body.l2-frame .l2f-content main,body.l2-frame .l2f-content .wrap,body.l2-frame .l2f-content .tw{max-width:none!important;margin:0!important;padding:0!important;width:auto!important}
-body.l2-frame .l2f-content .tw>.tbar:first-child h1{font:700 32px/1.2 Georgia,serif;color:#19334b;margin:0 0 8px}
+body.l2-frame .l2f-content .tw>.tbar:first-child h1{font:700 32px/1.2 Georgia,serif;color:#19334b;margin:7px 0 10px}
 body.l2-frame .l2f-content .tw>.tbar:first-child .actions{display:none}
 @media(max-width:760px){
   body.l2-frame .l2f-layout{grid-template-columns:1fr}
