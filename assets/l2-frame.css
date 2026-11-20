@@ -8,16 +8,16 @@
    in step (test_l2_frame.py checks the key numbers).
    ===================================================================== */
 body.l2-frame{margin:0;background:#f5f7fa;padding:0!important;display:block!important}
-body.l2-frame .l2f-lang{display:flex;justify-content:flex-end;align-items:center;background:#20313b;padding:4px 20px;min-height:52px;box-sizing:border-box}
+body.l2-frame .l2f-lang{display:flex;justify-content:flex-end;align-items:center;background:#20313b;padding:4px 20px;min-height:54px;box-sizing:border-box}
 body.l2-frame .l2f-lang #i18nbar{position:static!important;margin:0!important;box-shadow:none!important}
 body.l2-frame .l2f-lang #i18nbar button{min-width:48px;min-height:44px}
 body.l2-frame .l2f-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 20px;min-height:60px;box-sizing:border-box;background:#fff;border-bottom:1px solid #d7e1eb;flex-wrap:wrap;font:16px/1.6 system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 body.l2-frame .l2f-bar p{margin:0;font-size:12px;color:#53697d}
 body.l2-frame .l2f-back{display:inline-flex;align-items:center;border:1px solid #c9d6e2;border-radius:9px;background:#fff;color:#193e61;padding:10px 16px;min-height:44px;box-sizing:border-box;text-decoration:none;font-size:16px}
-body.l2-frame .l2f-layout{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:calc(100vh - 112px)}
+body.l2-frame .l2f-layout{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:calc(100vh - 114px)}
 body.l2-frame .l2f-side{background:#193d5b;color:#fff;padding:24px 16px;font:16px/1.6 system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;align-self:stretch}
 body.l2-frame .l2f-side h2{font:700 22px Georgia,serif;margin:0 0 5px;color:#fff;padding:0;border:0;background:none}
-body.l2-frame .l2f-side .l2f-scope{font-size:12px;color:#c5d8e7;margin:0 0 16px;min-height:19px}
+body.l2-frame .l2f-side .l2f-scope{font-size:12px;color:#c5d8e7;margin:12px 0;min-height:19px}
 body.l2-frame .l2f-side .l2f-group{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#bad1e1;margin:22px 10px 8px}
 body.l2-frame .l2f-side nav a{display:block;width:100%;min-height:58px;padding:11px 12px;border-radius:9px;color:#e4edf5;margin:3px 0;font-size:14px;line-height:1.6;text-decoration:none;box-sizing:border-box;background:transparent}
 body.l2-frame .l2f-side nav a:hover{background:#ffffff14}
