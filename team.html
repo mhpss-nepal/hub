@@ -61,7 +61,7 @@ tr.none td{background:#fff8e6}
     <div class="actions"><a href="./" data-i18n="team.back">← Dashboard</a><a href="../form/" data-i18n="team.forms">Field forms ↗</a></div>
   </div>
 
-  <div class="card" id="signedOut">
+  <div class="card hidden" id="signedOut">
     <h2 data-i18n="team.signinH">Sign in</h2>
     <p class="lead" data-i18n="team.signinLead">For coordinators, focal points and the coordination team. Field staff see their own records on the form itself.</p>
     <div id="signin"></div>
@@ -113,7 +113,9 @@ function org(c){var o=C.orgByCode&&C.orgByCode[c];return o?o.name:c}
 function pal(c){try{return C.palikaName?C.palikaName(c):c}catch(e){return c}}
 function msg(t,ok){var m=$("#msg");m.textContent=t||"";m.style.color=ok===true?"#1a7f37":ok===false?"#a3221c":"#52647a"}
 A.signInPanel($("#signin"),function(){start()});
-if(window.BaselineAuth)BaselineAuth.onChange(function(u){if(!u){me=null;$("#app").classList.add("hidden");$("#signedOut").classList.remove("hidden")}});
+/* QC 20 Nov 2026: the sign-in card shows only once we know nobody is signed in (no flash while restoring) */
+if(window.BaselineAuth)BaselineAuth.onChange(function(u,st){if(!u){me=null;$("#app").classList.add("hidden");if(!st||st.restoration!=="restoring")$("#signedOut").classList.remove("hidden")}});
+setTimeout(function(){if($("#app").classList.contains("hidden"))$("#signedOut").classList.remove("hidden")},8000);
 var started=false;
 async function start(){
   if(started)return;started=true;

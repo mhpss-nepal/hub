@@ -9,6 +9,8 @@
    ===================================================================== */
 (function () {
   "use strict";
+  var me_ = document.currentScript && document.currentScript.src;
+  var BASE = me_ ? me_.replace(/assets\/l2-frame\.js(\?.*)?$/, "") : "./";
   var page = (document.body.getAttribute("data-l2-page") || "").trim();
   var content = document.querySelector("main#dashboard-main") || document.querySelector(".tw");
   if (!page || !content) return;
@@ -20,8 +22,8 @@
     ["training", "Training & orientation", "Sessions and participants", "index.html?view=dashboard&house=training"],
     ["providers", "Provider register", "Registrations for review", "index.html?view=dashboard&house=providers"],
     ["servicepoints", "Service points", "Registrations for review", "index.html?view=dashboard&house=servicepoints"],
-    ["baseline", "Historical Baseline", "Available", "index.html?view=dashboard&house=baseline", true],
-    ["sample", "Sample Data", "Available", "index.html?view=dashboard&house=sample", true]
+    ["baseline", "Historical Baseline", "Available", "review-analytics-v48/?source=historical", true],
+    ["sample", "Sample Data", "Available", "legacy-dashboard.html?source=demo", true]
   ];
   function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
   var title = (content.querySelector("h1") || {}).textContent || document.title;
@@ -35,7 +37,7 @@
 
   var lang = el("div", "l2f-lang"); lang.setAttribute("data-i18n-toggle", "");
   var bar = el("div", "l2f-bar");
-  var back = el("a", "l2f-back", "← Back to Home"); back.href = "./";
+  var back = el("a", "l2f-back", "← Back to Home"); back.href = BASE;
   bar.append(back, el("p", null, "Coordination dashboard"));
   var layout = el("div", "l2f-layout");
   var side = el("aside", "l2f-side"); side.id = "l2f-sidebar"; side.setAttribute("aria-label", "Dashboard sections");
@@ -43,14 +45,14 @@
   var nav = el("nav"); nav.setAttribute("aria-label", "Dashboard sections");
   var admins = [];
   ITEMS.forEach(function (it) {
-    var a = el("a"); a.href = it[3]; a.dataset.house = it[0];
+    var a = el("a"); a.href = BASE + it[3]; a.dataset.house = it[0];
     a.append(el("span", null, it[1]), el("small", null, it[2]));
     if (it[0] === page) { a.className = "active"; a.setAttribute("aria-current", "page"); }
     if (it[4]) { a.hidden = true; admins.push(a); }
     nav.append(a);
   });
   var adm = el("div", "l2f-admin"); adm.hidden = true;
-  var admA = el("a"); admA.href = "index.html?view=dashboard&house=5ws&open=admin";
+  var admA = el("a"); admA.href = BASE + "index.html?view=dashboard&house=5ws&open=admin";
   admA.append(el("span", null, "Administration"), el("small", null, "Server-authorized records only"));
   var admNav = el("nav"); admNav.append(admA); adm.append(admNav);
   side.append(el("h2", null, "MHPSS Nepal"), scope, el("div", "l2f-group", "Dashboard"), nav, adm);
