@@ -113,5 +113,11 @@
     }).catch(function () { done = false; /* offline: the menu still works */ });
     return true;
   }
-  if (window.BaselineAuth && BaselineAuth.onChange) try { BaselineAuth.onChange(function (u, st) { if (!u) done = false; who(u, st); }); } catch (e) { /* optional */ }
+  /* the sign-in script loads after this file on most pages: wait for it, then follow its changes */
+  var waits = 0, hook = setInterval(function () {
+    if (window.BaselineAuth && BaselineAuth.onChange) {
+      clearInterval(hook);
+      try { BaselineAuth.onChange(function (u, st) { if (!u) done = false; who(u, st); }); } catch (e) { /* optional */ }
+    } else if (++waits > 80) clearInterval(hook);
+  }, 50);
 })();
