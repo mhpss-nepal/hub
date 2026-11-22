@@ -51,6 +51,46 @@ ALLOW_NEPALI: tuple = (
     "phq9.item1", "phq9.item2", "phq9.item3", "phq9.item4", "phq9.item5",
     "phq9.item6", "phq9.item7", "phq9.item8", "phq9.item9",
     "phq9.itemInstruction", "phq9.itemDifficulty",
+    # 2026-11-22 -- DECISION: Nepali written by a person for the grief and
+    # referral directory forms. These 31 consent, safeguarding and clinical
+    # sentences had no Nepali by rule; the native-speaking clinician reviewing
+    # the forms for CMC-Nepal wrote them in proofreading round 1 (formproof,
+    # 20-21 Nov 2026) and the owner approved applying them (22 Nov 2026).
+    # Each is declared in _meta.source.human, which is what lets the engine
+    # show it. The PHQ-9 back-translation lines (clinical.grief.phq.item*,
+    # .scale*) are NOT here and never get Nepali: the validated Kohrt 2016
+    # wording is the only Nepali PHQ-9 (owner decision, 22 Nov 2026).
+    "clinical.grief.phq.partial",
+    "clinical.grief.phq.src",
+    "clinical.grief.phq.ten",
+    "clinical.grief.phq.total",
+    "clinical.grief.state.calm",
+    "clinical.grief.state.confused",
+    "clinical.grief.state.draft",
+    "clinical.grief.state.overwhelmed",
+    "clinical.grief.state.q",
+    "clinical.grief.state.upset",
+    "clinical.grief.state.warn",
+    "clinical.grief.state.warnH",
+    "clinical.grief.triage.acute",
+    "clinical.grief.triage.normal",
+    "clinical.grief.triage.ptsd",
+    "clinical.grief.triage.redflag",
+    "consent.dirf.correct.01",
+    "consent.dirf.correct.02",
+    "consent.dirf.publish.01",
+    "consent.dirf.publish.02",
+    "consent.grief.script.01",
+    "consent.grief.script.02",
+    "safeguard.dirf.safe",
+    "safeguard.grief.cp",
+    "safeguard.grief.selfharm.01",
+    "safeguard.grief.selfharm.02",
+    "safeguard.grief.urgent.01",
+    "safeguard.grief.urgent.02",
+    "safeguard.grief.urgent.03",
+    "safeguard.grief.urgent.04",
+    "safeguard.grief.urgent.05",
 )
 
 
@@ -96,7 +136,7 @@ def main() -> int:
         for p in problems:
             print("    %s" % p)
         return 1
-    print("\n  OK: every protected string exists in English and none has Nepali.")
+    print("\n  OK: every protected string exists in English and only declared human-written ones have Nepali.")
     return 0
 
 

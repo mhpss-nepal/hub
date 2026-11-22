@@ -384,8 +384,12 @@
     var tr = (S[lang] || {})[key];
     if (lang === "en") return { text: en, translated: en != null, missing: en == null, kept: false };
     /* Protected keys stay English whatever the dictionary holds, so a
-       machine draft cannot reach a clinical instrument even by accident. */
-    if (isProtected(key)) {
+       machine draft cannot reach a clinical instrument even by accident.
+       The one exception is Nepali written by a person and declared in
+       source.human (for example the native-speaking clinician's wording of
+       the consent and safeguarding sentences, proofreading round 1,
+       21 Nov 2026): that is exactly the translation the guard waits for. */
+    if (isProtected(key) && provenance(key) !== "human") {
       return { text: en, translated: true, missing: en == null, kept: true, prov: "en" };
     }
     if (tr != null && String(tr).trim() !== "") {
@@ -693,6 +697,12 @@
     var keyed = !!(cov && cov.total);
     var hasLists = !!document.querySelector("select");
     var kind = keyed ? "full" : (hasLists ? "partial" : "notyet");
+    /* A page whose Nepali a person has mostly reviewed (the grief and referral
+       directory forms after proofreading round 1, 21 Nov 2026) must not say it
+       was machine-translated. It says it was reviewed and that the English is
+       authoritative; the Nepali line reuses the existing authoritative line, so
+       no new unreviewed Nepali is introduced by the notice itself. */
+    if (keyed && cov.human && cov.human > (cov.machine || 0)) kind = "reviewed";
     var WORDS = {
       /* The "clinical wording is kept in English" sentence is added only
          when this page actually HAS a string kept in English. Claiming it
@@ -712,6 +722,12 @@
                 ["mt.notice.en", "mt.authoritative.en"].concat(
                   (cov && cov.kept) ? ["mt.clinicalKept.en"] : []).concat(
                   (cov && cov.validated) ? ["mt.validated.en"] : [])],
+      reviewed: [["mt.authoritative.ne"].concat(
+                  (cov && cov.kept) ? ["mt.clinicalKept.ne"] : []).concat(
+                  (cov && cov.validated) ? ["mt.validated.ne"] : []),
+                ["mt.reviewed.en", "mt.authoritative.en"].concat(
+                  (cov && cov.kept) ? ["mt.clinicalKept.en"] : []).concat(
+                  (cov && cov.validated) ? ["mt.validated.en"] : [])],
       partial: [["mt.partial.ne", "mt.partial.auth.ne"],
                 ["mt.partial.en", "mt.partial.auth.en"]],
       notyet:  [["mt.notyet.ne", "mt.notyet.auth.ne"],
@@ -719,7 +735,7 @@
     };
     var ne = WORDS[kind][0].map(t);
     var en = WORDS[kind][1].map(t);
-    var partial = kind !== "full";
+    var partial = kind !== "full" && kind !== "reviewed";
 
     var n = document.createElement("div");
     n.id = "mtnote";
