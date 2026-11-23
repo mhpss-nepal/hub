@@ -1228,7 +1228,9 @@ window.I18N_STRINGS = {
       "vid.p003",
       "vid.p004",
       "vid.p005",
-      "dirf.040"
+      "dirf.040",
+      "send.partner",
+      "send.role.partner"
     ], human: [
       "phq9.item1",
       "phq9.item2",
@@ -1716,6 +1718,8 @@ window.I18N_STRINGS = {
     "send.mine": "My records on the server",
     "send.allOrgs": "all organisations",
     "send.role.field": "field staff",
+    "send.partner": "Signed in as a partner: you can send entries for this directory. The coordination team checks each entry before it is published.",
+    "send.role.partner": "partner",
     "send.role.coordinator": "coordinator",
     "send.role.focal": "focal point",
     "send.role.admin": "coordination",
@@ -3460,6 +3464,8 @@ window.I18N_STRINGS = {
     "send.mine": "सर्भरमा रहेका मेरा रेकर्ड",
     "send.allOrgs": "सबै संस्था",
     "send.role.field": "फिल्ड कर्मचारी",
+    "send.partner": "साझेदारको रूपमा साइन इन भयो: तपाईं यो निर्देशिकाका लागि प्रविष्टि पठाउन सक्नुहुन्छ। प्रकाशित हुनुअघि समन्वय टोलीले प्रत्येक प्रविष्टि जाँच गर्छ।",
+    "send.role.partner": "साझेदार",
     "send.role.coordinator": "संयोजक",
     "send.role.focal": "फोकल व्यक्ति",
     "send.role.admin": "समन्वय",
